@@ -8,7 +8,6 @@
 #include "sokol_gfx.h"
 #include "sokol_app.h"
 #include "sokol_glue.h"
-#include "dbgui/dbgui.h"
 #include "cube-sapp.glsl.h"
 
 static struct {
@@ -21,7 +20,6 @@ void init(void) {
     sg_setup(&(sg_desc){
         .context = sapp_sgcontext()
     });
-    __dbgui_setup(sapp_sample_count());
 
     /* cube vertex buffer */
     float vertices[] = {
@@ -128,13 +126,11 @@ void frame(void) {
     sg_apply_bindings(&state.bind);
     sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_params, &SG_RANGE(vs_params));
     sg_draw(0, 36, 1);
-    __dbgui_draw();
     sg_end_pass();
     sg_commit();
 }
 
 void cleanup(void) {
-    __dbgui_shutdown();
     sg_shutdown();
 }
 
@@ -145,7 +141,6 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         .init_cb = init,
         .frame_cb = frame,
         .cleanup_cb = cleanup,
-        .event_cb = __dbgui_event,
         .width = 800,
         .height = 600,
         .sample_count = 4,
