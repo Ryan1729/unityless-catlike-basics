@@ -1,0 +1,1 @@
+cc cube-sapp.c -o cube-sapp -DSOKOL_GLCORE33 -pthread -I./third-party -lGL -ldl -lm -lX11 -lasound -lXi -lXcursor

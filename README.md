@@ -12,4 +12,6 @@ I'm hoping doing this will cause me to both absorb the engine-agnostic content o
 
 ----
 
-Licensed under MIT-0, same as the original tutorials.
+The third-party libraries/engines are under their own licenses. See the separate license files and/or the files themselves for details.
+
+Everything else licensed under MIT-0, same as the original tutorials.
