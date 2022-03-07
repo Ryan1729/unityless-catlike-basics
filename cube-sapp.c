@@ -1,5 +1,6 @@
 #define SOKOL_IMPL
 #include "sokol_gfx.h"
+#define SOKOL_NO_ENTRY
 #include "sokol_app.h"
 #include "sokol_glue.h"
 #include "cube-sapp.glsl.h"
@@ -115,10 +116,8 @@ void cleanup(void) {
     sg_shutdown();
 }
 
-sapp_desc sokol_main(int argc, char* argv[]) {
-    (void)argc;
-    (void)argv;
-    return (sapp_desc){
+int main() {
+    sapp_run(&(sapp_desc){
         .init_cb = init,
         .frame_cb = frame,
         .cleanup_cb = cleanup,
@@ -128,5 +127,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         .gl_force_gles2 = true,
         .window_title = "Cube (sokol-app)",
         .icon.sokol_default = true,
-    };
+    });
+
+    return 0;
 }
