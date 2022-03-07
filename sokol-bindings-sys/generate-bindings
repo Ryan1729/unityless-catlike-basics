@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# bindgen was installed by running:
+# cargo install bindgen
+# As of this writing there are additional requirements.
+# See https://rust-lang.github.io/rust-bindgen/requirements.html
+
+# TODO generate separate modules for different backends, e.g. in addition to
+# src/gl_core_3_3.rs, have src/d3d11.rs, src/metal.rs ... and alow choosing
+# one via cargo features
+bindgen wrapper.h -o src/gl_core_3_3.rs \
+    --allowlist-function '^(sg|sapp)_.*'                              \
+    --allowlist-type '^(sg|sapp)_.*'                                  \
+    --blocklist-type '^__.*'                                          \
+    --with-derive-default                                             \
+    --size_t-is-usize                                                 \
+    --no-layout-tests                                                 \
+    -- -DSOKOL_GLCORE33                                               \
+
+# We use --no-layout-tests becasue that seems less bad than
+# adding `#![allow(deref_nullptr)]`
+# See https://github.com/rust-lang/rust-bindgen/issues/1651
