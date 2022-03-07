@@ -98,13 +98,10 @@ void init(void) {
 }
 
 void frame(void) {
-    const float w = sapp_widthf();
-    const float h = sapp_heightf();
-
     sg_pass_action pass_action = {
         .colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.25f, 0.5f, 0.75f, 1.0f } }
     };
-    sg_begin_default_pass(&pass_action, (int)w, (int)h);
+    sg_begin_default_pass(&pass_action, sapp_width(), sapp_height());
     sg_apply_pipeline(state.pip);
     sg_apply_bindings(&state.bind);
     sg_draw(0, 36, 1);
@@ -124,7 +121,6 @@ int main() {
         .width = 800,
         .height = 600,
         .sample_count = 4,
-        .gl_force_gles2 = true,
         .window_title = "Cube (sokol-app)",
         .icon.sokol_default = true,
     });
