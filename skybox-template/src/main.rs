@@ -5,11 +5,12 @@ struct State {
     pass_action: sg_pass_action,
 }
 
-unsafe extern "C" fn init(user_data: *mut ::std::os::raw::c_void) {
-    sg_setup(&sg_desc{
-        context: sapp_sgcontext(),
+fn init(user_data: *mut ::std::os::raw::c_void) {
+    let desc = &sg_desc{
+        context: unsafe { sapp_sgcontext() },
         ..<_>::default()
-    });
+    };
+    unsafe { sg_setup(desc); }
 
     // SAFTEY: Neither we or sokol has switched the pointer out for another type.
     let state = unsafe { &mut*(user_data as *mut State) };
@@ -28,7 +29,7 @@ unsafe extern "C" fn init(user_data: *mut ::std::os::raw::c_void) {
     }
 }
 
-unsafe extern "C" fn frame(user_data: *mut ::std::os::raw::c_void) {
+fn frame(user_data: *mut ::std::os::raw::c_void) {
     // SAFTEY: Neither we or sokol has switched the pointer out for another type.
     let state = unsafe { &mut*(user_data as *mut State) };
     let pass_action = &mut state.pass_action;
@@ -36,23 +37,33 @@ unsafe extern "C" fn frame(user_data: *mut ::std::os::raw::c_void) {
     let g = pass_action.colors[0].value.g + 0.01;
 
     pass_action.colors[0].value.g = if g > 1. { 0. } else { g };
-    sg_begin_default_pass(pass_action as _, sapp_width(), sapp_height());
-    sg_end_pass();
-    sg_commit();
-}
-
-unsafe extern "C" fn cleanup(_user_data: *mut ::std::os::raw::c_void) {
-    sg_shutdown();
+    unsafe {
+        sg_begin_default_pass(pass_action as _, sapp_width(), sapp_height());
+        sg_end_pass();
+        sg_commit();
+    }
 }
 
 fn main() {
     let window_title = concat!(env!("CARGO_CRATE_NAME"), "\0");
 
+    unsafe extern "C" fn init_extern(user_data: *mut ::std::os::raw::c_void) {
+        init(user_data)
+    }
+
+    unsafe extern "C" fn frame_extern(user_data: *mut ::std::os::raw::c_void) {
+        frame(user_data)
+    }
+
+    unsafe extern "C" fn cleanup_extern(_user_data: *mut ::std::os::raw::c_void) {
+        sg_shutdown()
+    }
+
     let desc = &sapp_desc{
         user_data: &mut State::default() as *mut State as _,
-        init_userdata_cb: Some(init),
-        frame_userdata_cb: Some(frame),
-        cleanup_userdata_cb: Some(cleanup),
+        init_userdata_cb: Some(init_extern),
+        frame_userdata_cb: Some(frame_extern),
+        cleanup_userdata_cb: Some(cleanup_extern),
         width: 800,
         height: 600,
         sample_count: 4,
