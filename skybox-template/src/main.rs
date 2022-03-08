@@ -34,6 +34,7 @@ unsafe extern "C" fn frame(user_data: *mut ::std::os::raw::c_void) {
     let pass_action = &mut state.pass_action;
 
     let g = pass_action.colors[0].value.g + 0.01;
+
     pass_action.colors[0].value.g = if g > 1. { 0. } else { g };
     sg_begin_default_pass(pass_action as _, sapp_width(), sapp_height());
     sg_end_pass();
@@ -49,8 +50,7 @@ fn main() {
         .expect(concat!(
             "CARGO_CRATE_NAME contained a nul byte!:\n",
             env!("CARGO_CRATE_NAME")
-        ))
-        .as_ptr();
+        ));
 
     let desc = &sapp_desc{
         user_data: &mut State::default() as *mut State as _,
@@ -60,7 +60,7 @@ fn main() {
         width: 800,
         height: 600,
         sample_count: 4,
-        window_title,
+        window_title: window_title.as_ptr(),
         icon: sapp_icon_desc {
             sokol_default: true,
             ..<_>::default()
