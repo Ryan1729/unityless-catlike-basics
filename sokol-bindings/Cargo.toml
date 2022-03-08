@@ -1,0 +1,10 @@
+[package]
+name = "sokol-bindings"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "./src/sokol_bindings.rs"
+
+[dependencies]
+sokol-bindings-sys = { path = "../sokol-bindings-sys"}

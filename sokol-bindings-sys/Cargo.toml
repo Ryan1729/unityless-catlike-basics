@@ -7,3 +7,6 @@ edition = "2021"
 path = "./src/sys.rs"
 
 [dependencies]
+
+[build-dependencies]
+cc = "1.0"
