@@ -46,11 +46,7 @@ unsafe extern "C" fn cleanup(_user_data: *mut ::std::os::raw::c_void) {
 }
 
 fn main() {
-    let window_title = std::ffi::CString::new(env!("CARGO_CRATE_NAME"))
-        .expect(concat!(
-            "CARGO_CRATE_NAME contained a nul byte!:\n",
-            env!("CARGO_CRATE_NAME")
-        ));
+    let window_title = concat!(env!("CARGO_CRATE_NAME"), "\0");
 
     let desc = &sapp_desc{
         user_data: &mut State::default() as *mut State as _,
@@ -60,7 +56,7 @@ fn main() {
         width: 800,
         height: 600,
         sample_count: 4,
-        window_title: window_title.as_ptr(),
+        window_title: window_title.as_ptr() as _,
         icon: sapp_icon_desc {
             sokol_default: true,
             ..<_>::default()
