@@ -5,15 +5,12 @@ struct State {
     pass_action: sg_pass_action,
 }
 
-fn init(user_data: *mut ::std::os::raw::c_void) {
+fn init(state: &mut State) {
     let desc = &sg_desc{
         context: unsafe { sapp_sgcontext() },
         ..<_>::default()
     };
     unsafe { sg_setup(desc); }
-
-    // SAFTEY: Neither we or sokol has switched the pointer out for another type.
-    let state = unsafe { &mut*(user_data as *mut State) };
 
     state.pass_action = sg_pass_action {
         colors:[
@@ -26,12 +23,10 @@ fn init(user_data: *mut ::std::os::raw::c_void) {
             <_>::default(),
         ],
         ..<_>::default()
-    }
+    };
 }
 
-fn frame(user_data: *mut ::std::os::raw::c_void) {
-    // SAFTEY: Neither we or sokol has switched the pointer out for another type.
-    let state = unsafe { &mut*(user_data as *mut State) };
+fn frame(state: &mut State) {
     let pass_action = &mut state.pass_action;
 
     let g = pass_action.colors[0].value.g + 0.01;
@@ -44,36 +39,30 @@ fn frame(user_data: *mut ::std::os::raw::c_void) {
     }
 }
 
+fn cleanup(_state: &mut State) {
+    unsafe { sg_shutdown() }
+}
+
 fn main() {
-    let window_title = concat!(env!("CARGO_CRATE_NAME"), "\0");
+    const WINDOW_TITLE: &str = concat!(env!("CARGO_CRATE_NAME"), "\0");
 
-    unsafe extern "C" fn init_extern(user_data: *mut ::std::os::raw::c_void) {
-        init(user_data)
-    }
-
-    unsafe extern "C" fn frame_extern(user_data: *mut ::std::os::raw::c_void) {
-        frame(user_data)
-    }
-
-    unsafe extern "C" fn cleanup_extern(_user_data: *mut ::std::os::raw::c_void) {
-        sg_shutdown()
-    }
-
-    let desc = &sapp_desc{
-        user_data: &mut State::default() as *mut State as _,
-        init_userdata_cb: Some(init_extern),
-        frame_userdata_cb: Some(frame_extern),
-        cleanup_userdata_cb: Some(cleanup_extern),
-        width: 800,
-        height: 600,
-        sample_count: 4,
-        window_title: window_title.as_ptr() as _,
-        icon: sapp_icon_desc {
-            sokol_default: true,
-            ..<_>::default()
+    sapp::run_with_userdata!(
+        cbs: {
+            type: State,
+            init: init,
+            frame: frame,
+            cleanup: cleanup,
         },
-        ..<_>::default()
-    };
-
-    unsafe{ sapp_run(desc) };
+        sapp::Desc{
+            width: 800,
+            height: 600,
+            sample_count: 4,
+            window_title: WINDOW_TITLE.as_ptr() as _,
+            icon: sapp_icon_desc {
+                sokol_default: true,
+                ..<_>::default()
+            },
+            ..<_>::default()
+        }
+    );
 }
