@@ -43,6 +43,14 @@ fn cleanup(_state: &mut State) {
     unsafe { sg_shutdown() }
 }
 
+fn event(_event: &sapp::Event, _state: &mut State) {
+
+}
+
+fn fail(_msg: &std::ffi::CStr, _state: &mut State) {
+
+}
+
 fn main() {
     const WINDOW_TITLE: &str = concat!(env!("CARGO_CRATE_NAME"), "\0");
 
@@ -52,6 +60,8 @@ fn main() {
             init: init,
             frame: frame,
             cleanup: cleanup,
+            event: event,
+            fail: fail,
         },
         sapp::Desc{
             width: 800,
