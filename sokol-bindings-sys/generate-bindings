@@ -9,6 +9,7 @@
 # src/gl_core_3_3.rs, have src/d3d11.rs, src/metal.rs ... and alow choosing
 # one via cargo features
 bindgen wrapper.h -o src/gl_core_3_3.rs \
+    --use-core                                                        \
     --allowlist-function '^(sg|sapp)_.*'                              \
     --allowlist-type '^(sg|sapp)_.*'                                  \
     --blocklist-type '^__.*'                                          \

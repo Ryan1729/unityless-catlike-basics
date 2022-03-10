@@ -6,9 +6,9 @@ pub struct sg_buffer {
 }
 impl Default for sg_buffer {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -19,9 +19,9 @@ pub struct sg_image {
 }
 impl Default for sg_image {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -32,9 +32,9 @@ pub struct sg_shader {
 }
 impl Default for sg_shader {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -45,9 +45,9 @@ pub struct sg_pipeline {
 }
 impl Default for sg_pipeline {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -58,9 +58,9 @@ pub struct sg_pass {
 }
 impl Default for sg_pass {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -71,9 +71,9 @@ pub struct sg_context {
 }
 impl Default for sg_context {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -81,14 +81,14 @@ impl Default for sg_context {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sg_range {
-    pub ptr: *const ::std::os::raw::c_void,
+    pub ptr: *const ::core::ffi::c_void,
     pub size: usize,
 }
 impl Default for sg_range {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -438,9 +438,9 @@ pub struct sg_color_attachment_action {
 }
 impl Default for sg_color_attachment_action {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -453,9 +453,9 @@ pub struct sg_depth_attachment_action {
 }
 impl Default for sg_depth_attachment_action {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -467,9 +467,9 @@ pub struct sg_stencil_attachment_action {
 }
 impl Default for sg_stencil_attachment_action {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -484,9 +484,9 @@ pub struct sg_pass_action {
 }
 impl Default for sg_pass_action {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -504,9 +504,9 @@ pub struct sg_bindings {
 }
 impl Default for sg_bindings {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -520,16 +520,16 @@ pub struct sg_buffer_desc {
     pub data: sg_range,
     pub label: *const ::std::os::raw::c_char,
     pub gl_buffers: [u32; 2usize],
-    pub mtl_buffers: [*const ::std::os::raw::c_void; 2usize],
-    pub d3d11_buffer: *const ::std::os::raw::c_void,
-    pub wgpu_buffer: *const ::std::os::raw::c_void,
+    pub mtl_buffers: [*const ::core::ffi::c_void; 2usize],
+    pub d3d11_buffer: *const ::core::ffi::c_void,
+    pub wgpu_buffer: *const ::core::ffi::c_void,
     pub _end_canary: u32,
 }
 impl Default for sg_buffer_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -541,9 +541,9 @@ pub struct sg_image_data {
 }
 impl Default for sg_image_data {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -573,17 +573,17 @@ pub struct sg_image_desc {
     pub label: *const ::std::os::raw::c_char,
     pub gl_textures: [u32; 2usize],
     pub gl_texture_target: u32,
-    pub mtl_textures: [*const ::std::os::raw::c_void; 2usize],
-    pub d3d11_texture: *const ::std::os::raw::c_void,
-    pub d3d11_shader_resource_view: *const ::std::os::raw::c_void,
-    pub wgpu_texture: *const ::std::os::raw::c_void,
+    pub mtl_textures: [*const ::core::ffi::c_void; 2usize],
+    pub d3d11_texture: *const ::core::ffi::c_void,
+    pub d3d11_shader_resource_view: *const ::core::ffi::c_void,
+    pub wgpu_texture: *const ::core::ffi::c_void,
     pub _end_canary: u32,
 }
 impl Default for sg_image_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -597,9 +597,9 @@ pub struct sg_shader_attr_desc {
 }
 impl Default for sg_shader_attr_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -613,9 +613,9 @@ pub struct sg_shader_uniform_desc {
 }
 impl Default for sg_shader_uniform_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -629,9 +629,9 @@ pub struct sg_shader_uniform_block_desc {
 }
 impl Default for sg_shader_uniform_block_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -645,9 +645,9 @@ pub struct sg_shader_image_desc {
 }
 impl Default for sg_shader_image_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -664,9 +664,9 @@ pub struct sg_shader_stage_desc {
 }
 impl Default for sg_shader_stage_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -682,9 +682,9 @@ pub struct sg_shader_desc {
 }
 impl Default for sg_shader_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -698,9 +698,9 @@ pub struct sg_buffer_layout_desc {
 }
 impl Default for sg_buffer_layout_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -714,9 +714,9 @@ pub struct sg_vertex_attr_desc {
 }
 impl Default for sg_vertex_attr_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -729,9 +729,9 @@ pub struct sg_layout_desc {
 }
 impl Default for sg_layout_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -746,9 +746,9 @@ pub struct sg_stencil_face_state {
 }
 impl Default for sg_stencil_face_state {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -764,9 +764,9 @@ pub struct sg_stencil_state {
 }
 impl Default for sg_stencil_state {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -783,9 +783,9 @@ pub struct sg_depth_state {
 }
 impl Default for sg_depth_state {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -803,9 +803,9 @@ pub struct sg_blend_state {
 }
 impl Default for sg_blend_state {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -819,9 +819,9 @@ pub struct sg_color_state {
 }
 impl Default for sg_color_state {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -847,9 +847,9 @@ pub struct sg_pipeline_desc {
 }
 impl Default for sg_pipeline_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -862,9 +862,9 @@ pub struct sg_pass_attachment_desc {
 }
 impl Default for sg_pass_attachment_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -879,9 +879,9 @@ pub struct sg_pass_desc {
 }
 impl Default for sg_pass_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -889,268 +889,267 @@ impl Default for sg_pass_desc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sg_trace_hooks {
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub user_data: *mut ::core::ffi::c_void,
     pub reset_state_cache:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
-    pub make_buffer: ::std::option::Option<
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
+    pub make_buffer: ::core::option::Option<
         unsafe extern "C" fn(
             desc: *const sg_buffer_desc,
             result: sg_buffer,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub make_image: ::std::option::Option<
+    pub make_image: ::core::option::Option<
         unsafe extern "C" fn(
             desc: *const sg_image_desc,
             result: sg_image,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub make_shader: ::std::option::Option<
+    pub make_shader: ::core::option::Option<
         unsafe extern "C" fn(
             desc: *const sg_shader_desc,
             result: sg_shader,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub make_pipeline: ::std::option::Option<
+    pub make_pipeline: ::core::option::Option<
         unsafe extern "C" fn(
             desc: *const sg_pipeline_desc,
             result: sg_pipeline,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub make_pass: ::std::option::Option<
+    pub make_pass: ::core::option::Option<
         unsafe extern "C" fn(
             desc: *const sg_pass_desc,
             result: sg_pass,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub destroy_buffer: ::std::option::Option<
-        unsafe extern "C" fn(buf: sg_buffer, user_data: *mut ::std::os::raw::c_void),
+    pub destroy_buffer: ::core::option::Option<
+        unsafe extern "C" fn(buf: sg_buffer, user_data: *mut ::core::ffi::c_void),
     >,
-    pub destroy_image: ::std::option::Option<
-        unsafe extern "C" fn(img: sg_image, user_data: *mut ::std::os::raw::c_void),
+    pub destroy_image: ::core::option::Option<
+        unsafe extern "C" fn(img: sg_image, user_data: *mut ::core::ffi::c_void),
     >,
-    pub destroy_shader: ::std::option::Option<
-        unsafe extern "C" fn(shd: sg_shader, user_data: *mut ::std::os::raw::c_void),
+    pub destroy_shader: ::core::option::Option<
+        unsafe extern "C" fn(shd: sg_shader, user_data: *mut ::core::ffi::c_void),
     >,
-    pub destroy_pipeline: ::std::option::Option<
-        unsafe extern "C" fn(pip: sg_pipeline, user_data: *mut ::std::os::raw::c_void),
+    pub destroy_pipeline: ::core::option::Option<
+        unsafe extern "C" fn(pip: sg_pipeline, user_data: *mut ::core::ffi::c_void),
     >,
-    pub destroy_pass: ::std::option::Option<
-        unsafe extern "C" fn(pass: sg_pass, user_data: *mut ::std::os::raw::c_void),
+    pub destroy_pass: ::core::option::Option<
+        unsafe extern "C" fn(pass: sg_pass, user_data: *mut ::core::ffi::c_void),
     >,
-    pub update_buffer: ::std::option::Option<
+    pub update_buffer: ::core::option::Option<
         unsafe extern "C" fn(
             buf: sg_buffer,
             data: *const sg_range,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub update_image: ::std::option::Option<
+    pub update_image: ::core::option::Option<
         unsafe extern "C" fn(
             img: sg_image,
             data: *const sg_image_data,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub append_buffer: ::std::option::Option<
+    pub append_buffer: ::core::option::Option<
         unsafe extern "C" fn(
             buf: sg_buffer,
             data: *const sg_range,
             result: ::std::os::raw::c_int,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub begin_default_pass: ::std::option::Option<
+    pub begin_default_pass: ::core::option::Option<
         unsafe extern "C" fn(
             pass_action: *const sg_pass_action,
             width: ::std::os::raw::c_int,
             height: ::std::os::raw::c_int,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub begin_pass: ::std::option::Option<
+    pub begin_pass: ::core::option::Option<
         unsafe extern "C" fn(
             pass: sg_pass,
             pass_action: *const sg_pass_action,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub apply_viewport: ::std::option::Option<
+    pub apply_viewport: ::core::option::Option<
         unsafe extern "C" fn(
             x: ::std::os::raw::c_int,
             y: ::std::os::raw::c_int,
             width: ::std::os::raw::c_int,
             height: ::std::os::raw::c_int,
             origin_top_left: bool,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub apply_scissor_rect: ::std::option::Option<
+    pub apply_scissor_rect: ::core::option::Option<
         unsafe extern "C" fn(
             x: ::std::os::raw::c_int,
             y: ::std::os::raw::c_int,
             width: ::std::os::raw::c_int,
             height: ::std::os::raw::c_int,
             origin_top_left: bool,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub apply_pipeline: ::std::option::Option<
-        unsafe extern "C" fn(pip: sg_pipeline, user_data: *mut ::std::os::raw::c_void),
+    pub apply_pipeline: ::core::option::Option<
+        unsafe extern "C" fn(pip: sg_pipeline, user_data: *mut ::core::ffi::c_void),
     >,
-    pub apply_bindings: ::std::option::Option<
-        unsafe extern "C" fn(bindings: *const sg_bindings, user_data: *mut ::std::os::raw::c_void),
+    pub apply_bindings: ::core::option::Option<
+        unsafe extern "C" fn(bindings: *const sg_bindings, user_data: *mut ::core::ffi::c_void),
     >,
-    pub apply_uniforms: ::std::option::Option<
+    pub apply_uniforms: ::core::option::Option<
         unsafe extern "C" fn(
             stage: sg_shader_stage,
             ub_index: ::std::os::raw::c_int,
             data: *const sg_range,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub draw: ::std::option::Option<
+    pub draw: ::core::option::Option<
         unsafe extern "C" fn(
             base_element: ::std::os::raw::c_int,
             num_elements: ::std::os::raw::c_int,
             num_instances: ::std::os::raw::c_int,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub end_pass:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
-    pub commit: ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
-    pub alloc_buffer: ::std::option::Option<
-        unsafe extern "C" fn(result: sg_buffer, user_data: *mut ::std::os::raw::c_void),
+    pub end_pass: ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
+    pub commit: ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
+    pub alloc_buffer: ::core::option::Option<
+        unsafe extern "C" fn(result: sg_buffer, user_data: *mut ::core::ffi::c_void),
     >,
-    pub alloc_image: ::std::option::Option<
-        unsafe extern "C" fn(result: sg_image, user_data: *mut ::std::os::raw::c_void),
+    pub alloc_image: ::core::option::Option<
+        unsafe extern "C" fn(result: sg_image, user_data: *mut ::core::ffi::c_void),
     >,
-    pub alloc_shader: ::std::option::Option<
-        unsafe extern "C" fn(result: sg_shader, user_data: *mut ::std::os::raw::c_void),
+    pub alloc_shader: ::core::option::Option<
+        unsafe extern "C" fn(result: sg_shader, user_data: *mut ::core::ffi::c_void),
     >,
-    pub alloc_pipeline: ::std::option::Option<
-        unsafe extern "C" fn(result: sg_pipeline, user_data: *mut ::std::os::raw::c_void),
+    pub alloc_pipeline: ::core::option::Option<
+        unsafe extern "C" fn(result: sg_pipeline, user_data: *mut ::core::ffi::c_void),
     >,
-    pub alloc_pass: ::std::option::Option<
-        unsafe extern "C" fn(result: sg_pass, user_data: *mut ::std::os::raw::c_void),
+    pub alloc_pass: ::core::option::Option<
+        unsafe extern "C" fn(result: sg_pass, user_data: *mut ::core::ffi::c_void),
     >,
-    pub dealloc_buffer: ::std::option::Option<
-        unsafe extern "C" fn(buf_id: sg_buffer, user_data: *mut ::std::os::raw::c_void),
+    pub dealloc_buffer: ::core::option::Option<
+        unsafe extern "C" fn(buf_id: sg_buffer, user_data: *mut ::core::ffi::c_void),
     >,
-    pub dealloc_image: ::std::option::Option<
-        unsafe extern "C" fn(img_id: sg_image, user_data: *mut ::std::os::raw::c_void),
+    pub dealloc_image: ::core::option::Option<
+        unsafe extern "C" fn(img_id: sg_image, user_data: *mut ::core::ffi::c_void),
     >,
-    pub dealloc_shader: ::std::option::Option<
-        unsafe extern "C" fn(shd_id: sg_shader, user_data: *mut ::std::os::raw::c_void),
+    pub dealloc_shader: ::core::option::Option<
+        unsafe extern "C" fn(shd_id: sg_shader, user_data: *mut ::core::ffi::c_void),
     >,
-    pub dealloc_pipeline: ::std::option::Option<
-        unsafe extern "C" fn(pip_id: sg_pipeline, user_data: *mut ::std::os::raw::c_void),
+    pub dealloc_pipeline: ::core::option::Option<
+        unsafe extern "C" fn(pip_id: sg_pipeline, user_data: *mut ::core::ffi::c_void),
     >,
-    pub dealloc_pass: ::std::option::Option<
-        unsafe extern "C" fn(pass_id: sg_pass, user_data: *mut ::std::os::raw::c_void),
+    pub dealloc_pass: ::core::option::Option<
+        unsafe extern "C" fn(pass_id: sg_pass, user_data: *mut ::core::ffi::c_void),
     >,
-    pub init_buffer: ::std::option::Option<
+    pub init_buffer: ::core::option::Option<
         unsafe extern "C" fn(
             buf_id: sg_buffer,
             desc: *const sg_buffer_desc,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub init_image: ::std::option::Option<
+    pub init_image: ::core::option::Option<
         unsafe extern "C" fn(
             img_id: sg_image,
             desc: *const sg_image_desc,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub init_shader: ::std::option::Option<
+    pub init_shader: ::core::option::Option<
         unsafe extern "C" fn(
             shd_id: sg_shader,
             desc: *const sg_shader_desc,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub init_pipeline: ::std::option::Option<
+    pub init_pipeline: ::core::option::Option<
         unsafe extern "C" fn(
             pip_id: sg_pipeline,
             desc: *const sg_pipeline_desc,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub init_pass: ::std::option::Option<
+    pub init_pass: ::core::option::Option<
         unsafe extern "C" fn(
             pass_id: sg_pass,
             desc: *const sg_pass_desc,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
-    pub uninit_buffer: ::std::option::Option<
-        unsafe extern "C" fn(buf_id: sg_buffer, user_data: *mut ::std::os::raw::c_void),
+    pub uninit_buffer: ::core::option::Option<
+        unsafe extern "C" fn(buf_id: sg_buffer, user_data: *mut ::core::ffi::c_void),
     >,
-    pub uninit_image: ::std::option::Option<
-        unsafe extern "C" fn(img_id: sg_image, user_data: *mut ::std::os::raw::c_void),
+    pub uninit_image: ::core::option::Option<
+        unsafe extern "C" fn(img_id: sg_image, user_data: *mut ::core::ffi::c_void),
     >,
-    pub uninit_shader: ::std::option::Option<
-        unsafe extern "C" fn(shd_id: sg_shader, user_data: *mut ::std::os::raw::c_void),
+    pub uninit_shader: ::core::option::Option<
+        unsafe extern "C" fn(shd_id: sg_shader, user_data: *mut ::core::ffi::c_void),
     >,
-    pub uninit_pipeline: ::std::option::Option<
-        unsafe extern "C" fn(pip_id: sg_pipeline, user_data: *mut ::std::os::raw::c_void),
+    pub uninit_pipeline: ::core::option::Option<
+        unsafe extern "C" fn(pip_id: sg_pipeline, user_data: *mut ::core::ffi::c_void),
     >,
-    pub uninit_pass: ::std::option::Option<
-        unsafe extern "C" fn(pass_id: sg_pass, user_data: *mut ::std::os::raw::c_void),
+    pub uninit_pass: ::core::option::Option<
+        unsafe extern "C" fn(pass_id: sg_pass, user_data: *mut ::core::ffi::c_void),
     >,
-    pub fail_buffer: ::std::option::Option<
-        unsafe extern "C" fn(buf_id: sg_buffer, user_data: *mut ::std::os::raw::c_void),
+    pub fail_buffer: ::core::option::Option<
+        unsafe extern "C" fn(buf_id: sg_buffer, user_data: *mut ::core::ffi::c_void),
     >,
-    pub fail_image: ::std::option::Option<
-        unsafe extern "C" fn(img_id: sg_image, user_data: *mut ::std::os::raw::c_void),
+    pub fail_image: ::core::option::Option<
+        unsafe extern "C" fn(img_id: sg_image, user_data: *mut ::core::ffi::c_void),
     >,
-    pub fail_shader: ::std::option::Option<
-        unsafe extern "C" fn(shd_id: sg_shader, user_data: *mut ::std::os::raw::c_void),
+    pub fail_shader: ::core::option::Option<
+        unsafe extern "C" fn(shd_id: sg_shader, user_data: *mut ::core::ffi::c_void),
     >,
-    pub fail_pipeline: ::std::option::Option<
-        unsafe extern "C" fn(pip_id: sg_pipeline, user_data: *mut ::std::os::raw::c_void),
+    pub fail_pipeline: ::core::option::Option<
+        unsafe extern "C" fn(pip_id: sg_pipeline, user_data: *mut ::core::ffi::c_void),
     >,
-    pub fail_pass: ::std::option::Option<
-        unsafe extern "C" fn(pass_id: sg_pass, user_data: *mut ::std::os::raw::c_void),
+    pub fail_pass: ::core::option::Option<
+        unsafe extern "C" fn(pass_id: sg_pass, user_data: *mut ::core::ffi::c_void),
     >,
-    pub push_debug_group: ::std::option::Option<
+    pub push_debug_group: ::core::option::Option<
         unsafe extern "C" fn(
             name: *const ::std::os::raw::c_char,
-            user_data: *mut ::std::os::raw::c_void,
+            user_data: *mut ::core::ffi::c_void,
         ),
     >,
     pub pop_debug_group:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_buffer_pool_exhausted:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_image_pool_exhausted:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_shader_pool_exhausted:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_pipeline_pool_exhausted:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_pass_pool_exhausted:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_context_mismatch:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_pass_invalid:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_draw_invalid:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
     pub err_bindings_invalid:
-        ::std::option::Option<unsafe extern "C" fn(user_data: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(user_data: *mut ::core::ffi::c_void)>,
 }
 impl Default for sg_trace_hooks {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1163,9 +1162,9 @@ pub struct sg_slot_info {
 }
 impl Default for sg_slot_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1182,9 +1181,9 @@ pub struct sg_buffer_info {
 }
 impl Default for sg_buffer_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1200,9 +1199,9 @@ pub struct sg_image_info {
 }
 impl Default for sg_image_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1213,9 +1212,9 @@ pub struct sg_shader_info {
 }
 impl Default for sg_shader_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1226,9 +1225,9 @@ pub struct sg_pipeline_info {
 }
 impl Default for sg_pipeline_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1239,9 +1238,9 @@ pub struct sg_pass_info {
 }
 impl Default for sg_pass_info {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1254,23 +1253,23 @@ pub struct sg_gl_context_desc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sg_metal_context_desc {
-    pub device: *const ::std::os::raw::c_void,
+    pub device: *const ::core::ffi::c_void,
     pub renderpass_descriptor_cb:
-        ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub renderpass_descriptor_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub renderpass_descriptor_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
-    pub drawable_cb: ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub drawable_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+    pub drawable_cb: ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub drawable_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub user_data: *mut ::core::ffi::c_void,
 }
 impl Default for sg_metal_context_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1278,25 +1277,25 @@ impl Default for sg_metal_context_desc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sg_d3d11_context_desc {
-    pub device: *const ::std::os::raw::c_void,
-    pub device_context: *const ::std::os::raw::c_void,
+    pub device: *const ::core::ffi::c_void,
+    pub device_context: *const ::core::ffi::c_void,
     pub render_target_view_cb:
-        ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub render_target_view_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub render_target_view_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
     pub depth_stencil_view_cb:
-        ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub depth_stencil_view_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub depth_stencil_view_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub user_data: *mut ::core::ffi::c_void,
 }
 impl Default for sg_d3d11_context_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1304,29 +1303,29 @@ impl Default for sg_d3d11_context_desc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sg_wgpu_context_desc {
-    pub device: *const ::std::os::raw::c_void,
+    pub device: *const ::core::ffi::c_void,
     pub render_view_cb:
-        ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub render_view_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub render_view_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
     pub resolve_view_cb:
-        ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub resolve_view_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub resolve_view_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
     pub depth_stencil_view_cb:
-        ::std::option::Option<unsafe extern "C" fn() -> *const ::std::os::raw::c_void>,
-    pub depth_stencil_view_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void) -> *const ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn() -> *const ::core::ffi::c_void>,
+    pub depth_stencil_view_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void) -> *const ::core::ffi::c_void,
     >,
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub user_data: *mut ::core::ffi::c_void,
 }
 impl Default for sg_wgpu_context_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1344,9 +1343,9 @@ pub struct sg_context_desc {
 }
 impl Default for sg_context_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1368,9 +1367,9 @@ pub struct sg_desc {
 }
 impl Default for sg_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1646,13 +1645,13 @@ extern "C" {
     pub fn sg_discard_context(ctx_id: sg_context);
 }
 extern "C" {
-    pub fn sg_d3d11_device() -> *const ::std::os::raw::c_void;
+    pub fn sg_d3d11_device() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sg_mtl_device() -> *const ::std::os::raw::c_void;
+    pub fn sg_mtl_device() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sg_mtl_render_command_encoder() -> *const ::std::os::raw::c_void;
+    pub fn sg_mtl_render_command_encoder() -> *const ::core::ffi::c_void;
 }
 pub const sapp_event_type_SAPP_EVENTTYPE_INVALID: sapp_event_type = 0;
 pub const sapp_event_type_SAPP_EVENTTYPE_KEY_DOWN: sapp_event_type = 1;
@@ -1841,9 +1840,9 @@ pub struct sapp_event {
 }
 impl Default for sapp_event {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1851,14 +1850,14 @@ impl Default for sapp_event {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sapp_range {
-    pub ptr: *const ::std::os::raw::c_void,
+    pub ptr: *const ::core::ffi::c_void,
     pub size: usize,
 }
 impl Default for sapp_range {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1872,9 +1871,9 @@ pub struct sapp_image_desc {
 }
 impl Default for sapp_image_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1887,9 +1886,9 @@ pub struct sapp_icon_desc {
 }
 impl Default for sapp_icon_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1897,26 +1896,23 @@ impl Default for sapp_icon_desc {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sapp_desc {
-    pub init_cb: ::std::option::Option<unsafe extern "C" fn()>,
-    pub frame_cb: ::std::option::Option<unsafe extern "C" fn()>,
-    pub cleanup_cb: ::std::option::Option<unsafe extern "C" fn()>,
-    pub event_cb: ::std::option::Option<unsafe extern "C" fn(arg1: *const sapp_event)>,
-    pub fail_cb: ::std::option::Option<unsafe extern "C" fn(arg1: *const ::std::os::raw::c_char)>,
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub init_cb: ::core::option::Option<unsafe extern "C" fn()>,
+    pub frame_cb: ::core::option::Option<unsafe extern "C" fn()>,
+    pub cleanup_cb: ::core::option::Option<unsafe extern "C" fn()>,
+    pub event_cb: ::core::option::Option<unsafe extern "C" fn(arg1: *const sapp_event)>,
+    pub fail_cb: ::core::option::Option<unsafe extern "C" fn(arg1: *const ::std::os::raw::c_char)>,
+    pub user_data: *mut ::core::ffi::c_void,
     pub init_userdata_cb:
-        ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void)>,
     pub frame_userdata_cb:
-        ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void)>,
     pub cleanup_userdata_cb:
-        ::std::option::Option<unsafe extern "C" fn(arg1: *mut ::std::os::raw::c_void)>,
-    pub event_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(arg1: *const sapp_event, arg2: *mut ::std::os::raw::c_void),
+        ::core::option::Option<unsafe extern "C" fn(arg1: *mut ::core::ffi::c_void)>,
+    pub event_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *const sapp_event, arg2: *mut ::core::ffi::c_void),
     >,
-    pub fail_userdata_cb: ::std::option::Option<
-        unsafe extern "C" fn(
-            arg1: *const ::std::os::raw::c_char,
-            arg2: *mut ::std::os::raw::c_void,
-        ),
+    pub fail_userdata_cb: ::core::option::Option<
+        unsafe extern "C" fn(arg1: *const ::std::os::raw::c_char, arg2: *mut ::core::ffi::c_void),
     >,
     pub width: ::std::os::raw::c_int,
     pub height: ::std::os::raw::c_int,
@@ -1946,9 +1942,9 @@ pub struct sapp_desc {
 }
 impl Default for sapp_desc {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1964,15 +1960,15 @@ pub struct sapp_html5_fetch_response {
     pub error_code: sapp_html5_fetch_error,
     pub file_index: ::std::os::raw::c_int,
     pub fetched_size: u32,
-    pub buffer_ptr: *mut ::std::os::raw::c_void,
+    pub buffer_ptr: *mut ::core::ffi::c_void,
     pub buffer_size: u32,
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub user_data: *mut ::core::ffi::c_void,
 }
 impl Default for sapp_html5_fetch_response {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -1981,16 +1977,16 @@ impl Default for sapp_html5_fetch_response {
 pub struct sapp_html5_fetch_request {
     pub dropped_file_index: ::std::os::raw::c_int,
     pub callback:
-        ::std::option::Option<unsafe extern "C" fn(arg1: *const sapp_html5_fetch_response)>,
-    pub buffer_ptr: *mut ::std::os::raw::c_void,
+        ::core::option::Option<unsafe extern "C" fn(arg1: *const sapp_html5_fetch_response)>,
+    pub buffer_ptr: *mut ::core::ffi::c_void,
     pub buffer_size: u32,
-    pub user_data: *mut ::std::os::raw::c_void,
+    pub user_data: *mut ::core::ffi::c_void,
 }
 impl Default for sapp_html5_fetch_request {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
     }
@@ -2050,7 +2046,7 @@ extern "C" {
     pub fn sapp_mouse_locked() -> bool;
 }
 extern "C" {
-    pub fn sapp_userdata() -> *mut ::std::os::raw::c_void;
+    pub fn sapp_userdata() -> *mut ::core::ffi::c_void;
 }
 extern "C" {
     pub fn sapp_query_desc() -> sapp_desc;
@@ -2109,52 +2105,52 @@ extern "C" {
     pub fn sapp_html5_fetch_dropped_file(request: *const sapp_html5_fetch_request);
 }
 extern "C" {
-    pub fn sapp_metal_get_device() -> *const ::std::os::raw::c_void;
+    pub fn sapp_metal_get_device() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_metal_get_renderpass_descriptor() -> *const ::std::os::raw::c_void;
+    pub fn sapp_metal_get_renderpass_descriptor() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_metal_get_drawable() -> *const ::std::os::raw::c_void;
+    pub fn sapp_metal_get_drawable() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_macos_get_window() -> *const ::std::os::raw::c_void;
+    pub fn sapp_macos_get_window() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_ios_get_window() -> *const ::std::os::raw::c_void;
+    pub fn sapp_ios_get_window() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_d3d11_get_device() -> *const ::std::os::raw::c_void;
+    pub fn sapp_d3d11_get_device() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_d3d11_get_device_context() -> *const ::std::os::raw::c_void;
+    pub fn sapp_d3d11_get_device_context() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_d3d11_get_swap_chain() -> *const ::std::os::raw::c_void;
+    pub fn sapp_d3d11_get_swap_chain() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_d3d11_get_render_target_view() -> *const ::std::os::raw::c_void;
+    pub fn sapp_d3d11_get_render_target_view() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_d3d11_get_depth_stencil_view() -> *const ::std::os::raw::c_void;
+    pub fn sapp_d3d11_get_depth_stencil_view() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_win32_get_hwnd() -> *const ::std::os::raw::c_void;
+    pub fn sapp_win32_get_hwnd() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_wgpu_get_device() -> *const ::std::os::raw::c_void;
+    pub fn sapp_wgpu_get_device() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_wgpu_get_render_view() -> *const ::std::os::raw::c_void;
+    pub fn sapp_wgpu_get_render_view() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_wgpu_get_resolve_view() -> *const ::std::os::raw::c_void;
+    pub fn sapp_wgpu_get_resolve_view() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_wgpu_get_depth_stencil_view() -> *const ::std::os::raw::c_void;
+    pub fn sapp_wgpu_get_depth_stencil_view() -> *const ::core::ffi::c_void;
 }
 extern "C" {
-    pub fn sapp_android_get_native_activity() -> *const ::std::os::raw::c_void;
+    pub fn sapp_android_get_native_activity() -> *const ::core::ffi::c_void;
 }
 extern "C" {
     pub fn sapp_sgcontext() -> sg_context_desc;
