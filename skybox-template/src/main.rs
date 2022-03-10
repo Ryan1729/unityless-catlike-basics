@@ -32,15 +32,19 @@ fn frame(state: &mut State) {
     let g = pass_action.colors[0].value.g + 0.01;
 
     pass_action.colors[0].value.g = if g > 1. { 0. } else { g };
+
+    let w = sapp::width();
+    let h = sapp::height();
+
     unsafe {
-        sg_begin_default_pass(pass_action as _, sapp_width(), sapp_height());
+        sg_begin_default_pass(pass_action as _, w, h);
         sg_end_pass();
         sg_commit();
     }
 }
 
 fn cleanup(_state: &mut State) {
-    unsafe { sg_shutdown() }
+    sg::shutdown()
 }
 
 fn event(_event: &sapp::Event, _state: &mut State) {
