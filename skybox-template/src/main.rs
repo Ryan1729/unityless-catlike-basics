@@ -1,6 +1,8 @@
-use sokol_bindings::*;
-
-use sokol_bindings::sg::{begin_default_pass, end_pass, commit, Action, Color, ColorAttachmentAction, PassAction};
+use sokol_bindings::{
+    sapp::{self, IconDesc},
+    setup_default_context,
+    sg::{self, begin_default_pass, end_pass, commit, Action, Color, ColorAttachmentAction, PassAction},
+};
 
 #[derive(Default)]
 struct State {
@@ -65,7 +67,7 @@ fn main() {
             height: 600,
             sample_count: 4,
             window_title: WINDOW_TITLE.as_ptr() as _,
-            icon: sapp_icon_desc {
+            icon: IconDesc {
                 sokol_default: true,
                 ..<_>::default()
             },

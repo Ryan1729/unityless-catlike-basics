@@ -3,6 +3,7 @@ use crate::Int;
 
 pub type Desc = sys::sapp_desc;
 pub type Event = sys::sapp_event;
+pub type IconDesc = sys::sapp_icon_desc;
 
 /// This macro calls sapp::run for you. It syntactically ensures that the same
 /// userdata type is used for each callback passed in the cbs section. It
@@ -51,9 +52,9 @@ macro_rules! _run_with_userdata {
 
         desc.user_data = &mut <$type>::default() as *mut $type as _;
 
-        $( desc.init_userdata_cb = cb_wrap_userdata!($init : fn(&mut $type)); )?
-        $( desc.frame_userdata_cb = cb_wrap_userdata!($frame : fn(&mut $type)); )?
-        $( desc.cleanup_userdata_cb = cb_wrap_userdata!($cleanup : fn(&mut $type)); )?
+        $( desc.init_userdata_cb = $crate::cb_wrap_userdata!($init : fn(&mut $type)); )?
+        $( desc.frame_userdata_cb = $crate::cb_wrap_userdata!($frame : fn(&mut $type)); )?
+        $( desc.cleanup_userdata_cb = $crate::cb_wrap_userdata!($cleanup : fn(&mut $type)); )?
         $(
             desc.event_userdata_cb = {
                 unsafe extern "C" fn cb_extern(
