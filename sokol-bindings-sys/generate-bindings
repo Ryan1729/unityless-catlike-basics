@@ -13,6 +13,7 @@ bindgen wrapper.h -o src/gl_core_3_3.rs \
     --allowlist-function '^(sg|sapp)_.*'                              \
     --allowlist-type '^(sg|sapp)_.*'                                  \
     --blocklist-type '^__.*'                                          \
+    --impl-debug                                                      \
     --with-derive-default                                             \
     --size_t-is-usize                                                 \
     --no-layout-tests                                                 \

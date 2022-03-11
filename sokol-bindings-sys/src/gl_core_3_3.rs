@@ -13,6 +13,11 @@ impl Default for sg_buffer {
         }
     }
 }
+impl ::core::fmt::Debug for sg_buffer {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_buffer {{  }}")
+    }
+}
 #[repr(C)]
 pub struct sg_image {
     pub id: u32,
@@ -24,6 +29,11 @@ impl Default for sg_image {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_image {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_image {{  }}")
     }
 }
 #[repr(C)]
@@ -39,6 +49,11 @@ impl Default for sg_shader {
         }
     }
 }
+impl ::core::fmt::Debug for sg_shader {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_shader {{  }}")
+    }
+}
 #[repr(C)]
 pub struct sg_pipeline {
     pub id: u32,
@@ -50,6 +65,11 @@ impl Default for sg_pipeline {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_pipeline {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_pipeline {{  }}")
     }
 }
 #[repr(C)]
@@ -65,6 +85,11 @@ impl Default for sg_pass {
         }
     }
 }
+impl ::core::fmt::Debug for sg_pass {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_pass {{  }}")
+    }
+}
 #[repr(C)]
 pub struct sg_context {
     pub id: u32,
@@ -76,6 +101,11 @@ impl Default for sg_context {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_context {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_context {{  }}")
     }
 }
 #[repr(C)]
@@ -474,6 +504,15 @@ impl Default for sg_stencil_attachment_action {
         }
     }
 }
+impl ::core::fmt::Debug for sg_stencil_attachment_action {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(
+            f,
+            "sg_stencil_attachment_action {{ action: {:?} }}",
+            self.action
+        )
+    }
+}
 #[repr(C)]
 pub struct sg_pass_action {
     pub _start_canary: u32,
@@ -489,6 +528,15 @@ impl Default for sg_pass_action {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_pass_action {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(
+            f,
+            "sg_pass_action {{ colors: {:?}, depth: {:?}, stencil: {:?} }}",
+            self.colors, self.depth, self.stencil
+        )
     }
 }
 #[repr(C)]
@@ -509,6 +557,11 @@ impl Default for sg_bindings {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_bindings {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_bindings {{ vertex_buffers: {:?}, vertex_buffer_offsets: {:?}, index_buffer: {:?}, index_buffer_offset: {:?}, vs_images: {:?}, fs_images: {:?} }}" , self . vertex_buffers , self . vertex_buffer_offsets , self . index_buffer , self . index_buffer_offset , self . vs_images , self . fs_images)
     }
 }
 #[repr(C)]
@@ -532,6 +585,11 @@ impl Default for sg_buffer_desc {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_buffer_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_buffer_desc {{ size: {:?}, type: {:?}, usage: {:?}, data: {:?}, label: {:?}, gl_buffers: {:?}, mtl_buffers: {:?}, d3d11_buffer: {:?}, wgpu_buffer: {:?} }}" , self . size , self . type_ , self . usage , self . data , self . label , self . gl_buffers , self . mtl_buffers , self . d3d11_buffer , self . wgpu_buffer)
     }
 }
 #[repr(C)]
@@ -586,6 +644,11 @@ impl Default for sg_image_desc {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_image_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_image_desc {{ type: {:?}, render_target: {:?}, width: {:?}, height: {:?}, num_slices: {:?}, num_mipmaps: {:?}, usage: {:?}, pixel_format: {:?}, sample_count: {:?}, min_filter: {:?}, mag_filter: {:?}, wrap_u: {:?}, wrap_v: {:?}, wrap_w: {:?}, border_color: {:?}, min_lod: {:?}, max_lod: {:?}, data: {:?}, label: {:?}, gl_textures: {:?}, mtl_textures: {:?}, d3d11_texture: {:?}, d3d11_shader_resource_view: {:?}, wgpu_texture: {:?} }}" , self . type_ , self . render_target , self . width , self . height , self . num_slices , self . num_mipmaps , self . usage , self . pixel_format , self . sample_count , self . min_filter , self . mag_filter , self . wrap_u , self . wrap_v , self . wrap_w , self . border_color , self . min_lod , self . max_lod , self . data , self . label , self . gl_textures , self . mtl_textures , self . d3d11_texture , self . d3d11_shader_resource_view , self . wgpu_texture)
     }
 }
 #[repr(C)]
@@ -689,6 +752,15 @@ impl Default for sg_shader_desc {
         }
     }
 }
+impl ::core::fmt::Debug for sg_shader_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(
+            f,
+            "sg_shader_desc {{ attrs: {:?}, vs: {:?}, fs: {:?}, label: {:?} }}",
+            self.attrs, self.vs, self.fs, self.label
+        )
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sg_buffer_layout_desc {
@@ -769,6 +841,15 @@ impl Default for sg_stencil_state {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_stencil_state {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(
+            f,
+            "sg_stencil_state {{ enabled: {:?}, front: {:?}, back: {:?} }}",
+            self.enabled, self.front, self.back
+        )
     }
 }
 #[repr(C)]
@@ -854,6 +935,11 @@ impl Default for sg_pipeline_desc {
         }
     }
 }
+impl ::core::fmt::Debug for sg_pipeline_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_pipeline_desc {{ shader: {:?}, layout: {:?}, depth: {:?}, stencil: {:?}, color_count: {:?}, colors: {:?}, primitive_type: {:?}, index_type: {:?}, cull_mode: {:?}, face_winding: {:?}, sample_count: {:?}, blend_color: {:?}, alpha_to_coverage_enabled: {:?}, label: {:?} }}" , self . shader , self . layout , self . depth , self . stencil , self . color_count , self . colors , self . primitive_type , self . index_type , self . cull_mode , self . face_winding , self . sample_count , self . blend_color , self . alpha_to_coverage_enabled , self . label)
+    }
+}
 #[repr(C)]
 pub struct sg_pass_attachment_desc {
     pub image: sg_image,
@@ -867,6 +953,15 @@ impl Default for sg_pass_attachment_desc {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_pass_attachment_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(
+            f,
+            "sg_pass_attachment_desc {{ image: {:?}, mip_level: {:?}, slice: {:?} }}",
+            self.image, self.mip_level, self.slice
+        )
     }
 }
 #[repr(C)]
@@ -884,6 +979,11 @@ impl Default for sg_pass_desc {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_pass_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_pass_desc {{ color_attachments: {:?}, depth_stencil_attachment: {:?}, label: {:?} }}" , self . color_attachments , self . depth_stencil_attachment , self . label)
     }
 }
 #[repr(C)]
@@ -1169,6 +1269,11 @@ impl Default for sg_slot_info {
         }
     }
 }
+impl ::core::fmt::Debug for sg_slot_info {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_slot_info {{ state: {:?} }}", self.state)
+    }
+}
 #[repr(C)]
 pub struct sg_buffer_info {
     pub slot: sg_slot_info,
@@ -1186,6 +1291,11 @@ impl Default for sg_buffer_info {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_buffer_info {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_buffer_info {{ slot: {:?}, append_pos: {:?}, append_overflow: {:?}, num_slots: {:?}, active_slot: {:?} }}" , self . slot , self . append_pos , self . append_overflow , self . num_slots , self . active_slot)
     }
 }
 #[repr(C)]
@@ -1206,6 +1316,11 @@ impl Default for sg_image_info {
         }
     }
 }
+impl ::core::fmt::Debug for sg_image_info {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_image_info {{ slot: {:?}, num_slots: {:?}, active_slot: {:?}, width: {:?}, height: {:?} }}" , self . slot , self . num_slots , self . active_slot , self . width , self . height)
+    }
+}
 #[repr(C)]
 pub struct sg_shader_info {
     pub slot: sg_slot_info,
@@ -1217,6 +1332,11 @@ impl Default for sg_shader_info {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_shader_info {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_shader_info {{ slot: {:?} }}", self.slot)
     }
 }
 #[repr(C)]
@@ -1232,6 +1352,11 @@ impl Default for sg_pipeline_info {
         }
     }
 }
+impl ::core::fmt::Debug for sg_pipeline_info {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_pipeline_info {{ slot: {:?} }}", self.slot)
+    }
+}
 #[repr(C)]
 pub struct sg_pass_info {
     pub slot: sg_slot_info,
@@ -1243,6 +1368,11 @@ impl Default for sg_pass_info {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_pass_info {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write!(f, "sg_pass_info {{ slot: {:?} }}", self.slot)
     }
 }
 #[repr(C)]
@@ -1372,6 +1502,11 @@ impl Default for sg_desc {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sg_desc {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sg_desc {{ buffer_pool_size: {:?}, image_pool_size: {:?}, shader_pool_size: {:?}, pipeline_pool_size: {:?}, pass_pool_size: {:?}, context_pool_size: {:?}, uniform_buffer_size: {:?}, staging_buffer_size: {:?}, sampler_cache_size: {:?}, context: {:?} }}" , self . buffer_pool_size , self . image_pool_size , self . shader_pool_size , self . pipeline_pool_size , self . pass_pool_size , self . context_pool_size , self . uniform_buffer_size , self . staging_buffer_size , self . sampler_cache_size , self . context)
     }
 }
 extern "C" {
@@ -1847,6 +1982,11 @@ impl Default for sapp_event {
         }
     }
 }
+impl ::core::fmt::Debug for sapp_event {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sapp_event {{ type: {:?}, key_code: {:?}, key_repeat: {:?}, mouse_button: {:?}, mouse_x: {:?}, mouse_y: {:?}, mouse_dx: {:?}, mouse_dy: {:?}, scroll_x: {:?}, scroll_y: {:?}, num_touches: {:?}, touches: {:?}, window_width: {:?}, window_height: {:?}, framebuffer_width: {:?}, framebuffer_height: {:?} }}" , self . type_ , self . key_code , self . key_repeat , self . mouse_button , self . mouse_x , self . mouse_y , self . mouse_dx , self . mouse_dy , self . scroll_x , self . scroll_y , self . num_touches , self . touches , self . window_width , self . window_height , self . framebuffer_width , self . framebuffer_height)
+    }
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sapp_range {
@@ -1973,6 +2113,11 @@ impl Default for sapp_html5_fetch_response {
         }
     }
 }
+impl ::core::fmt::Debug for sapp_html5_fetch_response {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sapp_html5_fetch_response {{ succeeded: {:?}, error_code: {:?}, file_index: {:?}, buffer_ptr: {:?}, user_data: {:?} }}" , self . succeeded , self . error_code , self . file_index , self . buffer_ptr , self . user_data)
+    }
+}
 #[repr(C)]
 pub struct sapp_html5_fetch_request {
     pub dropped_file_index: ::std::os::raw::c_int,
@@ -1989,6 +2134,11 @@ impl Default for sapp_html5_fetch_request {
             ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl ::core::fmt::Debug for sapp_html5_fetch_request {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        write ! (f , "sapp_html5_fetch_request {{ dropped_file_index: {:?}, callback: {:?}, buffer_ptr: {:?}, user_data: {:?} }}" , self . dropped_file_index , self . callback , self . buffer_ptr , self . user_data)
     }
 }
 extern "C" {
