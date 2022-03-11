@@ -1,5 +1,7 @@
 use sokol_bindings::*;
 
+use sokol_bindings::sg::{end_pass, commit};
+
 #[derive(Default)]
 struct State {
     pass_action: sg_pass_action,
@@ -38,9 +40,9 @@ fn frame(state: &mut State) {
 
     unsafe {
         sg_begin_default_pass(pass_action as _, w, h);
-        sg_end_pass();
-        sg_commit();
     }
+    end_pass();
+    commit();
 }
 
 fn cleanup(_state: &mut State) {
