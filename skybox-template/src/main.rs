@@ -8,11 +8,7 @@ struct State {
 }
 
 fn init(state: &mut State) {
-    let desc = &sg_desc{
-        context: unsafe { sapp_sgcontext() },
-        ..<_>::default()
-    };
-    unsafe { sg_setup(desc); }
+    setup_default_context();
 
     state.pass_action = sg_pass_action {
         colors:[

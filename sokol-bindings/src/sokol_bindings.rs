@@ -26,3 +26,14 @@ macro_rules! cb_wrap_userdata {
 
 pub mod sapp;
 pub mod sg;
+pub mod glue;
+
+pub fn setup_default_context() {
+    let desc = &sg_desc{
+        context: glue::sapp_sgcontext(),
+        ..<_>::default()
+    };
+    // SAFTEY: The desc value is valid. Using `sapp_sg_context` is explicitly
+    // recommended by the header docs.
+    unsafe { sg_setup(desc); }
+}
