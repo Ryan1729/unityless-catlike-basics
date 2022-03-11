@@ -1,4 +1,5 @@
 use sokol_bindings_sys as sys;
+use crate::Int;
 
 pub type Desc = sys::sapp_desc;
 pub type Event = sys::sapp_event;
@@ -103,10 +104,6 @@ macro_rules! _run_with_userdata {
 pub use _run_with_userdata as run_with_userdata;
 
 pub use sys::sapp_run as run;
-
-/// An alias for `c_int`. So in practice probably 32 bits, but technically allowed
-/// to be as low as 16 on some platforms.
-pub type Int = ::std::os::raw::c_int;
 
 pub fn width() -> Int {
     // SAFETY: There are no currently known safety issues with this fn.

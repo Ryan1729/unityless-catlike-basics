@@ -1,20 +1,20 @@
 use sokol_bindings::*;
 
-use sokol_bindings::sg::{end_pass, commit};
+use sokol_bindings::sg::{begin_default_pass, end_pass, commit, Action, Color, ColorAttachmentAction, PassAction};
 
 #[derive(Default)]
 struct State {
-    pass_action: sg_pass_action,
+    pass_action: PassAction,
 }
 
 fn init(state: &mut State) {
     setup_default_context();
 
-    state.pass_action = sg_pass_action {
+    state.pass_action = PassAction {
         colors:[
-            sg_color_attachment_action{
-                action: sg_action_SG_ACTION_CLEAR,
-                value: sg_color { r: 1., g: 0., b: 0., a: 1.},
+            ColorAttachmentAction {
+                action: Action::Clear,
+                value: Color { r: 1., g: 0., b: 0., a: 1.},
             },
             <_>::default(),
             <_>::default(),
@@ -31,12 +31,7 @@ fn frame(state: &mut State) {
 
     pass_action.colors[0].value.g = if g > 1. { 0. } else { g };
 
-    let w = sapp::width();
-    let h = sapp::height();
-
-    unsafe {
-        sg_begin_default_pass(pass_action as _, w, h);
-    }
+    begin_default_pass(pass_action, sapp::width(), sapp::height());
     end_pass();
     commit();
 }
