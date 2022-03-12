@@ -2,7 +2,22 @@
 use sokol_bindings_sys as sys;
 use crate::Int;
 
+pub use sys::sg_range as Range;
+
+// TODO wrap everywhere we'd want to use this with things that use slices instead.
+#[macro_export]
+macro_rules! _range {
+    ($arr: expr) => {
+        $crate::sg::Range {
+            size: $arr.len(),
+            ptr: &$arr as *const _ as _,
+        }
+    }
+}
+pub use _range as range;
+
 pub use sys::sg_context_desc as ContextDesc;
+pub use sys::sg_shader_desc as ShaderDesc;
 
 pub fn shutdown() {
     // SAFETY: There are no currently known safety issues with this fn.
@@ -17,9 +32,44 @@ pub enum Action {
     Load = sys::sg_action_SG_ACTION_LOAD,
     DontCare = sys::sg_action_SG_ACTION_DONTCARE,
 }
+
 impl Default for Action {
     fn default() -> Self {
         Self::Default
+    }
+}
+
+#[repr(u32)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Backend {
+    GlCore3_3 = sys::sg_backend_SG_BACKEND_GLCORE33,
+    Gles2 = sys::sg_backend_SG_BACKEND_GLES2,
+    Gles3 = sys::sg_backend_SG_BACKEND_GLES3,
+    D3D11 = sys::sg_backend_SG_BACKEND_D3D11,
+    MetalIos = sys::sg_backend_SG_BACKEND_METAL_IOS,
+    MetalMacos = sys::sg_backend_SG_BACKEND_METAL_MACOS,
+    MetalSimulator = sys::sg_backend_SG_BACKEND_METAL_SIMULATOR,
+    Wgpu = sys::sg_backend_SG_BACKEND_WGPU,
+    Dummy = sys::sg_backend_SG_BACKEND_DUMMY,
+}
+
+pub fn query_backend() -> Backend {
+    use Backend::*;
+
+    // SAFETY: There are no currently known safety issues with this fn.
+    let backend_int = unsafe{ sys::sg_query_backend() };
+
+    match backend_int {
+        sys::sg_backend_SG_BACKEND_GLCORE33 => GlCore3_3,
+        sys::sg_backend_SG_BACKEND_GLES2 => Gles2,
+        sys::sg_backend_SG_BACKEND_GLES3 => Gles3,
+        sys::sg_backend_SG_BACKEND_D3D11 => D3D11,
+        sys::sg_backend_SG_BACKEND_METAL_IOS => MetalIos,
+        sys::sg_backend_SG_BACKEND_METAL_MACOS => MetalMacos,
+        sys::sg_backend_SG_BACKEND_METAL_SIMULATOR => MetalSimulator,
+        sys::sg_backend_SG_BACKEND_WGPU => Wgpu,
+        sys::sg_backend_SG_BACKEND_DUMMY => Dummy,
+        _ => unreachable!(),
     }
 }
 
