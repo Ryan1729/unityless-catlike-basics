@@ -13,8 +13,8 @@ static inline const sg_shader_desc* cube_shader_desc(sg_backend backend) {
     static bool valid;
     if (!valid) {
       valid = true;
-      desc.attrs[0].name = "position";
-      desc.attrs[1].name = "color0";
+      desc.attrs[ATTR_vs_position].name = "position";
+      desc.attrs[ATTR_vs_color0].name = "color0";
       desc.vs.source = "#version 330\n"
         "\n"
         "layout(location = 0) in vec4 position;\n"
