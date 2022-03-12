@@ -3,7 +3,46 @@
 #define SOKOL_NO_ENTRY
 #include "sokol_app.h"
 #include "sokol_glue.h"
-#include "cube-sapp.glsl.h"
+
+#define ATTR_vs_position (0)
+#define ATTR_vs_color0 (1)
+
+static inline const sg_shader_desc* cube_shader_desc(sg_backend backend) {
+  if (backend == SG_BACKEND_GLCORE33) {
+    static sg_shader_desc desc;
+    static bool valid;
+    if (!valid) {
+      valid = true;
+      desc.attrs[0].name = "position";
+      desc.attrs[1].name = "color0";
+      desc.vs.source = "#version 330\n"
+        "\n"
+        "layout(location = 0) in vec4 position;\n"
+        "out vec4 color;\n"
+        "layout(location = 1) in vec4 color0;\n"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "    gl_Position = ((mat4(vec4(0.25, 0.0, 0.0, 0.0), vec4(0.0, 0.25, 0.0, 0.0), vec4(0.0, 0.0, 0.25, 0.0), vec4(0.0, 0.0, 0.0, 1.0)) * mat4(vec4(1.0, 0.0, 0.0, 0.0), vec4(0.0, 0.500459730625152587890625, -0.865759789943695068359375, 0.0), vec4(0.0, 0.865759789943695068359375, 0.500459730625152587890625, 0.0), vec4(0.0, 0.0, 0.0, 1.0))) * mat4(vec4(0.500459730625152587890625, -0.865759789943695068359375, 0.0, 0.0), vec4(0.865759789943695068359375, 0.500459730625152587890625, 0.0, 0.0), vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0))) * position;\n"
+        "    color = color0;\n"
+        "}\n";
+      desc.vs.entry = "main";
+      desc.fs.source = "#version 330\n"
+        "\n"
+        "layout(location = 0) out vec4 frag_color;\n"
+        "in vec4 color;\n"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "    frag_color = color;\n"
+        "}\n";
+      desc.fs.entry = "main";
+      desc.label = "cube_shader";
+    }
+    return &desc;
+  }
+  return 0;
+}
 
 static struct {
     sg_pipeline pip;
