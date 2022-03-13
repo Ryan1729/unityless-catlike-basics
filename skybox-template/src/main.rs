@@ -16,8 +16,7 @@ fn cube_shader_desc(backend: Backend) -> ShaderDesc {
 
     desc.attrs[ATTR_VS_POSITION as usize].name = b"position\0".as_ptr() as _;
     desc.attrs[ATTR_VS_COLOR0 as usize].name = b"color0\0".as_ptr() as _;
-    desc.vs.source = br#"
-#version 330
+    desc.vs.source = b"#version 330
 layout(location = 0) in vec4 position;
 out vec4 color;
 layout(location = 1) in vec4 color0;
@@ -26,10 +25,9 @@ void main()
     gl_Position = ((mat4(vec4(0.25, 0.0, 0.0, 0.0), vec4(0.0, 0.25, 0.0, 0.0), vec4(0.0, 0.0, 0.25, 0.0), vec4(0.0, 0.0, 0.0, 1.0)) * mat4(vec4(1.0, 0.0, 0.0, 0.0), vec4(0.0, 0.500459730625152587890625, -0.865759789943695068359375, 0.0), vec4(0.0, 0.865759789943695068359375, 0.500459730625152587890625, 0.0), vec4(0.0, 0.0, 0.0, 1.0))) * mat4(vec4(0.500459730625152587890625, -0.865759789943695068359375, 0.0, 0.0), vec4(0.865759789943695068359375, 0.500459730625152587890625, 0.0, 0.0), vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0))) * position;
     color = color0;
 }
-\0"#.as_ptr() as _;
+\0".as_ptr() as _;
     desc.vs.entry = b"main\0".as_ptr() as _;
-    desc.fs.source = br#"
-#version 330
+    desc.fs.source = b"#version 330
         
 layout(location = 0) out vec4 frag_color;
 in vec4 color;
@@ -38,7 +36,7 @@ void main()
 {
     frag_color = color;
 }
-\0"#.as_ptr() as _;
+\0".as_ptr() as _;
     desc.fs.entry = b"main\0".as_ptr() as _;
     desc.label = b"cube_shader\0".as_ptr() as _;
 
