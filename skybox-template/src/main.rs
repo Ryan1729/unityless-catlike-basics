@@ -49,8 +49,10 @@ struct State {
     pipe: sg_pipeline,
 }
 
+const VERTEX_STRIDE: Int = 28;
+
 /* cube vertex buffer */
-const VERTICIES: [f32; 28 * 6] = [
+const VERTICIES: [f32; VERTEX_STRIDE as usize * 6] = [
     -1.0, -1.0, -1.0,   1.0, 0.0, 0.0, 1.0,
      1.0, -1.0, -1.0,   1.0, 0.0, 0.0, 1.0,
      1.0,  1.0, -1.0,   1.0, 0.0, 0.0, 1.0,
@@ -119,7 +121,7 @@ fn init(state: &mut State) {
 
     let mut layout = sg_layout_desc::default();
     /* test to provide buffer stride, but no attr offsets */
-    layout.buffers[0].stride = 28;
+    layout.buffers[0].stride = VERTEX_STRIDE;
     layout.attrs[ATTR_VS_POSITION as usize].format = sg_vertex_format_SG_VERTEXFORMAT_FLOAT3;
     layout.attrs[ATTR_VS_COLOR0 as usize].format = sg_vertex_format_SG_VERTEXFORMAT_FLOAT4;
 
