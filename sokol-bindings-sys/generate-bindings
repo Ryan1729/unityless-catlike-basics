@@ -12,7 +12,7 @@ bindgen wrapper.h -o src/gl_core_3_3.rs \
     --use-core                                                        \
     --allowlist-function '^(sg|sapp)_.*'                              \
     --allowlist-type '^(sg|sapp)_.*'                                  \
-    --blocklist-type '^__uint[86].*'                                      \
+    --blocklist-type '^__uint[86].*'                                  \
     --impl-debug                                                      \
     --with-derive-default                                             \
     --size_t-is-usize                                                 \

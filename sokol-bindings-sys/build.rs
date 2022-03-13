@@ -18,10 +18,16 @@ fn main() {
     // be updated.
     const BACKEND: &str = "SOKOL_GLCORE33";
 
-    cc::Build::new()
+    let mut builder = cc::Build::new();
+    builder
         .file("wrapper.c")
         .define(BACKEND, None)
         .flag("-pthread")
-        .include("../third-party")
-        .compile("wrapper");
+        .include("../third-party");
+
+    if cfg!(debug_assertions) {
+        builder.define("SOKOL_BINGDINGS_DEBUG", None);
+    }
+
+    builder.compile("wrapper");
 }
