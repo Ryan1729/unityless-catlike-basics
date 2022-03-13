@@ -7,12 +7,22 @@ pub use sys::sg_range as Range;
 // TODO wrap everywhere we'd want to use this with things that use slices instead.
 #[macro_export]
 macro_rules! _range {
-    ($arr: expr) => {
+    // If you pass an ident, we can insert the `&` for you.
+    ($arr_name: ident) => {
         $crate::sg::Range {
-            size: $arr.len(),
-            ptr: &$arr as *const _ as _,
+            size: core::mem::size_of_val(&$arr_name),
+            ptr: &$arr_name as *const _ as _,
         }
-    }
+    };
+    // If you pass an expr, we don't want to evaluate the expr twice, so AFAIK
+    // the cleanest way to do that is for you to add the `&`.
+    ($arr_ref: expr) => {{
+        let arr_ref = $arr_ref;
+        $crate::sg::Range {
+            size: core::mem::size_of_val(arr_ref),
+            ptr: arr_ref as *const _ as _,
+        }
+    }}
 }
 pub use _range as range;
 
