@@ -28,6 +28,13 @@ macro_rules! cb_wrap_userdata {
     }}
 }
 
+#[macro_export]
+macro_rules! cstr {
+    ($str: literal) => {
+        concat!($str, "\0").as_bytes().as_ptr() as *const ::std::os::raw::c_char
+    }
+}
+
 pub mod sapp;
 pub mod sg;
 pub mod glue;

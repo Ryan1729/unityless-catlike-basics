@@ -1,5 +1,6 @@
 use sokol_bindings::{
     *,
+    cstr,
     sapp::{self, IconDesc},
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
@@ -14,9 +15,9 @@ fn cube_shader_desc(backend: Backend) -> ShaderDesc {
 
     let mut desc = ShaderDesc::default();
 
-    desc.attrs[ATTR_VS_POSITION as usize].name = b"position\0".as_ptr() as _;
-    desc.attrs[ATTR_VS_COLOR0 as usize].name = b"color0\0".as_ptr() as _;
-    desc.vs.source = b"#version 330
+    desc.attrs[ATTR_VS_POSITION as usize].name = cstr!("position");
+    desc.attrs[ATTR_VS_COLOR0 as usize].name = cstr!("color0");
+    desc.vs.source = cstr!("#version 330
 layout(location = 0) in vec4 position;
 out vec4 color;
 layout(location = 1) in vec4 color0;
@@ -30,9 +31,9 @@ void main()
     ) * position;
     color = color0;
 }
-\0".as_ptr() as _;
-    desc.vs.entry = b"main\0".as_ptr() as _;
-    desc.fs.source = b"#version 330
+");
+    desc.vs.entry = cstr!("main");
+    desc.fs.source = cstr!("#version 330
         
 layout(location = 0) out vec4 frag_color;
 in vec4 color;
@@ -41,9 +42,9 @@ void main()
 {
     frag_color = color;
 }
-\0".as_ptr() as _;
-    desc.fs.entry = b"main\0".as_ptr() as _;
-    desc.label = b"cube_shader\0".as_ptr() as _;
+");
+    desc.fs.entry = cstr!("main");
+    desc.label = cstr!("cube_shader");
 
     desc
 }
@@ -106,7 +107,7 @@ fn init(state: &mut State) {
 
     let v_buffer_desc = sg_buffer_desc{
         data: range!(VERTICIES),
-        label: b"cube-vertices\0".as_ptr() as _,
+        label: cstr!("cube-vertices"),
         ..<_>::default()
     };
 
@@ -115,7 +116,7 @@ fn init(state: &mut State) {
     let i_buffer_desc = sg_buffer_desc{
         type_: sg_buffer_type_SG_BUFFERTYPE_INDEXBUFFER,
         data: range!(INDICES),
-        label: b"cube-indices\0".as_ptr() as _,
+        label: cstr!("cube-indices"),
         ..<_>::default()
     };
 
@@ -140,7 +141,7 @@ fn init(state: &mut State) {
         index_type: sg_index_type_SG_INDEXTYPE_UINT16,
         cull_mode: sg_cull_mode_SG_CULLMODE_BACK,
         depth,
-        label: b"cube-pipeline\0".as_ptr() as _,
+        label: cstr!("cube-pipeline"),
         ..sg_pipeline_desc::default()
     };
     /* create pipeline object */
