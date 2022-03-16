@@ -95,7 +95,7 @@ struct Vertex {
 macro_rules! vertex_array {
     (
         $(
-            {$x: literal, $y: literal, $z: literal, $color: literal, $u: literal, $v: literal $(,)?}
+            {$x: literal, $y: literal, $z: literal, $color: literal, $u: expr, $v: expr $(,)?}
         ),*
 
         $(,)?
@@ -126,38 +126,49 @@ macro_rules! vertex_array {
     formats to floating point inputs (only to integer inputs),
     and WebGL2 / GLES2 don't support integer vertex shader inputs.
 */
-const VERTICIES: [Vertex; 24] = vertex_array![
-    /* pos                  color       uvs */
-    { -1.0, -1.0, -1.0,  0xFFFFFFFF,     0,     0 },
-    {  1.0, -1.0, -1.0,  0xFFFFFFFF, 32767,     0 },
-    {  1.0,  1.0, -1.0,  0xFFFFFFFF, 32767, 32767 },
-    { -1.0,  1.0, -1.0,  0xFFFFFFFF,     0, 32767 },
-
-    { -1.0, -1.0,  1.0,  0xFF00FF00,     0,     0 },
-    {  1.0, -1.0,  1.0,  0xFF00FF00, 32767,     0 },
-    {  1.0,  1.0,  1.0,  0xFF00FF00, 32767, 32767 },
-    { -1.0,  1.0,  1.0,  0xFF00FF00,     0, 32767 },
-
-    { -1.0, -1.0, -1.0,  0xFFFFFFFF,     0,     0 },
-    { -1.0,  1.0, -1.0,  0xFFFFFFFF, 32767,     0 },
-    { -1.0,  1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
-    { -1.0, -1.0,  1.0,  0xFFFFFFFF,     0, 32767 },
-
-    {  1.0, -1.0, -1.0,  0xFF00FF00,     0,     0 },
-    {  1.0,  1.0, -1.0,  0xFF00FF00, 32767,     0 },
-    {  1.0,  1.0,  1.0,  0xFF00FF00, 32767, 32767 },
-    {  1.0, -1.0,  1.0,  0xFF00FF00,     0, 32767 },
-
-    { -1.0, -1.0, -1.0,  0xFFFFFFFF,     0,     0 },
-    { -1.0, -1.0,  1.0,  0xFFFFFFFF, 32767,     0 },
-    {  1.0, -1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
-    {  1.0, -1.0, -1.0,  0xFFFFFFFF,     0, 32767 },
-
-    { -1.0,  1.0, -1.0,  0xFF00FF00,     0,     0 },
-    { -1.0,  1.0,  1.0,  0xFF00FF00, 32767,     0 },
-    {  1.0,  1.0,  1.0,  0xFF00FF00, 32767, 32767 },
-    {  1.0,  1.0, -1.0,  0xFF00FF00,     0, 32767 },
-];
+const VERTICIES: [Vertex; 24] = {
+    macro_rules! m {
+        (0/1) => {0};
+        (1/1) => {32767};
+        (1/4) => {32767/4};
+        (1/3) => {32767/3};
+        (1/2) => {32767/2};
+        (2/3) => {m!(1/3) * 2};
+        (3/4) => {m!(1/4) * 3};
+    }
+    vertex_array![
+        /* pos                  color       uvs */
+        { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(0/1), m!(1/3) },
+        {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+        {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
+        { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+    
+        { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(0/1), m!(2/3) },
+        {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
+        {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
+        { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(2/3) },
+    
+        { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/1), m!(2/3) },
+        { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/1), m!(2/3) },
+    
+        {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+        {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
+        {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
+        {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
+    
+        { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(0/1), m!(1/3) },
+        { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(0/1), m!(2/3) },
+        {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
+        {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+    
+        { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(2/3) },
+        {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
+        {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
+    ]
+};
 
 const INDEX_COUNT: Int = 36;
 
