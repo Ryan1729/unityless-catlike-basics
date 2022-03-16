@@ -188,21 +188,13 @@ fn init(state: &mut State) {
 
     state.bind.index_buffer = unsafe { sg_make_buffer(&i_buffer_desc) };
 
-    const W: Int = 4;
-    const H: Int = 4;
-
-    /* create a checkerboard texture */
-    let pixels: [ABGR; W as usize * H as usize ] = [
-        0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF, 0xFF000000,
-        0xFF000000, 0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF,
-        0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF, 0xFF000000,
-        0xFF000000, 0xFFFFFFFF, 0xFF000000, 0xFFFFFFFF,
-    ];
+    let image_bytes = include_bytes!("../../assets/skybox.png");
+    let (header, image_data) = png_decoder::decode(image_bytes).unwrap();
 
     let mut image_desc = sg_image_desc::default();
-    image_desc.width = W;
-    image_desc.height = H;
-    image_desc.data.subimage[0][0] = range!(pixels);
+    image_desc.width = header.width as _;
+    image_desc.height = header.height as _;
+    image_desc.data.subimage[0][0] = range!(&image_data);
     image_desc.label = cstr!("cube-texture");
 
     state.bind.fs_images[SLOT_TEX as usize] = unsafe { sg_make_image(&image_desc) };

@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 sokol-bindings = { path = "../sokol-bindings" }
+png-decoder = "0.1.0"

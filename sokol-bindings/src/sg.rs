@@ -17,7 +17,7 @@ macro_rules! _range {
     // If you pass an expr, we don't want to evaluate the expr twice, so AFAIK
     // the cleanest way to do that is for you to add the `&`.
     ($arr_ref: expr) => {{
-        let arr_ref = $arr_ref;
+        let arr_ref: &[u8] = $arr_ref;
         $crate::sg::Range {
             size: core::mem::size_of_val(arr_ref),
             ptr: arr_ref as *const _ as _,
