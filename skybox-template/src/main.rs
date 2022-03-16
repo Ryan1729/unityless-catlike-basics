@@ -34,7 +34,7 @@ void main()
 {
     gl_Position = mat4(vs_params[0], vs_params[1], vs_params[2], vs_params[3]) * position;
     color = color0;
-    uv = texcoord0 * 5.0;
+    uv = texcoord0;
 }
 ");
     desc.vs.uniform_blocks[0].size = 64;
@@ -133,30 +133,30 @@ const VERTICIES: [Vertex; 24] = vertex_array![
     {  1.0,  1.0, -1.0,  0xFFFFFFFF, 32767, 32767 },
     { -1.0,  1.0, -1.0,  0xFFFFFFFF,     0, 32767 },
 
-    { -1.0, -1.0,  1.0,  0xFFFFFFFF,     0,     0 },
-    {  1.0, -1.0,  1.0,  0xFFFFFFFF, 32767,     0 },
-    {  1.0,  1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
-    { -1.0,  1.0,  1.0,  0xFFFFFFFF,     0, 32767 },
+    { -1.0, -1.0,  1.0,  0xFF00FF00,     0,     0 },
+    {  1.0, -1.0,  1.0,  0xFF00FF00, 32767,     0 },
+    {  1.0,  1.0,  1.0,  0xFF00FF00, 32767, 32767 },
+    { -1.0,  1.0,  1.0,  0xFF00FF00,     0, 32767 },
 
     { -1.0, -1.0, -1.0,  0xFFFFFFFF,     0,     0 },
     { -1.0,  1.0, -1.0,  0xFFFFFFFF, 32767,     0 },
     { -1.0,  1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
     { -1.0, -1.0,  1.0,  0xFFFFFFFF,     0, 32767 },
 
-    {  1.0, -1.0, -1.0,  0xFFFFFFFF,     0,     0 },
-    {  1.0,  1.0, -1.0,  0xFFFFFFFF, 32767,     0 },
-    {  1.0,  1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
-    {  1.0, -1.0,  1.0,  0xFFFFFFFF,     0, 32767 },
+    {  1.0, -1.0, -1.0,  0xFF00FF00,     0,     0 },
+    {  1.0,  1.0, -1.0,  0xFF00FF00, 32767,     0 },
+    {  1.0,  1.0,  1.0,  0xFF00FF00, 32767, 32767 },
+    {  1.0, -1.0,  1.0,  0xFF00FF00,     0, 32767 },
 
     { -1.0, -1.0, -1.0,  0xFFFFFFFF,     0,     0 },
     { -1.0, -1.0,  1.0,  0xFFFFFFFF, 32767,     0 },
     {  1.0, -1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
     {  1.0, -1.0, -1.0,  0xFFFFFFFF,     0, 32767 },
 
-    { -1.0,  1.0, -1.0,  0xFFFFFFFF,     0,     0 },
-    { -1.0,  1.0,  1.0,  0xFFFFFFFF, 32767,     0 },
-    {  1.0,  1.0,  1.0,  0xFFFFFFFF, 32767, 32767 },
-    {  1.0,  1.0, -1.0,  0xFFFFFFFF,     0, 32767 },
+    { -1.0,  1.0, -1.0,  0xFF00FF00,     0,     0 },
+    { -1.0,  1.0,  1.0,  0xFF00FF00, 32767,     0 },
+    {  1.0,  1.0,  1.0,  0xFF00FF00, 32767, 32767 },
+    {  1.0,  1.0, -1.0,  0xFF00FF00,     0, 32767 },
 ];
 
 const INDEX_COUNT: Int = 36;
@@ -232,8 +232,7 @@ fn init(state: &mut State) {
     state.bind.index_buffer = unsafe { sg_make_buffer(&i_buffer_desc) };
 
     let decoded = decode_png_with_checkerboard_fallback(
-        //include_bytes!("../../assets/skybox.png"),
-        include_bytes!("../../assets/how-the-assets-were-made.md"),
+        include_bytes!("../../assets/skybox.png"),
     );
 
     let mut image_desc = sg_image_desc::default();
