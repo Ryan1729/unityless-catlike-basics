@@ -171,6 +171,46 @@ const INDICES: [u16; INDEX_COUNT as usize] = [
     22, 21, 20,  23, 22, 20
 ];
 
+/// The byte at index 0 is the red channel, index 1 green, index 2 blue, index 3
+// alpha, index 4 red again, and so on.
+type RGBAVec<'image> = std::borrow::Cow<'image, [u8]>;
+
+struct DecodedPng<'image> {
+    w: Int,
+    h: Int,
+    image_bytes: RGBAVec<'image>,
+}
+
+fn decode_png_with_checkerboard_fallback<'image>(png_bytes: &[u8]) -> DecodedPng<'image> {
+    match png_decoder::decode(png_bytes) {
+        Ok((header, image_data)) => DecodedPng {
+            w: header.width as _,
+            h: header.height as _,
+            image_bytes: RGBAVec::from(image_data),
+        },
+        Err(err) => {
+            eprintln!("{}:{}:{} {:?}\nfalling back to checkerboard", file!(), line!(), column!(), err);
+
+            const W: Int = 4;
+            const H: Int = 4;
+
+            // R, G, B, A, R, ...
+            const CHECKERBOARD: [u8; W as usize * H as usize * 4 as usize ] = [
+                0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF,
+                0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF,
+                0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+            ];
+
+            DecodedPng {
+                w: W,
+                h: H,
+                image_bytes: RGBAVec::from(CHECKERBOARD.as_slice()),
+            }
+        }
+    }
+}
+
 fn init(state: &mut State) {
     setup_default_context();
 
@@ -191,13 +231,15 @@ fn init(state: &mut State) {
 
     state.bind.index_buffer = unsafe { sg_make_buffer(&i_buffer_desc) };
 
-    let image_bytes = include_bytes!("../../assets/skybox.png");
-    let (header, image_data) = png_decoder::decode(image_bytes).unwrap();
+    let decoded = decode_png_with_checkerboard_fallback(
+        //include_bytes!("../../assets/skybox.png"),
+        include_bytes!("../../assets/how-the-assets-were-made.md"),
+    );
 
     let mut image_desc = sg_image_desc::default();
-    image_desc.width = header.width as _;
-    image_desc.height = header.height as _;
-    image_desc.data.subimage[0][0] = range!(&image_data);
+    image_desc.width = decoded.w;
+    image_desc.height = decoded.h;
+    image_desc.data.subimage[0][0] = range!(&decoded.image_bytes);
     image_desc.label = cstr!("cube-texture");
 
     state.bind.fs_images[SLOT_TEX as usize] = unsafe { sg_make_image(&image_desc) };
