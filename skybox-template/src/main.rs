@@ -1,10 +1,11 @@
 use sokol_bindings::{
     *,
     cstr,
-    sapp::{self, IconDesc},
+    sapp::{self, IconDesc, frame_duration, FPS},
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
 };
+use math::mat4::Mat4;
 
 const ATTR_VS_POSITION: u8 = 0;
 const ATTR_VS_COLOR0: u8 = 1;
@@ -287,6 +288,22 @@ fn frame(state: &mut State) {
         action: Action::Clear,
         value: Color{ r: 0.25, g: 0.5, b: 0.75, a: 1. },
     };
+
+    let w = sapp::width();
+    let h = sapp::height();
+
+    /* compute model-view-projection matrix for vertex shader */
+    let t = (frame_duration() * FPS as f64) as f32;
+    let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
+    //HMM_Perspective(60.0f, sapp_widthf()/sapp_heightf(), 0.01f, 10.0f);
+    //hmm_mat4 view = HMM_LookAt(HMM_Vec3(0.0f, 1.5f, 6.0f), HMM_Vec3(0.0f, 0.0f, 0.0f), HMM_Vec3(0.0f, 1.0f, 0.0f));
+    //hmm_mat4 view_proj = HMM_MultiplyMat4(proj, view);
+    //vs_params_t vs_params;
+    //state.rx += 1.0f * t; state.ry += 2.0f * t;
+    //hmm_mat4 rxm = HMM_Rotate(state.rx, HMM_Vec3(1.0f, 0.0f, 0.0f));
+    //hmm_mat4 rym = HMM_Rotate(state.ry, HMM_Vec3(0.0f, 1.0f, 0.0f));
+    //hmm_mat4 model = HMM_MultiplyMat4(rxm, rym);
+    //vs_params.mvp = HMM_MultiplyMat4(view_proj, model);
 
     let vs_params: VsParams = [
         0.12511493265628815, 0.10831947781532758, 0.18738500347083775, 0.0,

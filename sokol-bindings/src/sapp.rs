@@ -1,6 +1,10 @@
 use sokol_bindings_sys as sys;
 use crate::Int;
 
+/// The expected Frames Per Second. That is, the number of times a second the
+/// frame callbacks are usually called.
+pub const FPS: u8 = 60;
+
 pub type Desc = sys::sapp_desc;
 pub type Event = sys::sapp_event;
 pub type IconDesc = sys::sapp_icon_desc;
@@ -116,3 +120,7 @@ pub fn height() -> Int {
     unsafe{ sys::sapp_height() }
 }
 
+pub fn frame_duration() -> f64 {
+    // SAFETY: There are no currently known safety issues with this fn.
+    unsafe{ sys::sapp_frame_duration() }
+}
