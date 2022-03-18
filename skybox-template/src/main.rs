@@ -5,7 +5,10 @@ use sokol_bindings::{
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
 };
-use math::mat4::Mat4;
+use math::{
+    mat4::Mat4,
+    vec3::vec3,
+};
 
 const ATTR_VS_POSITION: u8 = 0;
 const ATTR_VS_COLOR0: u8 = 1;
@@ -295,8 +298,7 @@ fn frame(state: &mut State) {
     /* compute model-view-projection matrix for vertex shader */
     let t = (frame_duration() * FPS as f64) as f32;
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
-    //HMM_Perspective(60.0f, sapp_widthf()/sapp_heightf(), 0.01f, 10.0f);
-    //hmm_mat4 view = HMM_LookAt(HMM_Vec3(0.0f, 1.5f, 6.0f), HMM_Vec3(0.0f, 0.0f, 0.0f), HMM_Vec3(0.0f, 1.0f, 0.0f));
+    let view = Mat4::look_at(vec3!(0., 1.5, 6.), vec3!(), vec3!(0., 1., 0.));
     //hmm_mat4 view_proj = HMM_MultiplyMat4(proj, view);
     //vs_params_t vs_params;
     //state.rx += 1.0f * t; state.ry += 2.0f * t;
