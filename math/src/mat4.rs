@@ -1,4 +1,4 @@
-use core::ops::{Index, IndexMut};
+use core::ops::{Index, IndexMut, Mul, MulAssign};
 use crate::vec3::Vec3;
 
 pub type Element = f32;
@@ -10,8 +10,22 @@ pub type Elements = [Element; 16];
 
 /// We have this wrapper struct so we can implement `Mul`, etc.
 #[repr(transparent)]
-#[derive(Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, PartialOrd)]
 pub struct Mat4(pub Elements);
+
+impl Index<u8> for Mat4 {
+    type Output = Element;
+
+    fn index(&self, index: u8) -> &Self::Output {
+        self.0.index(index as usize)
+    }
+}
+
+impl IndexMut<u8> for Mat4 {
+    fn index_mut(&mut self, index: u8) -> &mut Self::Output {
+        self.0.index_mut(index as usize)
+    }
+}
 
 impl Index<usize> for Mat4 {
     type Output = Element;
@@ -30,6 +44,101 @@ impl IndexMut<usize> for Mat4 {
 pub const WIDTH: u8 = 4;
 pub const HEIGHT: u8 = 4;
 pub const LENGTH: u8 = WIDTH * HEIGHT;
+
+macro_rules! row_col {
+    ($row: literal $col: literal) => {
+        row_col!($row, $col)
+    };
+    ($row: expr, $col: expr $(,)?) => {
+        WIDTH * $row + $col
+    }
+}
+
+// If we want to expose these, consider using an enum instead.
+const _0_0: u8 = row_col!(0 0);
+const _0_1: u8 = row_col!(0 1);
+const _0_2: u8 = row_col!(0 2);
+const _0_3: u8 = row_col!(0 3);
+const _1_0: u8 = row_col!(1 0);
+const _1_1: u8 = row_col!(1 1);
+const _1_2: u8 = row_col!(1 2);
+const _1_3: u8 = row_col!(1 3);
+const _2_0: u8 = row_col!(2 0);
+const _2_1: u8 = row_col!(2 1);
+const _2_2: u8 = row_col!(2 2);
+const _2_3: u8 = row_col!(2 3);
+const _3_0: u8 = row_col!(3 0);
+const _3_1: u8 = row_col!(3 1);
+const _3_2: u8 = row_col!(3 2);
+const _3_3: u8 = row_col!(3 3);
+
+impl Mul for Mat4 {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self::Output {
+       let mut output = Self::default();
+
+        // TODO add SSE version
+
+        for column in 0..WIDTH {
+            for row in 0..HEIGHT {
+                let mut sum = 0.;
+
+                // This assumes `WIDTH == HEIGHT == 4`, which is unlikely to change.
+                for index in 0..4 {
+                    sum += self[row_col!(row, index)]
+                        * other[row_col!(index, column)];
+                }
+
+                output[(WIDTH * row + column) as usize] = sum;
+            }
+        }
+
+        output
+    }
+}
+
+impl MulAssign for Mat4 {
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
+    }
+}
+
+#[test]
+fn mat4_mul_works_on_this_prime_number_example() {
+    let actual = Mat4([
+        2.,3.,5.,7.,
+        11.,13.,17.,19.,
+        23.,29.,31.,37.,
+        41.,43.,47.,53.,
+    ]) * Mat4([
+        59.,61.,67.,71.,
+        73.,79.,83.,89.,
+        97.,101.,103.,107.,
+        109.,113.,127.,131.,
+    ]);
+
+    let expected = Mat4([
+        1585.,1655.,1787.,1861.,
+        5318.,5562.,5980.,6246.,
+        10514.,11006.,11840.,12378.,
+        15894.,16634.,17888.,18710.,
+    ]);
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn mat4_mul_works_on_this_asymmetrical_example() {
+    let initial = Mat4([
+        0.,1.,2.,3.,
+        0.,0.,4.,5.,
+        0.,0.,0.,6.,
+        0.,0.,0.,0.,
+    ]);
+
+    assert_eq!(initial * Mat4::identity(), initial);
+}
 
 impl Mat4 {
     pub fn diagonal(value: f32) -> Self {
@@ -51,24 +160,6 @@ pub type ClipPlanes = (Element, Element);
 
 /// Width / Height
 pub type AspectRatio = Element;
-
-// If we want to exose these, consider using an enum instead.
-const _0_0: usize = 0;
-const _0_1: usize = 1;
-const _0_2: usize = 2;
-const _0_3: usize = 3;
-const _1_0: usize = WIDTH as usize;
-const _1_1: usize = WIDTH as usize + 1;
-const _1_2: usize = WIDTH as usize + 2;
-const _1_3: usize = WIDTH as usize + 3;
-const _2_0: usize = WIDTH as usize * 2 + 0;
-const _2_1: usize = WIDTH as usize * 2 + 1;
-const _2_2: usize = WIDTH as usize * 2 + 2;
-const _2_3: usize = WIDTH as usize * 2 + 3;
-const _3_0: usize = WIDTH as usize * 3 + 0;
-const _3_1: usize = WIDTH as usize * 3 + 1;
-const _3_2: usize = WIDTH as usize * 3 + 2;
-const _3_3: usize = WIDTH as usize * 3 + 3;
 
 impl Mat4 {
     pub fn perspective(

@@ -299,7 +299,7 @@ fn frame(state: &mut State) {
     let t = (frame_duration() * FPS as f64) as f32;
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
     let view = Mat4::look_at(vec3!(0., 1.5, 6.), vec3!(), vec3!(0., 1., 0.));
-    //hmm_mat4 view_proj = HMM_MultiplyMat4(proj, view);
+    let view_proj = proj * view;
     //vs_params_t vs_params;
     //state.rx += 1.0f * t; state.ry += 2.0f * t;
     //hmm_mat4 rxm = HMM_Rotate(state.rx, HMM_Vec3(1.0f, 0.0f, 0.0f));
