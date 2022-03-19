@@ -6,6 +6,7 @@ use sokol_bindings::{
     sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
 };
 use math::{
+    angle::Degrees,
     mat4::Mat4,
     vec3::vec3,
 };
@@ -72,6 +73,8 @@ void main()
 struct State {
     bind: sg_bindings,
     pipe: sg_pipeline,
+    rx: Degrees,
+    ry: Degrees,
 }
 
 /// From most significant to least significant. So in a hex literal that's
@@ -146,27 +149,27 @@ const VERTICIES: [Vertex; 24] = {
         {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
         {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
         { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
-    
+
         { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(0/1), m!(2/3) },
         {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
         {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
         { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(2/3) },
-    
+
         { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/1), m!(2/3) },
         { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
         { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
         { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/1), m!(2/3) },
-    
+
         {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
         {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
         {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
         {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
-    
+
         { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(0/1), m!(1/3) },
         { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(0/1), m!(2/3) },
         {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
         {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
-    
+
         { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
         { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(2/3) },
         {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
@@ -300,19 +303,14 @@ fn frame(state: &mut State) {
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
     let view = Mat4::look_at(vec3!(0., 1.5, 6.), vec3!(), vec3!(0., 1., 0.));
     let view_proj = proj * view;
-    //vs_params_t vs_params;
-    //state.rx += 1.0f * t; state.ry += 2.0f * t;
-    //hmm_mat4 rxm = HMM_Rotate(state.rx, HMM_Vec3(1.0f, 0.0f, 0.0f));
-    //hmm_mat4 rym = HMM_Rotate(state.ry, HMM_Vec3(0.0f, 1.0f, 0.0f));
-    //hmm_mat4 model = HMM_MultiplyMat4(rxm, rym);
-    //vs_params.mvp = HMM_MultiplyMat4(view_proj, model);
+    state.rx += Degrees(1. * t);
+    state.ry += Degrees(2. * t);
+    let rxm = Mat4::rotation(state.rx, vec3!(x));
+    let rym = Mat4::rotation(state.ry, vec3!(y));
+    let model = rxm * rym;
+    let mvp = view_proj * model;
 
-    let vs_params: VsParams = [
-        0.12511493265628815, 0.10831947781532758, 0.18738500347083775, 0.0,
-        -0.21643994748592377, 0.06261498549435007, 0.10831947781532758, 0.0,
-        0.0, -0.21643994748592377, 0.12511493265628815, 0.0,
-        0.0, 0.0, 0.0, 1.0
-    ];
+    let vs_params: VsParams = mvp.0;
 
     begin_default_pass(&pass_action, sapp::width(), sapp::height());
     unsafe {

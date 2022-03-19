@@ -5,6 +5,15 @@ macro_rules! _vec3 {
     () => {
         $crate::vec3::Vec3::default()
     };
+    (x) => {
+        $crate::vec3::Vec3 { x: 1., y: 0., z: 0. }
+    };
+    (y) => {
+        $crate::vec3::Vec3 { x: 0., y: 1., z: 0. }
+    };
+    (z) => {
+        $crate::vec3::Vec3 { x: 0., y: 0., z: 1. }
+    };
     ($x: literal $y: literal $z: literal) => {
         $crate::vec3::Vec3 { x: $x, y: $y, z: $z }
     };

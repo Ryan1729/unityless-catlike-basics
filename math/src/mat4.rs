@@ -1,5 +1,8 @@
 use core::ops::{Index, IndexMut, Mul, MulAssign};
-use crate::vec3::Vec3;
+use crate::{
+    angle::Angle,
+    vec3::Vec3,
+};
 
 pub type Element = f32;
 
@@ -212,6 +215,42 @@ impl Mat4 {
         output[_3_3] = 1.;
 
         output
+    }
+
+    pub fn rotation(angle: impl Angle, mut axis: Vec3) -> Self {
+        let radians = angle.raw_radians();
+
+        let mut output = Self::default();
+
+        axis = axis.normalize();
+
+        let (sin_theta, cos_theta) = radians.sin_cos();
+        let cos_value = 1. - cos_theta;
+
+        output[_0_0] = (axis.x * axis.x * cos_value) + cos_theta;
+        output[_0_1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
+        output[_0_2] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
+
+        output[_1_0] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
+        output[_1_1] = (axis.y * axis.y * cos_value) + cos_theta;
+        output[_1_2] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
+
+        output[_2_0] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
+        output[_2_1] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
+        output[_2_2] = (axis.z * axis.z * cos_value) + cos_theta;
+
+        output[_3_3] = 1.;
+
+        output
+    }
+
+    pub fn transpose(self) -> Self {
+        Self([
+            self[_0_0], self[_1_0], self[_2_0], self[_3_0],
+            self[_0_1], self[_1_1], self[_2_1], self[_3_1],
+            self[_0_2], self[_1_2], self[_2_2], self[_3_2],
+            self[_0_3], self[_1_3], self[_2_3], self[_3_3],
+        ])
     }
 }
 
