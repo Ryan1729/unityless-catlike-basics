@@ -32,6 +32,12 @@ pub struct Vec3 {
     pub z: Element,
 }
 
+impl core::fmt::Display for Vec3 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
 impl SubAssign for Vec3 {
     fn sub_assign(&mut self, other: Self) {
         self.x -= other.x;

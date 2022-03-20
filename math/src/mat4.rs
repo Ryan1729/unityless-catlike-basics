@@ -18,16 +18,16 @@ pub struct Mat4(pub Elements);
 
 impl core::fmt::Display for Mat4 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "[\n")?;
+        write!(f, "[row_col!(row, column)\n")?;
 
-        for column in 0..WIDTH {
+        for row in 0..HEIGHT {
             write!(f, "    ")?;
-            for row in 0..HEIGHT {
+            for column in 0..WIDTH {
                 let val = self[row_col!(row, column)];
-                if val < 0. {
-                    write!(f, "{val:.7}, ")?;
+                if val.is_sign_negative() {
+                    write!(f, "{val:.8} ({row} {column}), ")?;
                 } else {
-                    write!(f, " {val:.7}, ")?;
+                    write!(f, " {val:.8} ({row} {column}), ")?;
                 }
             }
             write!(f, "\n")?;
@@ -215,9 +215,9 @@ impl Mat4 {
 
         output[_0_0] = 1. / tan_theta_over_2;
         output[_1_1] = aspect_ratio / tan_theta_over_2;
-        output[_2_3] = -1.;
+        output[_3_2] = -1.;
         output[_2_2] = (near + far) / (near - far);
-        output[_3_2] = (2. * near * far) / (near - far);
+        output[_2_3] = (2. * near * far) / (near - far);
         output[_3_3] = 0.;
 
         output
@@ -232,23 +232,23 @@ impl Mat4 {
 
         let f = (center - eye).normalize();
         let s = f.cross(up).normalize();
-        let u = s.cross(up);
+        let u = s.cross(f);
 
         output[_0_0] = s.x;
-        output[_0_1] = u.x;
-        output[_0_2] = -f.x;
+        output[_1_0] = u.x;
+        output[_2_0] = -f.x;
 
-        output[_1_0] = s.y;
+        output[_0_1] = s.y;
         output[_1_1] = u.y;
-        output[_1_2] = -f.y;
+        output[_2_1] = -f.y;
 
-        output[_2_0] = s.z;
-        output[_2_1] = u.z;
+        output[_0_2] = s.z;
+        output[_1_2] = u.z;
         output[_2_2] = -f.z;
 
-        output[_3_0] = -(s.dot(eye));
-        output[_3_1] = -(u.dot(eye));
-        output[_3_2] = -(f.dot(eye));
+        output[_0_3] = -(s.dot(eye));
+        output[_1_3] = -(u.dot(eye));
+        output[_2_3] = f.dot(eye);
         output[_3_3] = 1.;
 
         output
@@ -265,15 +265,15 @@ impl Mat4 {
         let cos_value = 1. - cos_theta;
 
         output[_0_0] = (axis.x * axis.x * cos_value) + cos_theta;
-        output[_0_1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
-        output[_0_2] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
+        output[_1_0] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
+        output[_2_0] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
 
-        output[_1_0] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
+        output[_0_1] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
         output[_1_1] = (axis.y * axis.y * cos_value) + cos_theta;
-        output[_1_2] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
+        output[_2_1] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
 
-        output[_2_0] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
-        output[_2_1] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
+        output[_0_2] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
+        output[_1_2] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
         output[_2_2] = (axis.z * axis.z * cos_value) + cos_theta;
 
         output[_3_3] = 1.;

@@ -301,9 +301,24 @@ fn frame(state: &mut State) {
     /* compute model-view-projection matrix for vertex shader */
     let t = (frame_duration() * FPS as f64) as f32;
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
-    println!("{}", proj);
+    println!("proj\n{proj}");
+
+    let eye = vec3!(0., 1.5, 6.);
+    let center = vec3!();
+    let up = vec3!(0., 1., 0.);
+
+    let f = (center - eye).normalize();
+    let s = f.cross(up).normalize();
+    let u = s.cross(f);
+
+    println!("s\n{s}");
+    println!("u\n{u}");
+    println!("f\n{f}");
+
     let view = Mat4::look_at(vec3!(0., 1.5, 6.), vec3!(), vec3!(0., 1., 0.));
+    println!("view\n{view}");
     let view_proj = proj * view;
+    println!("view_proj\n{view_proj}");
     state.rx += Degrees(1. * t);
     state.ry += Degrees(2. * t);
     let rxm = Mat4::rotation(state.rx, vec3!(x));
@@ -311,8 +326,8 @@ fn frame(state: &mut State) {
     let model = rxm * rym;
     let mvp = view_proj * model;
 
-    //let vs_params: VsParams = mvp.0;
-    let vs_params: VsParams = proj.0;
+//    let vs_params: VsParams = mvp.0;
+    let vs_params: VsParams = view_proj.0;
 //    let vs_params: VsParams = [
 //        0.12511493265628815, 0.10831947781532758, 0.18738500347083775, 0.0,
 //        -0.21643994748592377, 0.06261498549435007, 0.10831947781532758, 0.0,
