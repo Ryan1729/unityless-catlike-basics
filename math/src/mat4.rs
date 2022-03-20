@@ -25,9 +25,9 @@ impl core::fmt::Display for Mat4 {
             for row in 0..HEIGHT {
                 let val = self[row_col!(row, column)];
                 if val < 0. {
-                    write!(f, "{:.7}, ", val)?;
+                    write!(f, "{val:.7}, ")?;
                 } else {
-                    write!(f, " {:.7}, ", val)?;
+                    write!(f, " {val:.7}, ")?;
                 }
             }
             write!(f, "\n")?;
