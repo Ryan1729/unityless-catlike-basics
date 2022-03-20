@@ -301,6 +301,7 @@ fn frame(state: &mut State) {
     /* compute model-view-projection matrix for vertex shader */
     let t = (frame_duration() * FPS as f64) as f32;
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
+    println!("{}", proj);
     let view = Mat4::look_at(vec3!(0., 1.5, 6.), vec3!(), vec3!(0., 1., 0.));
     let view_proj = proj * view;
     state.rx += Degrees(1. * t);
@@ -310,7 +311,14 @@ fn frame(state: &mut State) {
     let model = rxm * rym;
     let mvp = view_proj * model;
 
-    let vs_params: VsParams = mvp.0;
+    //let vs_params: VsParams = mvp.0;
+    let vs_params: VsParams = proj.0;
+//    let vs_params: VsParams = [
+//        0.12511493265628815, 0.10831947781532758, 0.18738500347083775, 0.0,
+//        -0.21643994748592377, 0.06261498549435007, 0.10831947781532758, 0.0,
+//        0.0, -0.21643994748592377, 0.12511493265628815, 0.0,
+//        0.0, 0.0, 0.0, 1.0
+//    ];
 
     begin_default_pass(&pass_action, sapp::width(), sapp::height());
     unsafe {

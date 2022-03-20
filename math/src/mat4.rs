@@ -16,6 +16,27 @@ pub type Elements = [Element; 16];
 #[derive(Copy, Clone, Debug, Default, PartialEq, PartialOrd)]
 pub struct Mat4(pub Elements);
 
+impl core::fmt::Display for Mat4 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "[\n")?;
+
+        for column in 0..WIDTH {
+            write!(f, "    ")?;
+            for row in 0..HEIGHT {
+                let val = self[row_col!(row, column)];
+                if val < 0. {
+                    write!(f, "{:.7}, ", val)?;
+                } else {
+                    write!(f, " {:.7}, ", val)?;
+                }
+            }
+            write!(f, "\n")?;
+        }
+            
+        write!(f, "]\n")
+    }
+}
+
 impl Index<u8> for Mat4 {
     type Output = Element;
 
@@ -26,6 +47,20 @@ impl Index<u8> for Mat4 {
 
 impl IndexMut<u8> for Mat4 {
     fn index_mut(&mut self, index: u8) -> &mut Self::Output {
+        self.0.index_mut(index as usize)
+    }
+}
+
+impl Index<i32> for Mat4 {
+    type Output = Element;
+
+    fn index(&self, index: i32) -> &Self::Output {
+        self.0.index(index as usize)
+    }
+}
+
+impl IndexMut<i32> for Mat4 {
+    fn index_mut(&mut self, index: i32) -> &mut Self::Output {
         self.0.index_mut(index as usize)
     }
 }
@@ -48,7 +83,8 @@ pub const WIDTH: u8 = 4;
 pub const HEIGHT: u8 = 4;
 pub const LENGTH: u8 = WIDTH * HEIGHT;
 
-macro_rules! row_col {
+#[macro_export]
+macro_rules! _row_col {
     ($row: literal $col: literal) => {
         row_col!($row, $col)
     };
@@ -56,6 +92,7 @@ macro_rules! row_col {
         WIDTH * $row + $col
     }
 }
+pub use _row_col as row_col;
 
 // If we want to expose these, consider using an enum instead.
 const _0_0: u8 = row_col!(0 0);
