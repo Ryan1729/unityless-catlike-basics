@@ -12,9 +12,30 @@ pub const PI: Element = std::f32::consts::PI;
 pub type Elements = [Element; 16];
 
 /// We have this wrapper struct so we can implement `Mul`, etc.
+/// We keep the interior `Elements` private so we have the option to change
+/// the internal representation between column-major to row-major  without external
+/// code needing to care.
 #[repr(transparent)]
 #[derive(Copy, Clone, Debug, Default, PartialEq, PartialOrd)]
-pub struct Mat4(pub Elements);
+pub struct Mat4(Elements);
+
+impl Mat4 {
+    pub fn from_row_major(elements: Elements) -> Self {
+        Mat4(elements)
+    }
+
+    pub fn from_column_major(elements: Elements) -> Self {
+        Mat4(elements).transpose()
+    }
+
+    pub fn to_row_major(self) -> Elements {
+        self.0
+    }
+
+    pub fn to_column_major(self) -> Elements {
+        self.transpose().0
+    }
+}
 
 impl core::fmt::Display for Mat4 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -32,7 +53,7 @@ impl core::fmt::Display for Mat4 {
             }
             write!(f, "\n")?;
         }
-            
+
         write!(f, "]\n")
     }
 }
