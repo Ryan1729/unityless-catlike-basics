@@ -1,4 +1,4 @@
-use core::ops::{Neg, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[macro_export]
 macro_rules! _vec3 {
@@ -25,7 +25,7 @@ pub use _vec3 as vec3;
 
 pub type Element = f32;
 
-#[derive(Clone, Copy, Default, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)]
 pub struct Vec3 {
     pub x: Element,
     pub y: Element,
@@ -35,6 +35,23 @@ pub struct Vec3 {
 impl core::fmt::Display for Vec3 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
+    }
+}
+
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, other: Self) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+    }
+}
+
+impl Add for Vec3 {
+    type Output = Self;
+
+    fn add(mut self, other: Self) -> Self::Output {
+        self += other;
+        self
     }
 }
 
@@ -62,6 +79,23 @@ impl Neg for Vec3 {
         self.x = -self.x;
         self.y = -self.y;
         self.z = -self.z;
+        self
+    }
+}
+
+impl MulAssign<Element> for Vec3 {
+    fn mul_assign(&mut self, scale: Element) {
+        self.x *= scale;
+        self.y *= scale;
+        self.z *= scale;
+    }
+}
+
+impl Mul<Element> for Vec3 {
+    type Output = Self;
+
+    fn mul(mut self, scale: Element) -> Self::Output {
+        self *= scale;
         self
     }
 }

@@ -8,7 +8,7 @@ use sokol_bindings::{
 use math::{
     angle::Degrees,
     mat4::Mat4,
-    vec3::vec3,
+    vec3::{Vec3, vec3},
 };
 
 const ATTR_VS_POSITION: u8 = 0;
@@ -75,6 +75,8 @@ struct State {
     pipe: sg_pipeline,
     rx: Degrees,
     ry: Degrees,
+    eye: Vec3,
+    center: Vec3,
 }
 
 /// From most significant to least significant. So in a hex literal that's
@@ -230,6 +232,9 @@ fn decode_png_with_checkerboard_fallback<'image>(png_bytes: &[u8]) -> DecodedPng
 }
 
 fn init(state: &mut State) {
+    state.eye = vec3!(0., 1.5, 1./16.);
+    state.center = vec3!();
+
     setup_default_context();
 
     let v_buffer_desc = sg_buffer_desc{
@@ -277,7 +282,7 @@ fn init(state: &mut State) {
         layout,
         shader,
         index_type: sg_index_type_SG_INDEXTYPE_UINT16,
-        cull_mode: sg_cull_mode_SG_CULLMODE_BACK,
+        cull_mode: sg_cull_mode_SG_CULLMODE_FRONT,
         depth,
         label: cstr!("cube-pipeline"),
         ..sg_pipeline_desc::default()
@@ -301,7 +306,7 @@ fn frame(state: &mut State) {
     /* compute model-view-projection matrix for vertex shader */
     let t = (frame_duration() * FPS as f64) as f32;
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
-    let view = Mat4::look_at(vec3!(0., 1.5, 6.), vec3!(), vec3!(0., 1., 0.));
+    let view = Mat4::look_at(state.eye, state.center, vec3!(y));
     let view_proj = proj * view;
     state.rx += Degrees(1. * t);
     state.ry += Degrees(2. * t);
@@ -331,8 +336,44 @@ fn cleanup(_state: &mut State) {
     sg::shutdown()
 }
 
-fn event(_event: &sapp::Event, _state: &mut State) {
+fn event(event: &sapp::Event, state: &mut State) {
+    const MOVE_SCALE: f32 = 1./16.;
 
+    match event.type_ {
+        sapp_event_type_SAPP_EVENTTYPE_KEY_DOWN => {
+            match event.key_code {
+                sapp_keycode_SAPP_KEYCODE_RIGHT => {
+                    state.eye += vec3!(x) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_LEFT => {
+                    state.eye -= vec3!(x) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_DOWN => {
+                    state.eye -= vec3!(z) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_UP => {
+                    state.eye += vec3!(z) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_D => {
+                    state.center += vec3!(x) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_A => {
+                    state.center -= vec3!(x) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_S => {
+                    state.center -= vec3!(z) * MOVE_SCALE;
+                },
+                sapp_keycode_SAPP_KEYCODE_W => {
+                    state.center += vec3!(z) * MOVE_SCALE;
+                },
+                _ => {}
+            }
+
+            dbg!(state.eye);
+            dbg!(state.center);
+        }
+        _ => {}
+    }
 }
 
 fn fail(_msg: &std::ffi::CStr, _state: &mut State) {
