@@ -337,33 +337,35 @@ fn cleanup(_state: &mut State) {
 }
 
 fn event(event: &sapp::Event, state: &mut State) {
+    use sapp::{EventKind, KeyCode};
+
     const MOVE_SCALE: f32 = 1./16.;
 
-    match event.type_ {
-        sapp_event_type_SAPP_EVENTTYPE_KEY_DOWN => {
-            match event.key_code {
-                sapp_keycode_SAPP_KEYCODE_RIGHT => {
+    match event.kind {
+        EventKind::KeyDown { key_code, .. } => {
+            match dbg!(key_code) {
+                KeyCode::Right => {
                     state.eye += vec3!(x) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_LEFT => {
+                KeyCode::Left => {
                     state.eye -= vec3!(x) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_DOWN => {
+                KeyCode::Down => {
                     state.eye -= vec3!(z) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_UP => {
+                KeyCode::Up => {
                     state.eye += vec3!(z) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_D => {
+                KeyCode::D => {
                     state.center += vec3!(x) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_A => {
+                KeyCode::A => {
                     state.center -= vec3!(x) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_S => {
+                KeyCode::S => {
                     state.center -= vec3!(z) * MOVE_SCALE;
                 },
-                sapp_keycode_SAPP_KEYCODE_W => {
+                KeyCode::W => {
                     state.center += vec3!(z) * MOVE_SCALE;
                 },
                 _ => {}
@@ -396,7 +398,7 @@ fn main() {
             width: 800,
             height: 600,
             sample_count: 4,
-            window_title: WINDOW_TITLE.as_ptr() as _,
+            window_title: WINDOW_TITLE,
             icon: IconDesc {
                 sokol_default: true,
                 ..<_>::default()

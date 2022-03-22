@@ -6,6 +6,9 @@ pub use sokol_bindings_sys::*;
 /// An alias for `c_int`. So in practice probably 32 bits, but technically allowed
 /// to be as low as 16 on some platforms.
 pub type Int = ::std::os::raw::c_int;
+/// An alias for `c_uint`. So in practice probably 32 bits, but technically allowed
+/// to be as low as 16 on some platforms.
+pub type Uint = ::std::os::raw::c_uint;
 
 /// This convenience macro creates a userdata callback, for example for the sapp
 /// desc struct. Note that the paramter type indicated *must* be the same as the
