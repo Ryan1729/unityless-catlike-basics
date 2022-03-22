@@ -306,7 +306,7 @@ fn frame(state: &mut State) {
     /* compute model-view-projection matrix for vertex shader */
     let t = (frame_duration() * FPS as f64) as f32;
     let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
-    let view = Mat4::look_at(state.eye, state.center, vec3!(y));
+    let view = get_view_matrix(state);
     let view_proj = proj * view;
     state.rx += Degrees(1. * t);
     state.ry += Degrees(2. * t);
@@ -343,36 +343,53 @@ fn event(event: &sapp::Event, state: &mut State) {
 
     match event.kind {
         EventKind::KeyDown { key_code, .. } => {
-            match dbg!(key_code) {
-                KeyCode::Right => {
-                    state.eye += vec3!(x) * MOVE_SCALE;
-                },
-                KeyCode::Left => {
-                    state.eye -= vec3!(x) * MOVE_SCALE;
-                },
-                KeyCode::Down => {
-                    state.eye -= vec3!(z) * MOVE_SCALE;
-                },
-                KeyCode::Up => {
-                    state.eye += vec3!(z) * MOVE_SCALE;
-                },
-                KeyCode::D => {
-                    state.center += vec3!(x) * MOVE_SCALE;
-                },
-                KeyCode::A => {
-                    state.center -= vec3!(x) * MOVE_SCALE;
-                },
-                KeyCode::S => {
-                    state.center -= vec3!(z) * MOVE_SCALE;
-                },
-                KeyCode::W => {
-                    state.center += vec3!(z) * MOVE_SCALE;
-                },
-                _ => {}
+            macro_rules! do_move {
+                () => {
+                    match key_code {
+                        KeyCode::Right => {
+                            state.eye += vec3!(x) * MOVE_SCALE;
+                        },
+                        KeyCode::Left => {
+                            state.eye -= vec3!(x) * MOVE_SCALE;
+                        },
+                        KeyCode::Down => {
+                            state.eye -= vec3!(z) * MOVE_SCALE;
+                        },
+                        KeyCode::Up => {
+                            state.eye += vec3!(z) * MOVE_SCALE;
+                        },
+                        KeyCode::D => {
+                            state.center += vec3!(x) * MOVE_SCALE;
+                        },
+                        KeyCode::A => {
+                            state.center -= vec3!(x) * MOVE_SCALE;
+                        },
+                        KeyCode::S => {
+                            state.center -= vec3!(z) * MOVE_SCALE;
+                        },
+                        KeyCode::W => {
+                            state.center += vec3!(z) * MOVE_SCALE;
+                        },
+                        _ => {}
+                    }
+                }
             }
 
-            dbg!(state.eye);
-            dbg!(state.center);
+            do_move!();
+
+            let view = get_view_matrix(state);
+            // Certain cases make the view matrix become degenerate. This can cause issues,
+            // for example the skybox disappearing. In at least some of these cases,
+            // doing the move again "fixes" the issue. So we  use that workaround.
+            if (
+                view.x_axis() == vec3!()
+            ) || (
+                view.y_axis() == vec3!()
+            ) || (
+                view.z_axis() == vec3!()
+            ) {
+                do_move!();
+            }
         }
         _ => {}
     }
@@ -380,6 +397,10 @@ fn event(event: &sapp::Event, state: &mut State) {
 
 fn fail(_msg: &std::ffi::CStr, _state: &mut State) {
 
+}
+
+fn get_view_matrix(state: &State) -> Mat4 {
+    Mat4::look_at(state.eye, state.center, vec3!(y))
 }
 
 fn main() {

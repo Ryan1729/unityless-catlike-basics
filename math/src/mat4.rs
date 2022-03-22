@@ -1,7 +1,7 @@
 use core::ops::{Index, IndexMut, Mul, MulAssign};
 use crate::{
     angle::Angle,
-    vec3::Vec3,
+    vec3::{vec3, Vec3},
 };
 
 pub type Element = f32;
@@ -34,6 +34,20 @@ impl Mat4 {
 
     pub fn to_column_major(self) -> Elements {
         self.transpose().0
+    }
+
+    // Having these be contiguous in memory instead of spread out like this is an
+    // argument for changing to column-major representation at some point.
+    pub fn x_axis(self) -> Vec3 {
+        vec3!(self[_0_0], self[_1_0], self[_2_0])
+    }
+
+    pub fn y_axis(self) -> Vec3 {
+        vec3!(self[_0_1], self[_1_1], self[_2_1])
+    }
+
+    pub fn z_axis(self) -> Vec3 {
+        vec3!(self[_0_2], self[_1_2], self[_2_2])
     }
 }
 
