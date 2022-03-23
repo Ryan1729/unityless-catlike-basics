@@ -28,6 +28,7 @@ pub use _range as range;
 
 pub use sys::sg_context_desc as ContextDesc;
 pub use sys::sg_shader_desc as ShaderDesc;
+pub use sys::sg_image_desc as ImageDesc;
 
 pub fn shutdown() {
     // SAFETY: There are no currently known safety issues with this fn.

@@ -3,7 +3,7 @@ use sokol_bindings::{
     cstr,
     sapp::{self, IconDesc},
     setup_default_context,
-    sg::{self, begin_default_pass, end_pass, commit, make_immutable_vertex_buffer, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
+    sg::{self, begin_default_pass, end_pass, commit, make_immutable_vertex_buffer, query_backend, range, Action, Backend, Color, ColorAttachmentAction, ImageDesc, PassAction, ShaderDesc},
 };
 use math::{
     mat4::Mat4,
@@ -327,15 +327,25 @@ fn init(state: &mut State) {
         include_bytes!("../../assets/skybox.png"),
     );
 
-    let mut image_desc = sg_image_desc::default();
-    image_desc.width = decoded.w;
-    image_desc.height = decoded.h;
-    image_desc.data.subimage[0][0] = range!(&decoded.image_bytes);
-    image_desc.label = cstr!("cube-texture");
+    let mut skybox_image_desc = ImageDesc::default();
+    skybox_image_desc.width = decoded.w;
+    skybox_image_desc.height = decoded.h;
+    skybox_image_desc.data.subimage[0][0] = range!(&decoded.image_bytes);
+    skybox_image_desc.label = cstr!("cube-texture");
 
-    let image = unsafe { sg_make_image(&image_desc) };
-    state.skybox.bind.fs_images[SLOT_TEX as usize] = image;
-    state.model.bind.fs_images[SLOT_TEX as usize] = image;
+    state.skybox.bind.fs_images[SLOT_TEX as usize]
+        = unsafe { sg_make_image(&skybox_image_desc) };
+
+    const WHITE_TEXTURE: [u8; 4] = [0xFF, 0xFF, 0xFF, 0xFF];
+
+    let mut white_image_desc = ImageDesc::default();
+    white_image_desc.width = 1;
+    white_image_desc.height = 1;
+    white_image_desc.data.subimage[0][0] = range!(WHITE_TEXTURE);
+    white_image_desc.label = cstr!("white-texture");
+
+    state.model.bind.fs_images[SLOT_TEX as usize]
+        = unsafe { sg_make_image(&white_image_desc) };
 
     let shader_desc = cube_shader_desc(query_backend());
     let shader = unsafe { sg_make_shader(&shader_desc) };
