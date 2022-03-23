@@ -10,6 +10,15 @@ pub type Int = ::std::os::raw::c_int;
 /// to be as low as 16 on some platforms.
 pub type Uint = ::std::os::raw::c_uint;
 
+pub type CharStar = *const ::std::os::raw::c_char;
+
+#[macro_export]
+macro_rules! cstr {
+    ($str: literal) => {
+        concat!($str, "\0").as_bytes().as_ptr() as *const ::std::os::raw::c_char
+    }
+}
+
 /// This convenience macro creates a userdata callback, for example for the sapp
 /// desc struct. Note that the paramter type indicated *must* be the same as the
 /// original type of the userdata field passed elsewhere, otherwise undefined
@@ -29,13 +38,6 @@ macro_rules! cb_wrap_userdata {
 
         Some(cb_extern)
     }}
-}
-
-#[macro_export]
-macro_rules! cstr {
-    ($str: literal) => {
-        concat!($str, "\0").as_bytes().as_ptr() as *const ::std::os::raw::c_char
-    }
 }
 
 pub mod sapp;

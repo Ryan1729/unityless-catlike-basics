@@ -3,7 +3,7 @@ use sokol_bindings::{
     cstr,
     sapp::{self, IconDesc},
     setup_default_context,
-    sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
+    sg::{self, begin_default_pass, end_pass, commit, make_immutable_vertex_buffer, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
 };
 use math::{
     mat4::Mat4,
@@ -70,7 +70,8 @@ void main()
 
 #[derive(Default)]
 struct State {
-    bind: sg_bindings,
+    skybox_bind: sg_bindings,
+    model_bind: sg_bindings,
     pipe: sg_pipeline,
     eye: Vec3,
     center: Vec3,
@@ -137,7 +138,7 @@ const FAR: f32 = 16777216.0;
     formats to floating point inputs (only to integer inputs),
     and WebGL2 / GLES2 don't support integer vertex shader inputs.
 */
-const VERTICIES: [Vertex; 24] = {
+const SKYBOX_VERTICIES: [Vertex; 24] = {
     // Short for Cube Scale.
     const C_S: f32
         // We want something that we're sure won't ever clip.
@@ -185,10 +186,56 @@ const VERTICIES: [Vertex; 24] = {
     ]
 };
 
+const MODEL_VERTICIES: [Vertex; 24] = {
+    // Short for Cube Scale.
+    const C_S: f32 = 1./8.;
+    macro_rules! m {
+        (0/1) => {0};
+        (1/1) => {32767};
+        (1/4) => {32767/4};
+        (1/3) => {32767/3};
+        (1/2) => {32767/2};
+        (2/3) => {m!(1/3) * 2};
+        (3/4) => {m!(1/4) * 3};
+    }
+    vertex_array![
+        /* pos                  color       uvs */
+        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(0/1), m!(1/3) },
+        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+
+        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
+        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(3/4), m!(2/3) },
+
+        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(1/1), m!(2/3) },
+        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(1/1), m!(2/3) },
+
+        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+
+        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(0/1), m!(1/3) },
+        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+
+        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(3/4), m!(2/3) },
+        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
+        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+    ]
+};
+
 const INDEX_COUNT: Int = 36;
 
-/* create an index buffer for the cube */
-const INDICES: [u16; INDEX_COUNT as usize] = [
+/* create an index buffer for the cubes */
+const CUBE_INDICES: [u16; INDEX_COUNT as usize] = [
     0, 1, 2,  0, 2, 3,
     6, 5, 4,  7, 6, 4,
     8, 9, 10,  8, 10, 11,
@@ -243,22 +290,28 @@ fn init(state: &mut State) {
 
     setup_default_context();
 
-    let v_buffer_desc = sg_buffer_desc{
-        data: range!(VERTICIES),
-        label: cstr!("cube-vertices"),
-        ..<_>::default()
-    };
+    state.skybox_bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
+        SKYBOX_VERTICIES
+        "skybox-vertices"
+    );
 
-    state.bind.vertex_buffers[0] = unsafe{ sg_make_buffer(&v_buffer_desc) };
+    state.model_bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
+        MODEL_VERTICIES
+        "model-vertices"
+    );
 
     let i_buffer_desc = sg_buffer_desc{
         type_: sg_buffer_type_SG_BUFFERTYPE_INDEXBUFFER,
-        data: range!(INDICES),
+        data: range!(CUBE_INDICES),
         label: cstr!("cube-indices"),
         ..<_>::default()
     };
 
-    state.bind.index_buffer = unsafe { sg_make_buffer(&i_buffer_desc) };
+    let ibuf = unsafe { sg_make_buffer(&i_buffer_desc) };
+
+    state.skybox_bind.index_buffer = ibuf;
+    // TODO should I be making a second separate index buffer?
+    state.model_bind.index_buffer = ibuf;
 
     let decoded = decode_png_with_checkerboard_fallback(
         include_bytes!("../../assets/skybox.png"),
@@ -270,7 +323,9 @@ fn init(state: &mut State) {
     image_desc.data.subimage[0][0] = range!(&decoded.image_bytes);
     image_desc.label = cstr!("cube-texture");
 
-    state.bind.fs_images[SLOT_TEX as usize] = unsafe { sg_make_image(&image_desc) };
+    let image = unsafe { sg_make_image(&image_desc) };
+    state.skybox_bind.fs_images[SLOT_TEX as usize] = image;
+    state.model_bind.fs_images[SLOT_TEX as usize] = image;
 
     let shader_desc = cube_shader_desc(query_backend());
     let shader = unsafe { sg_make_shader(&shader_desc) };
@@ -313,23 +368,40 @@ fn frame(state: &mut State) {
     let proj = Mat4::perspective(60., w as f32/h as f32, (NEAR, FAR));
     let view = get_view_matrix(state);
     let view_proj = proj * view;
-    //let model = Mat4::identity();
-    let mvp = view_proj;// * model;
-
-    let vs_params: VsParams = mvp.to_column_major();
 
     begin_default_pass(&pass_action, sapp::width(), sapp::height());
+
+    // Skybox Sub-Pass
+    let skybox_vs_params: VsParams = view_proj.to_column_major();
     unsafe {
         sg_apply_pipeline(state.pipe);
-        sg_apply_bindings(&state.bind);
+        sg_apply_bindings(&state.skybox_bind);
         sg_apply_uniforms(
             sg_shader_stage_SG_SHADERSTAGE_VS,
             SLOT_VS_PARAMS as _,
-            &range!(vs_params)
+            &range!(skybox_vs_params)
         );
         sg_draw(0, INDEX_COUNT, 1);
     }
+
+    let mvp = view_proj;
+
+    // Model Sub-Pass
+    let model_vs_params: VsParams = mvp.to_column_major();
+    unsafe {
+        sg_apply_pipeline(state.pipe);
+        sg_apply_bindings(&state.model_bind);
+        sg_apply_uniforms(
+            sg_shader_stage_SG_SHADERSTAGE_VS,
+            SLOT_VS_PARAMS as _,
+            &range!(model_vs_params)
+        );
+        sg_draw(0, INDEX_COUNT, 1);
+    }
+
     end_pass();
+
+
     commit();
 }
 

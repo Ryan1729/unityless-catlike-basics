@@ -83,6 +83,40 @@ pub fn query_backend() -> Backend {
     }
 }
 
+#[repr(u32)]
+pub enum Usage {
+    Default = 0,
+    Immutable = 1,
+    Dynamic = 2,
+    Stream = 3,
+}
+
+#[macro_export]
+macro_rules! _make_immutable_vertex_buffer {
+    (
+        $vertex: ident $(,)?
+        $label: literal $(,)?
+    ) => {{
+        let v_buffer_desc = $crate::sg::BufferDesc {
+            usage: $crate::sg::Usage::Immutable as _,
+            data: $crate::sg::range!($vertex),
+            label: $crate::cstr!($label),
+            ..<_>::default()
+        };
+
+        // SAFETY: The types of the arguments to this macro, and the macros those 
+        // arguments are passed to, ensure that the `v_buffer_desc` is correct, 
+        // for at least some given vertex size/type.
+        unsafe{ $crate::sg::make_buffer(&v_buffer_desc) }
+    }}
+}
+
+pub use _make_immutable_vertex_buffer as make_immutable_vertex_buffer;
+
+pub type BufferDesc = sys::sg_buffer_desc;
+
+pub use sys::sg_make_buffer as make_buffer;
+
 pub use sys::sg_color as Color;
 
 #[derive(Clone, Copy, Debug, Default)]
