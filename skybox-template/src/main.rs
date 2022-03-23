@@ -1,12 +1,11 @@
 use sokol_bindings::{
     *,
     cstr,
-    sapp::{self, IconDesc, frame_duration, FPS},
+    sapp::{self, IconDesc},
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Backend, Color, ColorAttachmentAction, PassAction, ShaderDesc},
 };
 use math::{
-    angle::Degrees,
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
@@ -73,8 +72,6 @@ void main()
 struct State {
     bind: sg_bindings,
     pipe: sg_pipeline,
-    rx: Degrees,
-    ry: Degrees,
     eye: Vec3,
     center: Vec3,
 }
@@ -104,7 +101,7 @@ struct Vertex {
 macro_rules! vertex_array {
     (
         $(
-            {$x: literal, $y: literal, $z: literal, $color: literal, $u: expr, $v: expr $(,)?}
+            {$x: expr, $y: expr, $z: expr, $color: literal, $u: expr, $v: expr $(,)?}
         ),*
 
         $(,)?
@@ -124,6 +121,11 @@ macro_rules! vertex_array {
     }
 }
 
+// Near/Far clipping plnae distances along z.
+const NEAR: f32 = 0.01;
+// An f32 has 24 mantissa bits, so 2 to the 24th power seems reasonable here.
+const FAR: f32 = 16777216.0;
+
 /*
     Cube vertex buffer with packed vertex formats for color and texture coords.
     Note that a vertex format which must be portable across all
@@ -136,6 +138,10 @@ macro_rules! vertex_array {
     and WebGL2 / GLES2 don't support integer vertex shader inputs.
 */
 const VERTICIES: [Vertex; 24] = {
+    // Short for Cube Scale.
+    const C_S: f32
+        // We want something that we're sure won't ever clip.
+        = FAR * 0.5;
     macro_rules! m {
         (0/1) => {0};
         (1/1) => {32767};
@@ -147,35 +153,35 @@ const VERTICIES: [Vertex; 24] = {
     }
     vertex_array![
         /* pos                  color       uvs */
-        { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(0/1), m!(1/3) },
-        {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
-        {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
-        { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(0/1), m!(1/3) },
+        {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  0xFFFFFFFF, m!(1/2), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
 
-        { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(0/1), m!(2/3) },
-        {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
-        {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
-        { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(2/3) },
+        { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/4), m!(2/3) },
+        {  C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/2), m!(2/3) },
+        { -C_S,  C_S,  C_S,  0xFFFFFFFF, m!(3/4), m!(2/3) },
 
-        { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
-        { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
-        { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/1), m!(2/3) },
-        { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/1), m!(2/3) },
+        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/1), m!(2/3) },
+        { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/1), m!(2/3) },
 
-        {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
-        {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
-        {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
-        {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
+        {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  0xFFFFFFFF, m!(1/2), m!(1/3) },
+        {  C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/2), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/4), m!(2/3) },
 
-        { -1.0, -1.0, -1.0,  0xFFFFFFFF, m!(0/1), m!(1/3) },
-        { -1.0, -1.0,  1.0,  0xFFFFFFFF, m!(0/1), m!(2/3) },
-        {  1.0, -1.0,  1.0,  0xFFFFFFFF, m!(1/4), m!(2/3) },
-        {  1.0, -1.0, -1.0,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(0/1), m!(1/3) },
+        { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/4), m!(2/3) },
+        {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) },
 
-        { -1.0,  1.0, -1.0,  0xFFFFFFFF, m!(3/4), m!(1/3) },
-        { -1.0,  1.0,  1.0,  0xFFFFFFFF, m!(3/4), m!(2/3) },
-        {  1.0,  1.0,  1.0,  0xFFFFFFFF, m!(1/2), m!(2/3) },
-        {  1.0,  1.0, -1.0,  0xFFFFFFFF, m!(1/2), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S,  0xFFFFFFFF, m!(3/4), m!(2/3) },
+        {  C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/2), m!(2/3) },
+        {  C_S,  C_S, -C_S,  0xFFFFFFFF, m!(1/2), m!(1/3) },
     ]
 };
 
@@ -304,16 +310,11 @@ fn frame(state: &mut State) {
     let h = sapp::height();
 
     /* compute model-view-projection matrix for vertex shader */
-    let t = (frame_duration() * FPS as f64) as f32;
-    let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 10.));
+    let proj = Mat4::perspective(60., w as f32/h as f32, (NEAR, FAR));
     let view = get_view_matrix(state);
     let view_proj = proj * view;
-    state.rx += Degrees(1. * t);
-    state.ry += Degrees(2. * t);
-    let rxm = Mat4::rotation(state.rx, vec3!(x));
-    let rym = Mat4::rotation(state.ry, vec3!(y));
-    let model = rxm * rym;
-    let mvp = view_proj * model;
+    //let model = Mat4::identity();
+    let mvp = view_proj;// * model;
 
     let vs_params: VsParams = mvp.to_column_major();
 
