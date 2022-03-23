@@ -69,10 +69,21 @@ void main()
 }
 
 #[derive(Default)]
-struct State {
-    skybox_bind: sg_bindings,
-    model_bind: sg_bindings,
+struct SkyboxState {
+    bind: sg_bindings,
     pipe: sg_pipeline,
+}
+
+#[derive(Default)]
+struct ModelState {
+    bind: sg_bindings,
+    pipe: sg_pipeline,
+}
+
+#[derive(Default)]
+struct State {
+    skybox: SkyboxState,
+    model: ModelState,
     eye: Vec3,
     center: Vec3,
 }
@@ -290,12 +301,12 @@ fn init(state: &mut State) {
 
     setup_default_context();
 
-    state.skybox_bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
+    state.skybox.bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
         SKYBOX_VERTICIES
         "skybox-vertices"
     );
 
-    state.model_bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
+    state.model.bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
         MODEL_VERTICIES
         "model-vertices"
     );
@@ -309,9 +320,8 @@ fn init(state: &mut State) {
 
     let ibuf = unsafe { sg_make_buffer(&i_buffer_desc) };
 
-    state.skybox_bind.index_buffer = ibuf;
-    // TODO should I be making a second separate index buffer?
-    state.model_bind.index_buffer = ibuf;
+    state.skybox.bind.index_buffer = ibuf;
+    state.model.bind.index_buffer = ibuf;
 
     let decoded = decode_png_with_checkerboard_fallback(
         include_bytes!("../../assets/skybox.png"),
@@ -324,8 +334,8 @@ fn init(state: &mut State) {
     image_desc.label = cstr!("cube-texture");
 
     let image = unsafe { sg_make_image(&image_desc) };
-    state.skybox_bind.fs_images[SLOT_TEX as usize] = image;
-    state.model_bind.fs_images[SLOT_TEX as usize] = image;
+    state.skybox.bind.fs_images[SLOT_TEX as usize] = image;
+    state.model.bind.fs_images[SLOT_TEX as usize] = image;
 
     let shader_desc = cube_shader_desc(query_backend());
     let shader = unsafe { sg_make_shader(&shader_desc) };
@@ -339,7 +349,7 @@ fn init(state: &mut State) {
     depth.write_enabled = true;
     depth.compare = sg_compare_func_SG_COMPAREFUNC_LESS_EQUAL;
 
-    let pipeline_desc = sg_pipeline_desc{
+    let mut pipeline_desc = sg_pipeline_desc{
         layout,
         shader,
         index_type: sg_index_type_SG_INDEXTYPE_UINT16,
@@ -348,8 +358,10 @@ fn init(state: &mut State) {
         label: cstr!("cube-pipeline"),
         ..sg_pipeline_desc::default()
     };
-    /* create pipeline object */
-    state.pipe = unsafe { sg_make_pipeline(&pipeline_desc) };
+    /* create pipeline objects */
+    state.skybox.pipe = unsafe { sg_make_pipeline(&pipeline_desc) };
+    pipeline_desc.cull_mode = sg_cull_mode_SG_CULLMODE_BACK;
+    state.model.pipe = unsafe { sg_make_pipeline(&pipeline_desc) };
 }
 
 type VsParams = [f32; 4 * 4];
@@ -374,8 +386,8 @@ fn frame(state: &mut State) {
     // Skybox Sub-Pass
     let skybox_vs_params: VsParams = view_proj.to_column_major();
     unsafe {
-        sg_apply_pipeline(state.pipe);
-        sg_apply_bindings(&state.skybox_bind);
+        sg_apply_pipeline(state.skybox.pipe);
+        sg_apply_bindings(&state.skybox.bind);
         sg_apply_uniforms(
             sg_shader_stage_SG_SHADERSTAGE_VS,
             SLOT_VS_PARAMS as _,
@@ -389,8 +401,8 @@ fn frame(state: &mut State) {
     // Model Sub-Pass
     let model_vs_params: VsParams = mvp.to_column_major();
     unsafe {
-        sg_apply_pipeline(state.pipe);
-        sg_apply_bindings(&state.model_bind);
+        sg_apply_pipeline(state.model.pipe);
+        sg_apply_bindings(&state.model.bind);
         sg_apply_uniforms(
             sg_shader_stage_SG_SHADERSTAGE_VS,
             SLOT_VS_PARAMS as _,
@@ -400,7 +412,6 @@ fn frame(state: &mut State) {
     }
 
     end_pass();
-
 
     commit();
 }
