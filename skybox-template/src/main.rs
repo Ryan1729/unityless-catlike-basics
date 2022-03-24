@@ -376,6 +376,37 @@ fn init(state: &mut State) {
 
 type VsParams = [f32; 4 * 4];
 
+fn draw_skybox(skybox: &SkyboxState, view_proj: Mat4) {
+    let skybox_vs_params: VsParams = view_proj.to_column_major();
+    unsafe {
+        sg_apply_pipeline(skybox.pipe);
+        sg_apply_bindings(&skybox.bind);
+        sg_apply_uniforms(
+            sg_shader_stage_SG_SHADERSTAGE_VS,
+            SLOT_VS_PARAMS as _,
+            &range!(skybox_vs_params)
+        );
+        sg_draw(0, INDEX_COUNT, 1);
+    }
+}
+
+fn draw_model(model: &ModelState, view_proj: Mat4) {
+    let mvp = view_proj;
+
+    // Model Sub-Pass
+    let model_vs_params: VsParams = mvp.to_column_major();
+    unsafe {
+        sg_apply_pipeline(model.pipe);
+        sg_apply_bindings(&model.bind);
+        sg_apply_uniforms(
+            sg_shader_stage_SG_SHADERSTAGE_VS,
+            SLOT_VS_PARAMS as _,
+            &range!(model_vs_params)
+        );
+        sg_draw(0, INDEX_COUNT, 1);
+    }
+}
+
 fn frame(state: &mut State) {
     let mut pass_action = PassAction::default();
     pass_action.colors[0] = ColorAttachmentAction {
@@ -393,34 +424,10 @@ fn frame(state: &mut State) {
 
     begin_default_pass(&pass_action, sapp::width(), sapp::height());
 
-    // Skybox Sub-Pass
-    let skybox_vs_params: VsParams = view_proj.to_column_major();
-    unsafe {
-        sg_apply_pipeline(state.skybox.pipe);
-        sg_apply_bindings(&state.skybox.bind);
-        sg_apply_uniforms(
-            sg_shader_stage_SG_SHADERSTAGE_VS,
-            SLOT_VS_PARAMS as _,
-            &range!(skybox_vs_params)
-        );
-        sg_draw(0, INDEX_COUNT, 1);
-    }
+    draw_skybox(&state.skybox, view_proj);
 
-    let mvp = view_proj;
-
-    // Model Sub-Pass
-    let model_vs_params: VsParams = mvp.to_column_major();
-    unsafe {
-        sg_apply_pipeline(state.model.pipe);
-        sg_apply_bindings(&state.model.bind);
-        sg_apply_uniforms(
-            sg_shader_stage_SG_SHADERSTAGE_VS,
-            SLOT_VS_PARAMS as _,
-            &range!(model_vs_params)
-        );
-        sg_draw(0, INDEX_COUNT, 1);
-    }
-
+    draw_model(&state.model, view_proj);
+    
     end_pass();
 
     commit();
