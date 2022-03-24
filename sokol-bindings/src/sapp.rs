@@ -1,5 +1,5 @@
 use sokol_bindings_sys as sys;
-use crate::{Int, Uint};
+use crate::{Int, UInt};
 
 /// The expected Frames Per Second. That is, the number of times a second the
 /// frame callbacks are usually called.
@@ -407,8 +407,8 @@ pub enum MouseButton {
     Invalid = sys::sapp_mousebutton_SAPP_MOUSEBUTTON_INVALID,
 }
 
-impl From<Uint> for MouseButton {
-    fn from(uint: Uint) -> Self {
+impl From<UInt> for MouseButton {
+    fn from(uint: UInt) -> Self {
         use MouseButton::*;
         match uint {
             sys::sapp_mousebutton_SAPP_MOUSEBUTTON_LEFT => Left,
@@ -545,8 +545,8 @@ pub enum KeyCode {
     Menu = sys::sapp_keycode_SAPP_KEYCODE_MENU,
 }
 
-impl From<Uint> for KeyCode {
-    fn from(uint: Uint) -> Self {
+impl From<UInt> for KeyCode {
+    fn from(uint: UInt) -> Self {
         use KeyCode::*;
         match uint {
             sys::sapp_keycode_SAPP_KEYCODE_SPACE => Space,

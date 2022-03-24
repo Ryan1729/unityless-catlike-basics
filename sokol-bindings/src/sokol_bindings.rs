@@ -8,7 +8,7 @@ pub use sokol_bindings_sys::*;
 pub type Int = ::std::os::raw::c_int;
 /// An alias for `c_uint`. So in practice probably 32 bits, but technically allowed
 /// to be as low as 16 on some platforms.
-pub type Uint = ::std::os::raw::c_uint;
+pub type UInt = ::std::os::raw::c_uint;
 
 pub type CharStar = *const ::std::os::raw::c_char;
 
