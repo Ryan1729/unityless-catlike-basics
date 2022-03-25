@@ -2,9 +2,10 @@
 use sokol_bindings_sys as sys;
 use crate::Int;
 
-pub use sys::sg_buffer as Buffer;
-pub use sys::sg_range as Range;
 pub use sys::sg_bindings as Bindings;
+pub use sys::sg_buffer as Buffer;
+pub use sys::sg_buffer_desc as BufferDesc;
+pub use sys::sg_color as Color;
 pub use sys::sg_context_desc as ContextDesc;
 pub use sys::sg_depth_state as DepthState;
 pub use sys::sg_image as Image;
@@ -12,9 +13,11 @@ pub use sys::sg_image_desc as ImageDesc;
 pub use sys::sg_layout_desc as LayoutDesc;
 pub use sys::sg_pipeline as Pipeline;
 pub use sys::sg_pipeline_desc as PipelineDesc;
+pub use sys::sg_range as Range;
 pub use sys::sg_shader as Shader;
 pub use sys::sg_shader_desc as ShaderDesc;
 
+pub use sys::sg_make_buffer as make_buffer;
 pub use sys::sg_make_image as make_image;
 pub use sys::sg_make_pipeline as make_pipeline;
 pub use sys::sg_make_shader as make_shader;
@@ -272,18 +275,19 @@ impl Default for VertexFormat {
 #[macro_export]
 macro_rules! _make_immutable_vertex_buffer {
     (
-        $vertex: ident $(,)?
+        $vertices: ident $(,)?
         $label: literal $(,)?
     ) => {{
         let v_buffer_desc = $crate::sg::BufferDesc {
+            type_: sg::BufferType::Vertex as _,
             usage: $crate::sg::Usage::Immutable as _,
-            data: $crate::sg::range!($vertex),
+            data: $crate::sg::range!($vertices),
             label: $crate::cstr!($label),
             ..<_>::default()
         };
 
-        // SAFETY: The types of the arguments to this macro, and the macros those 
-        // arguments are passed to, ensure that the `v_buffer_desc` is correct, 
+        // SAFETY: The types of the arguments to this macro, and the macros those
+        // arguments are passed to, ensure that the `v_buffer_desc` is correct,
         // for at least some given vertex size/type.
         unsafe{ $crate::sg::make_buffer(&v_buffer_desc) }
     }}
@@ -291,11 +295,28 @@ macro_rules! _make_immutable_vertex_buffer {
 
 pub use _make_immutable_vertex_buffer as make_immutable_vertex_buffer;
 
-pub type BufferDesc = sys::sg_buffer_desc;
+#[macro_export]
+macro_rules! _make_immutable_index_buffer {
+    (
+        $indices: ident $(,)?
+        $label: literal $(,)?
+    ) => {{
+        let i_buffer_desc = sg::BufferDesc{
+            type_: sg::BufferType::Index as _,
+            usage: $crate::sg::Usage::Immutable as _,
+            data: $crate::sg::range!($indices),
+            label: $crate::cstr!($label),
+            ..<_>::default()
+        };
 
-pub use sys::sg_make_buffer as make_buffer;
+        // SAFETY: The types of the arguments to this macro, and the macros those
+        // arguments are passed to, ensure that the `i_buffer_desc` is correct,
+        // for at least some given index size/type.
+        unsafe { sg::make_buffer(&i_buffer_desc) }
+    }}
+}
 
-pub use sys::sg_color as Color;
+pub use _make_immutable_index_buffer as make_immutable_index_buffer;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ColorAttachmentAction {

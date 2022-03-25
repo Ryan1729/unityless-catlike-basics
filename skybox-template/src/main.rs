@@ -2,7 +2,7 @@ use sokol_bindings::{
     cstr,
     sapp::{self, IconDesc},
     setup_default_context,
-    sg::{self, begin_default_pass, end_pass, commit, make_immutable_vertex_buffer, query_backend, range, Action, Bindings, Color, ColorAttachmentAction, ImageDesc, PassAction, Pipeline, PipelineDesc},
+    sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Bindings, Color, ColorAttachmentAction, ImageDesc, PassAction, Pipeline, PipelineDesc},
     Int,
 };
 use math::{
@@ -10,6 +10,8 @@ use math::{
     vec3::{Vec3, vec3},
 };
 use sokol_extras::textured;
+
+mod skybox;
 
 #[derive(Default)]
 struct ModelState {
@@ -25,12 +27,9 @@ struct State {
     center: Vec3,
 }
 
-mod skybox;
+const CUBE_INDEX_COUNT: Int = 36;
 
-pub const CUBE_INDEX_COUNT: Int = 36;
-
-/* create an index buffer for the cubes */
-pub const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
+const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
     0, 1, 2,  0, 2, 3,
     6, 5, 4,  7, 6, 4,
     8, 9, 10,  8, 10, 11,
@@ -38,17 +37,6 @@ pub const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
     16, 17, 18,  16, 18, 19,
     22, 21, 20,  23, 22, 20
 ];
-
-fn make_cube_index_buffer() -> sg::Buffer {
-    let i_buffer_desc = sg::BufferDesc{
-        type_: sg::BufferType::Index as _,
-        data: range!(CUBE_INDICES),
-        label: cstr!("cube-indices"),
-        ..<_>::default()
-    };
-
-    unsafe { sg::make_buffer(&i_buffer_desc) }
-}
 
 // Near/Far clipping plane distances along z.
 const NEAR: f32 = 0.01;
@@ -149,12 +137,15 @@ fn init(state: &mut State) {
 
     skybox::init(&mut state.skybox);
 
-    state.model.bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
+    state.model.bind.vertex_buffers[0] = sg::make_immutable_vertex_buffer!(
         MODEL_VERTICIES
         "model-vertices"
     );
 
-    state.model.bind.index_buffer = make_cube_index_buffer();
+    state.model.bind.index_buffer = sg::make_immutable_index_buffer!(
+        CUBE_INDICES
+        "cube-indices"
+    );
 
     const WHITE_TEXTURE: [u8; 4] = [0xFF, 0xFF, 0xFF, 0xFF];
 

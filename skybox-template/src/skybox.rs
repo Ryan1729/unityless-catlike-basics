@@ -1,16 +1,16 @@
-use crate::{textured, make_cube_index_buffer};
 use sokol_bindings::{
     cstr,
     sg::{
         self,
-        make_immutable_vertex_buffer,
         range,
         Bindings,
         Pipeline,
         PipelineDesc,
     },
+    Int,
 };
 use math::mat4::Mat4;
+use sokol_extras::textured;
 
 #[derive(Default)]
 pub struct State {
@@ -77,13 +77,27 @@ const SKYBOX_VERTICIES: [textured::Vertex; 24] = {
     ]
 };
 
+const CUBE_INDEX_COUNT: Int = 36;
+
+const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
+    0, 1, 2,  0, 2, 3,
+    6, 5, 4,  7, 6, 4,
+    8, 9, 10,  8, 10, 11,
+    14, 13, 12,  15, 14, 12,
+    16, 17, 18,  16, 18, 19,
+    22, 21, 20,  23, 22, 20
+];
+
 pub fn init(skybox: &mut State) {
-    skybox.bind.vertex_buffers[0] = make_immutable_vertex_buffer!(
+    skybox.bind.vertex_buffers[0] = sg::make_immutable_vertex_buffer!(
         SKYBOX_VERTICIES
         "skybox-vertices"
     );
 
-    skybox.bind.index_buffer = make_cube_index_buffer();
+    skybox.bind.index_buffer = sg::make_immutable_index_buffer!(
+        CUBE_INDICES
+        "cube-indices"
+    );
 
     let decoded = crate::decode_png_with_checkerboard_fallback(
         include_bytes!("../../assets/skybox.png"),
