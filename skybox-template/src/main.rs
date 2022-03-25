@@ -2,14 +2,14 @@ use sokol_bindings::{
     cstr,
     sapp::{self, IconDesc},
     setup_default_context,
-    sg::{self, begin_default_pass, end_pass, commit, query_backend, range, Action, Bindings, Color, ColorAttachmentAction, ImageDesc, PassAction, Pipeline, PipelineDesc},
+    sg::{self, begin_default_pass, end_pass, commit, query_backend, Action, Bindings, Color, ColorAttachmentAction, PassAction, Pipeline, PipelineDesc},
     Int,
 };
 use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::textured;
+use sokol_extras::{textured, white_image};
 
 mod skybox;
 mod decoded;
@@ -27,17 +27,6 @@ struct State {
     eye: Vec3,
     center: Vec3,
 }
-
-const CUBE_INDEX_COUNT: Int = 36;
-
-const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
-    0, 1, 2,  0, 2, 3,
-    6, 5, 4,  7, 6, 4,
-    8, 9, 10,  8, 10, 11,
-    14, 13, 12,  15, 14, 12,
-    16, 17, 18,  16, 18, 19,
-    22, 21, 20,  23, 22, 20
-];
 
 // Near/Far clipping plane distances along z.
 const NEAR: f32 = 0.01;
@@ -90,6 +79,17 @@ const MODEL_VERTICIES: [textured::Vertex; 24] = {
     ]
 };
 
+const CUBE_INDEX_COUNT: Int = 36;
+
+const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
+    0, 1, 2,  0, 2, 3,
+    6, 5, 4,  7, 6, 4,
+    8, 9, 10,  8, 10, 11,
+    14, 13, 12,  15, 14, 12,
+    16, 17, 18,  16, 18, 19,
+    22, 21, 20,  23, 22, 20
+];
+
 fn init(state: &mut State) {
     state.eye = vec3!(0., 1.5, 1./16.);
     state.center = vec3!();
@@ -108,16 +108,7 @@ fn init(state: &mut State) {
         "cube-indices"
     );
 
-    const WHITE_TEXTURE: [u8; 4] = [0xFF, 0xFF, 0xFF, 0xFF];
-
-    let mut white_image_desc = ImageDesc::default();
-    white_image_desc.width = 1;
-    white_image_desc.height = 1;
-    white_image_desc.data.subimage[0][0] = range!(WHITE_TEXTURE);
-    white_image_desc.label = cstr!("white-texture");
-
-    state.model.bind.fs_images[textured::SLOT_TEX as usize]
-        = unsafe { sg::make_image(&white_image_desc) };
+    state.model.bind.fs_images[textured::SLOT_TEX as usize] = white_image::make();
 
     let (shader, layout, depth) = textured::make_shader_etc(query_backend());
 
@@ -131,18 +122,6 @@ fn init(state: &mut State) {
         ..PipelineDesc::default()
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
-}
-
-fn draw_model(model: &ModelState, view_proj: Mat4) {
-    unsafe {
-        sg::apply_pipeline(model.pipe);
-        sg::apply_bindings(&model.bind);
-    }
-
-    let mvp = view_proj;
-    textured::apply_uniforms(mvp.to_column_major());
-
-    unsafe { sg::draw(0, CUBE_INDEX_COUNT, 1); }
 }
 
 fn frame(state: &mut State) {
@@ -169,6 +148,18 @@ fn frame(state: &mut State) {
     end_pass();
 
     commit();
+}
+
+fn draw_model(model: &ModelState, view_proj: Mat4) {
+    unsafe {
+        sg::apply_pipeline(model.pipe);
+        sg::apply_bindings(&model.bind);
+    }
+
+    let mvp = view_proj;
+    textured::apply_uniforms(mvp.to_column_major());
+
+    unsafe { sg::draw(0, CUBE_INDEX_COUNT, 1); }
 }
 
 fn cleanup(_state: &mut State) {

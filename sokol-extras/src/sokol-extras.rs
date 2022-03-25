@@ -2,3 +2,4 @@
 ///! but which don't fit in `sokol_bindings`.
 
 pub mod textured;
+pub mod white_image;
