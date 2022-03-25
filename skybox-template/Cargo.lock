@@ -122,6 +122,7 @@ dependencies = [
  "math",
  "png-decoder",
  "sokol-bindings",
+ "sokol-extras",
 ]
 
 [[package]]
@@ -136,6 +137,14 @@ name = "sokol-bindings-sys"
 version = "0.1.0"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "sokol-extras"
+version = "0.1.0"
+dependencies = [
+ "math",
+ "sokol-bindings",
 ]
 
 [[package]]
