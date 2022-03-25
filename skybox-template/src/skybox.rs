@@ -99,7 +99,7 @@ pub fn init(skybox: &mut State) {
         "cube-indices"
     );
 
-    let decoded = crate::decode_png_with_checkerboard_fallback(
+    let decoded = crate::decoded::png_with_checkerboard_fallback(
         include_bytes!("../../assets/skybox.png"),
     );
 
