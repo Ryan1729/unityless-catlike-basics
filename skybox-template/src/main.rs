@@ -1,5 +1,4 @@
 use sokol_bindings::{
-    *, // TODO Remove
     cstr,
     sapp::{self, IconDesc},
     setup_default_context,
@@ -286,7 +285,7 @@ fn init(state: &mut State) {
         "model-vertices"
     );
 
-    state.model.bind.index_buffer = cube::make_index_buffer();
+    state.model.bind.index_buffer = make_cube_index_buffer();
 
     const WHITE_TEXTURE: [u8; 4] = [0xFF, 0xFF, 0xFF, 0xFF];
 
@@ -304,25 +303,25 @@ fn init(state: &mut State) {
     let pipeline_desc = PipelineDesc{
         layout,
         shader,
-        index_type: sg_index_type_SG_INDEXTYPE_UINT16,
-        cull_mode: sg_cull_mode_SG_CULLMODE_BACK,
+        index_type: sg::IndexType::UInt16 as _,
+        cull_mode: sg::CullMode::Back as _,
         depth,
         label: cstr!("cube-pipeline"),
         ..PipelineDesc::default()
     };
-    state.model.pipe = unsafe { sg_make_pipeline(&pipeline_desc) };
+    state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 }
 
 fn draw_model(model: &ModelState, view_proj: Mat4) {
     unsafe {
-        sg_apply_pipeline(model.pipe);
-        sg_apply_bindings(&model.bind);
+        sg::apply_pipeline(model.pipe);
+        sg::apply_bindings(&model.bind);
     }
 
     let mvp = view_proj;
     textured::apply_uniforms(mvp.to_column_major());
 
-    unsafe { sg_draw(0, cube::INDEX_COUNT, 1); }
+    unsafe { sg::draw(0, CUBE_INDEX_COUNT, 1); }
 }
 
 fn frame(state: &mut State) {
@@ -422,45 +421,32 @@ fn get_view_matrix(state: &State) -> Mat4 {
     Mat4::look_at(state.eye, state.center, vec3!(y))
 }
 
-mod cube {
-    use sokol_bindings::{
-        *, // TODO Remove
-        cstr,
-        sg::{
-            make_buffer,
-            range,
-        },
-        Int,
+pub const CUBE_INDEX_COUNT: Int = 36;
+
+/* create an index buffer for the cubes */
+pub const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
+    0, 1, 2,  0, 2, 3,
+    6, 5, 4,  7, 6, 4,
+    8, 9, 10,  8, 10, 11,
+    14, 13, 12,  15, 14, 12,
+    16, 17, 18,  16, 18, 19,
+    22, 21, 20,  23, 22, 20
+];
+
+pub fn make_cube_index_buffer() -> sg::Buffer {
+    let i_buffer_desc = sg::BufferDesc{
+        type_: sg::BufferType::Index as _,
+        data: range!(CUBE_INDICES),
+        label: cstr!("cube-indices"),
+        ..<_>::default()
     };
 
-    pub const INDEX_COUNT: Int = 36;
-
-    /* create an index buffer for the cubes */
-    pub const INDICES: [u16; INDEX_COUNT as usize] = [
-        0, 1, 2,  0, 2, 3,
-        6, 5, 4,  7, 6, 4,
-        8, 9, 10,  8, 10, 11,
-        14, 13, 12,  15, 14, 12,
-        16, 17, 18,  16, 18, 19,
-        22, 21, 20,  23, 22, 20
-    ];
-
-    pub fn make_index_buffer() -> sg_buffer {
-        let i_buffer_desc = sg_buffer_desc{
-            type_: sg_buffer_type_SG_BUFFERTYPE_INDEXBUFFER,
-            data: range!(INDICES),
-            label: cstr!("cube-indices"),
-            ..<_>::default()
-        };
-
-        unsafe { make_buffer(&i_buffer_desc) }
-    }
+    unsafe { sg::make_buffer(&i_buffer_desc) }
 }
 
 mod skybox {
-    use crate::{textured, cube};
+    use crate::{textured, make_cube_index_buffer};
     use sokol_bindings::{
-        *, // TODO Remove
         cstr,
         sg::{
             self,
@@ -544,7 +530,7 @@ mod skybox {
             "skybox-vertices"
         );
 
-        skybox.bind.index_buffer = cube::make_index_buffer();
+        skybox.bind.index_buffer = make_cube_index_buffer();
 
         let decoded = crate::decode_png_with_checkerboard_fallback(
             include_bytes!("../../assets/skybox.png"),
@@ -565,8 +551,8 @@ mod skybox {
             shader,
             layout,
             depth,
-            index_type: sg_index_type_SG_INDEXTYPE_UINT16,
-            cull_mode: sg_cull_mode_SG_CULLMODE_FRONT,
+            index_type: sg::IndexType::UInt16 as _,
+            cull_mode: sg::CullMode::Front as _,
             label: cstr!("skybox-pipeline"),
             ..PipelineDesc::default()
         };
@@ -576,13 +562,13 @@ mod skybox {
 
     pub fn draw(skybox: &State, view_proj: Mat4) {
         unsafe {
-            sg_apply_pipeline(skybox.pipe);
-            sg_apply_bindings(&skybox.bind);
+            sg::apply_pipeline(skybox.pipe);
+            sg::apply_bindings(&skybox.bind);
         }
 
         textured::apply_uniforms(view_proj.to_column_major());
 
-        unsafe { sg_draw(0, cube::INDEX_COUNT, 1); }
+        unsafe { sg::draw(0, crate::CUBE_INDEX_COUNT, 1); }
     }
 }
 

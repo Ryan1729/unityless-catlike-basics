@@ -2,6 +2,7 @@
 use sokol_bindings_sys as sys;
 use crate::Int;
 
+pub use sys::sg_buffer as Buffer;
 pub use sys::sg_range as Range;
 pub use sys::sg_bindings as Bindings;
 pub use sys::sg_context_desc as ContextDesc;
@@ -17,7 +18,12 @@ pub use sys::sg_shader_desc as ShaderDesc;
 pub use sys::sg_make_image as make_image;
 pub use sys::sg_make_pipeline as make_pipeline;
 pub use sys::sg_make_shader as make_shader;
+
+pub use sys::sg_apply_bindings as apply_bindings;
+pub use sys::sg_apply_pipeline as apply_pipeline;
 pub use sys::sg_apply_uniforms as apply_uniforms;
+
+pub use sys::sg_draw as draw;
 
 // TODO wrap everywhere we'd want to use this with things that use slices instead.
 #[macro_export]
@@ -96,6 +102,33 @@ pub fn query_backend() -> Backend {
 }
 
 #[repr(u32)]
+pub enum BufferType {
+    Default = sys::sg_buffer_type__SG_BUFFERTYPE_DEFAULT,
+    Vertex = sys::sg_buffer_type_SG_BUFFERTYPE_VERTEXBUFFER,
+    Index = sys::sg_buffer_type_SG_BUFFERTYPE_INDEXBUFFER,
+}
+
+impl Default for BufferType {
+    fn default() -> Self {
+        Self::Default
+    }
+}
+
+#[repr(u32)]
+pub enum CullMode {
+    Default = sys::sg_cull_mode__SG_CULLMODE_DEFAULT,
+    None = sys::sg_cull_mode_SG_CULLMODE_NONE,
+    Front = sys::sg_cull_mode_SG_CULLMODE_FRONT,
+    Back = sys::sg_cull_mode_SG_CULLMODE_BACK,
+}
+
+impl Default for CullMode {
+    fn default() -> Self {
+        Self::Default
+    }
+}
+
+#[repr(u32)]
 pub enum CompareFunc {
     Default = sys::sg_compare_func__SG_COMPAREFUNC_DEFAULT,
     Never = sys::sg_compare_func_SG_COMPAREFUNC_NEVER,
@@ -109,6 +142,20 @@ pub enum CompareFunc {
 }
 
 impl Default for CompareFunc {
+    fn default() -> Self {
+        Self::Default
+    }
+}
+
+#[repr(u32)]
+pub enum IndexType {
+    Default = sys::sg_index_type__SG_INDEXTYPE_DEFAULT,
+    None = sys::sg_index_type_SG_INDEXTYPE_NONE,
+    UInt16 = sys::sg_index_type_SG_INDEXTYPE_UINT16,
+    UInt32 = sys::sg_index_type_SG_INDEXTYPE_UINT32,
+}
+
+impl Default for IndexType {
     fn default() -> Self {
         Self::Default
     }
