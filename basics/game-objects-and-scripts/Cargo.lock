@@ -36,6 +36,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "game-objects-and-scripts"
+version = "0.1.0"
+dependencies = [
+ "math",
+ "png-decoder",
+ "sokol-bindings",
+ "sokol-extras",
+]
+
+[[package]]
 name = "math"
 version = "0.1.0"
 
@@ -114,16 +124,6 @@ name = "serde"
 version = "1.0.136"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce31e24b01e1e524df96f1c2fdd054405f8d7376249a5110886fb4b658484789"
-
-[[package]]
-name = "skybox-template"
-version = "0.1.0"
-dependencies = [
- "math",
- "png-decoder",
- "sokol-bindings",
- "sokol-extras",
-]
 
 [[package]]
 name = "sokol-bindings"
