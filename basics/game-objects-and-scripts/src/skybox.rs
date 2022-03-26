@@ -100,7 +100,7 @@ pub fn init(skybox: &mut State) {
     );
 
     let decoded = crate::decoded::png_with_checkerboard_fallback(
-        include_bytes!("../../assets/skybox.png"),
+        include_bytes!("../../../assets/skybox.png"),
     );
 
     let mut image_desc = sg::ImageDesc::default();

@@ -1,0 +1,10 @@
+[package]
+name = "skybox-template"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sokol-bindings = { path = "../../sokol-bindings" }
+sokol-extras = { path = "../../sokol-extras" }
+math = { path = "../../math" }
+png-decoder = "0.1.0"
