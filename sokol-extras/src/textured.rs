@@ -8,22 +8,47 @@ use sokol_bindings::{
 /// and adound 1/4 red.
 pub type ABGR = u32;
 
-#[derive(Default)]
 pub struct Vertex {
-    //We use these in the shader, after passing to them to `sg_make_buffer`.
-    #[allow(dead_code)]
     pub x: f32,
-    #[allow(dead_code)]
     pub y: f32,
-    #[allow(dead_code)]
     pub z: f32,
-    #[allow(dead_code)]
     pub color: ABGR,
-    #[allow(dead_code)]
     pub u: i16,
-    #[allow(dead_code)]
     pub v: i16,
 }
+
+pub const VERTEX_DEFAULT: Vertex = Vertex {
+    x: 0.,
+    y: 0.,
+    z: 0.,
+    color: 0xFF000000,
+    u: 0,
+    v: 0,
+};
+
+impl Default for Vertex {
+    fn default() -> Self {
+        VERTEX_DEFAULT
+    }
+}
+
+#[macro_export]
+macro_rules! _vertex {
+    (
+        $x: expr, $y: expr, $z: expr, $color: literal, $u: expr, $v: expr $(,)?
+    ) => {
+        $crate::textured::Vertex {
+            x: $x,
+            y: $y,
+            z: $z,
+            color: $color,
+            u: $u,
+            v: $v,
+        }
+    }
+}
+pub use _vertex as vertex;
+
 
 #[macro_export]
 macro_rules! _vertex_array {
@@ -151,4 +176,11 @@ pub fn apply_uniforms(vs_params: VSParams) {
             &sg::range!(vs_params)
         );
     }
+}
+
+pub type Index = u16;
+
+pub struct IndexedMesh<const VERTEX_COUNT: usize, const INDEX_COUNT: usize> {
+    pub vertices: [Vertex; VERTEX_COUNT],
+    pub indices: [Index; INDEX_COUNT],
 }
