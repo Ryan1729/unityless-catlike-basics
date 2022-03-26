@@ -135,5 +135,5 @@ pub fn draw(skybox: &State, view_proj: Mat4) {
 
     textured::apply_uniforms(view_proj.to_column_major());
 
-    unsafe { sg::draw(0, crate::CUBE_INDEX_COUNT, 1); }
+    unsafe { sg::draw(0, CUBE_INDEX_COUNT, 1); }
 }
