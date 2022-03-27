@@ -170,10 +170,11 @@ pub fn gen_cylinder_mesh(scale: Scale)
 -> IndexedMesh<CYLINDER_POINT_COUNT_USIZE, CYLINDER_INDEX_COUNT_USIZE> {
     let mut points = [Point::default(); DISC_POINT_COUNT as usize];
 
-    const DISC_POINT_COUNT_COORD: Coord = DISC_POINT_COUNT as Coord;
+    const RING_POINT_COUNT_COORD: Coord = RING_POINT_COUNT as Coord;
 
+    // Leave the first point, (at index 0,)  as the default.
     for i in 1..=RING_POINT_COUNT as usize {
-        let theta = (i - 1) as Coord * TAU / DISC_POINT_COUNT_COORD;
+        let theta = (i - 1) as Coord * TAU / RING_POINT_COUNT_COORD;
 
         let (cos, sin) = theta.sin_cos();
 

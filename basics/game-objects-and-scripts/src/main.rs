@@ -50,7 +50,7 @@ fn gen_mesh() -> textured::IndexedMesh<
             point.x,
             point.y,
             point.z,
-            0xFFFFFFFF,
+            0xFF000000 + ((i / 4) as textured::ABGR * 0x40 * 0x40) + ((i % 4) as textured::ABGR * 0x40),
             0,
             0,
         };
@@ -137,7 +137,7 @@ fn draw_model(model: &ModelState, view_proj: Mat4) {
     let mvp = view_proj;
     textured::apply_uniforms(mvp.to_column_major());
 
-    unsafe { sg::draw(0, math::geom::CUBE_INDEX_COUNT as Int, 1); }
+    unsafe { sg::draw(0, math::geom::CYLINDER_INDEX_COUNT as Int, 1); }
 }
 
 fn cleanup(_state: &mut State) {

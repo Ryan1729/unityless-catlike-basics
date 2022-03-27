@@ -35,7 +35,7 @@ impl Default for Vertex {
 #[macro_export]
 macro_rules! _vertex {
     (
-        $x: expr, $y: expr, $z: expr, $color: literal, $u: expr, $v: expr $(,)?
+        $x: expr, $y: expr, $z: expr, $color: expr, $u: expr, $v: expr $(,)?
     ) => {
         $crate::textured::Vertex {
             x: $x,
@@ -54,7 +54,7 @@ pub use _vertex as vertex;
 macro_rules! _vertex_array {
     (
         $(
-            {$x: expr, $y: expr, $z: expr, $color: literal, $u: expr, $v: expr $(,)?}
+            {$x: expr, $y: expr, $z: expr, $color: expr, $u: expr, $v: expr $(,)?}
         ),*
 
         $(,)?
