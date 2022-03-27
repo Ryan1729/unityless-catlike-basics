@@ -34,57 +34,25 @@ const NEAR: f32 = 0.01;
 const FAR: f32 = 16777216.0;
 
 fn gen_mesh() -> textured::IndexedMesh<
-    {math::geom::CUBE_POINT_COUNT_USIZE},
-    {math::geom::CUBE_INDEX_COUNT_USIZE},
+    {math::geom::CYLINDER_POINT_COUNT_USIZE},
+    {math::geom::CYLINDER_INDEX_COUNT_USIZE},
 > {
-    let mesh = math::geom::gen_cube_mesh(1./8.);
+    use math::geom::Scale;
+    let mesh = math::geom::gen_cylinder_mesh(Scale {
+        x: 1./8.,
+        y: 1./8.,
+        z: 1./8.,
+    });
 
-    macro_rules! m {
-        (0/1) => {0};
-        (1/1) => {32767};
-        (1/4) => {32767/4};
-        (1/3) => {32767/3};
-        (1/2) => {32767/2};
-        (2/3) => {m!(1/3) * 2};
-        (3/4) => {m!(1/4) * 3};
-    }
-
-    const UVS: [(i16, i16); math::geom::CUBE_POINT_COUNT_USIZE] = [
-        (m!(0/1), m!(1/3)),
-        (m!(1/4), m!(1/3)),
-        (m!(1/2), m!(1/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(0/1), m!(2/3)),
-        (m!(1/4), m!(2/3)),
-        (m!(1/2), m!(2/3)),
-        (m!(3/4), m!(2/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(1/1), m!(2/3)),
-        (m!(1/1), m!(2/3)),
-        (m!(1/4), m!(1/3)),
-        (m!(1/2), m!(1/3)),
-        (m!(1/2), m!(2/3)),
-        (m!(1/4), m!(2/3)),
-        (m!(0/1), m!(1/3)),
-        (m!(0/1), m!(2/3)),
-        (m!(1/4), m!(2/3)),
-        (m!(1/4), m!(1/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(3/4), m!(2/3)),
-        (m!(1/2), m!(2/3)),
-        (m!(1/2), m!(1/3)),
-    ];
-
-    let mut vertices = [textured::VERTEX_DEFAULT; math::geom::CUBE_POINT_COUNT_USIZE];
+    let mut vertices = [textured::VERTEX_DEFAULT; math::geom::CYLINDER_POINT_COUNT_USIZE];
     for (i, point) in mesh.points.iter().enumerate() {
         vertices[i] = textured::vertex!{
             point.x,
             point.y,
             point.z,
-            0xFF00FF00,
-            UVS[i].0,
-            UVS[i].1,
+            0xFFFFFFFF,
+            0,
+            0,
         };
     }
 
