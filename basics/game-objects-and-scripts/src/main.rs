@@ -94,7 +94,7 @@ fn init(state: &mut State) {
         layout,
         shader,
         index_type: sg::IndexType::UInt16 as _,
-        cull_mode: sg::CullMode::None as _,//Back as _,
+        cull_mode: sg::CullMode::Back as _,
         depth,
         label: cstr!("model-pipeline"),
         ..PipelineDesc::default()

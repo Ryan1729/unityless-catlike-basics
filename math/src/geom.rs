@@ -4,7 +4,7 @@ pub type Coord = f32;
 
 pub const TAU: Coord = std::f32::consts::TAU;
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Point {
     pub x: Coord,
     pub y: Coord,
@@ -140,7 +140,6 @@ pub fn gen_cube_mesh(scale: Coord)
 
 const RING_POINT_COUNT: Index = 16;
 const DISC_POINT_COUNT: Index = RING_POINT_COUNT + 1;
-const DISC_POINT_COUNT_USIZE: usize = DISC_POINT_COUNT as usize;
 
 pub const CYLINDER_POINT_COUNT: Index = DISC_POINT_COUNT * 2;
 pub const CYLINDER_POINT_COUNT_USIZE: usize = CYLINDER_POINT_COUNT as usize;
@@ -161,6 +160,10 @@ pub fn gen_cylinder_mesh(scale: Scale)
 -> IndexedMesh<CYLINDER_POINT_COUNT_USIZE, CYLINDER_INDEX_COUNT_USIZE> {
     let mut points = [Point::default(); CYLINDER_POINT_COUNT_USIZE];
 
+    const TOP_RING_START: Index = 1;
+    const BOTTOM_RING_START: Index = TOP_RING_START + RING_POINT_COUNT;
+    const BOTTOM_DISC_CENTER: Index = BOTTOM_RING_START + RING_POINT_COUNT;
+
     const RING_POINT_COUNT_COORD: Coord = RING_POINT_COUNT as Coord;
 
     // Leave the first point, (at index 0,)  as the default.
@@ -176,48 +179,44 @@ pub fn gen_cylinder_mesh(scale: Scale)
         };
         points[i] = p;
 
-        points[i + DISC_POINT_COUNT_USIZE] = Point {
+        points[i + RING_POINT_COUNT as usize] = Point {
             z: scale.z,
             ..p
         };
     }
 
-    points[CYLINDER_POINT_COUNT_USIZE - 1] = Point {
+    points[BOTTOM_DISC_CENTER as usize] = Point {
         x: 0.,
         y: 0.,
         z: scale.z,
     };
 
     let mut indices = [0; CYLINDER_INDEX_COUNT as usize];
-    const TOP_RING_START: Index = 1;
-    const BOTTOM_RING_START: Index = TOP_RING_START + RING_POINT_COUNT;
-    const BOTTOM_DISC_CENTER: Index = BOTTOM_RING_START + RING_POINT_COUNT;
 
     // Top disc
     for index in 0..RING_POINT_COUNT {
         let i = (index * 3) as usize;
-        let current = index + TOP_RING_START;
-        indices[i] = 0;
-        indices[i + 1] = current;
-        indices[i + 2] = (current % RING_POINT_COUNT) + 1;
+        indices[i] = ((index + TOP_RING_START) % RING_POINT_COUNT) + 1;
+        indices[i + 1] = index + TOP_RING_START;
+        indices[i + 2] = 0;
     }
 
     // Downward pointing edge triangles
     for index in 0..RING_POINT_COUNT {
         let i = ((index + RING_POINT_COUNT) * 3) as usize;
         indices[i] = index + TOP_RING_START;
-        indices[i + 1] = (index % RING_POINT_COUNT) + TOP_RING_START + 1;
+        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + TOP_RING_START;
         // Jump up to next disc
-        indices[i + 2] = indices[i + 1] + RING_POINT_COUNT;
+        indices[i + 2] = index + BOTTOM_RING_START;
     }
 
     // Upward pointing edge triangles
     for index in 0..RING_POINT_COUNT {
         let i = ((index + RING_POINT_COUNT * 2) * 3) as usize;
-        indices[i] = index + BOTTOM_RING_START;
-        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + BOTTOM_RING_START;
         // Jump back to previous disc
-        indices[i + 2] = indices[i] - RING_POINT_COUNT;
+        indices[i] = ((index + 1) % RING_POINT_COUNT) + TOP_RING_START;
+        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + BOTTOM_RING_START;
+        indices[i + 2] = index + BOTTOM_RING_START;
     }
 
     // Bottom disc
