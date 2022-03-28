@@ -147,25 +147,6 @@ pub const CYLINDER_POINT_COUNT_USIZE: usize = CYLINDER_POINT_COUNT as usize;
 pub const CYLINDER_INDEX_COUNT: Index = RING_POINT_COUNT * 3;
 pub const CYLINDER_INDEX_COUNT_USIZE: usize = CYLINDER_INDEX_COUNT as usize;
 
-const CYLINDER_INDICES: [Index; CYLINDER_INDEX_COUNT as usize] = [
-    0, 1, 2,
-    0, 2, 3,
-    0, 3, 4,
-    0, 4, 5,
-    0, 5, 6,
-    0, 6, 7,
-    0, 7, 8,
-    0, 8, 9,
-    0, 9, 10,
-    0, 10, 11,
-    0, 11, 12,
-    0, 12, 13,
-    0, 13, 14,
-    0, 14, 15,
-    0, 15, 16,
-    0, 16, 1,
-];
-
 pub fn gen_cylinder_mesh(scale: Scale)
 -> IndexedMesh<CYLINDER_POINT_COUNT_USIZE, CYLINDER_INDEX_COUNT_USIZE> {
     let mut points = [Point::default(); DISC_POINT_COUNT as usize];
@@ -185,8 +166,18 @@ pub fn gen_cylinder_mesh(scale: Scale)
         };
     }
 
+    let mut indices = [0; CYLINDER_INDEX_COUNT as usize];
+
+    for index in 0..RING_POINT_COUNT {
+        let i = (index * 3) as usize;
+        let current = index + 1;
+        indices[i] = 0;
+        indices[i + 1] = current;
+        indices[i + 2] = (current % RING_POINT_COUNT) + 1;
+    }
+
     IndexedMesh{
         points,
-        indices: CYLINDER_INDICES,
+        indices,
     }
 }
