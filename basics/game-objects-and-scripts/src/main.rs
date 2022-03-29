@@ -41,7 +41,7 @@ fn gen_mesh() -> textured::IndexedMesh<
     let mesh = math::geom::gen_cylinder_mesh(Scale {
         x: 1./8.,
         y: 1./8.,
-        z: 1./8.,
+        z: 1./4.,
     });
 
     let mut vertices = [textured::VERTEX_DEFAULT; math::geom::CYLINDER_POINT_COUNT_USIZE];
@@ -50,7 +50,7 @@ fn gen_mesh() -> textured::IndexedMesh<
             point.x,
             point.y,
             point.z,
-            0xFF000000 + ((i / 4) as textured::ABGR * 0x40 * 0x40) + ((i % 4) as textured::ABGR * 0x40),
+            0xFFFFFFFF,
             0,
             0,
         };
