@@ -166,7 +166,15 @@ pub fn gen_cylinder_mesh(scale: Scale)
 
     const RING_POINT_COUNT_COORD: Coord = RING_POINT_COUNT as Coord;
 
-    // Leave the first point, (at index 0,)  as the default.
+    let top_z = scale.z;
+    let bottom_z = -top_z;
+
+    points[0] = Point {
+        x: 0.,
+        y: 0.,
+        z: top_z,
+    };
+
     for i in 1..=RING_POINT_COUNT as usize {
         let theta = (i - 1) as Coord * TAU / RING_POINT_COUNT_COORD;
 
@@ -175,12 +183,12 @@ pub fn gen_cylinder_mesh(scale: Scale)
         let p = Point {
             x: scale.x * cos,
             y: scale.y * sin,
-            z: 0.,
+            z: top_z,
         };
         points[i] = p;
 
         points[i + RING_POINT_COUNT as usize] = Point {
-            z: scale.z,
+            z: bottom_z,
             ..p
         };
     }
@@ -188,7 +196,7 @@ pub fn gen_cylinder_mesh(scale: Scale)
     points[BOTTOM_DISC_CENTER as usize] = Point {
         x: 0.,
         y: 0.,
-        z: scale.z,
+        z: bottom_z,
     };
 
     let mut indices = [0; CYLINDER_INDEX_COUNT as usize];
