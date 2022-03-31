@@ -21,7 +21,6 @@
 #define ATTR_shadowVS_position (0)
 #define ATTR_colorVS_position (0)
 #define ATTR_colorVS_normal (1)
-#define SLOT_shadowMap (0)
 #define SLOT_vs_shadow_params (0)
 #pragma pack(push,1)
 SOKOL_SHDC_ALIGN(16) typedef struct vs_shadow_params_t {
@@ -41,8 +40,6 @@ SOKOL_SHDC_ALIGN(16) typedef struct vs_light_params_t {
 #define SLOT_fs_light_params (0)
 #pragma pack(push,1)
 SOKOL_SHDC_ALIGN(16) typedef struct fs_light_params_t {
-    hmm_vec2 shadowMapSize;
-    uint8_t _pad_8[8];
     hmm_vec3 lightDir;
     uint8_t _pad_28[4];
     hmm_vec3 eyePos;
@@ -86,8 +83,7 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
       desc.vs.uniform_blocks[0].uniforms[0].array_count = 13;
       desc.fs.source = "#version 330\n"
 "\n"
-"uniform vec4 fs_light_params[3];\n"
-"uniform sampler2D shadowMap;\n"
+"uniform vec4 fs_light_params[2];\n"
 "\n"
 "in vec3 N;\n"
 "in vec4 lightProjPos;\n"
@@ -100,22 +96,20 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
 "    return dot(rgba, vec4(1.0, 0.0039215688593685626983642578125, 1.5378700481960549950599670410156e-05, 6.0308629201699659461155533790588e-08));\n"
 "}\n"
 "\n"
-"float sampleShadow(sampler2D shadowMap_1, vec2 uv, float compare)\n"
+"float sampleShadow(float compare)\n"
 "{\n"
-"    vec4 param = texture(shadowMap_1, vec2(uv.x, uv.y));\n"
+"    vec4 param = vec4(1.0, 1.0, 1.0, 1.0);\n"
 "    return step(compare, decodeDepth(param) + 0.001000000047497451305389404296875);\n"
 "}\n"
 "\n"
-"float sampleShadowPCF(sampler2D shadowMap_1, vec2 uv, vec2 smSize, float compare)\n"
+"float sampleShadowPCF(float compare)\n"
 "{\n"
 "    float result = 0.0;\n"
 "    for (int x = -2; x <= 2; x++)\n"
 "    {\n"
 "        for (int y = -2; y <= 2; y++)\n"
 "        {\n"
-"            vec2 param = uv + (vec2(float(x), float(y)) / smSize);\n"
-"            float param_1 = compare;\n"
-"            result += sampleShadow(shadowMap_1, param, param_1);\n"
+"            result += sampleShadow(compare);\n"
 "        }\n"
 "    }\n"
 "    return result * 0.039999999105930328369140625;\n"
@@ -128,17 +122,14 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
 "\n"
 "void main()\n"
 "{\n"
-"    vec3 _149 = normalize(fs_light_params[1].xyz);\n"
+"    vec3 _149 = normalize(fs_light_params[0].xyz);\n"
 "    vec3 _154 = normalize(N);\n"
 "    float _158 = dot(_154, _149);\n"
 "    if (_158 > 0.0)\n"
 "    {\n"
 "        vec3 _172 = lightProjPos.xyz / vec3(lightProjPos.w);\n"
-"        vec2 param = (_172.xy + vec2(1.0)) * 0.5;\n"
-"        vec2 param_1 = fs_light_params[0].xy;\n"
-"        float param_2 = _172.z;\n"
-"        float _195 = sampleShadowPCF(shadowMap, param, param_1, param_2);\n"
-"        fragColor = vec4(vec3((pow(max(dot(reflect(-_149, _154), normalize(fs_light_params[2].xyz - P.xyz)), 0.0), 2.2000000476837158203125) * _158) * _195) + (color * (max(_158 * _195, 0.0) + 0.25)), 1.0);\n"
+"        float _195 = sampleShadowPCF(_172.z);\n"
+"        fragColor = vec4(vec3((pow(max(dot(reflect(-_149, _154), normalize(fs_light_params[1].xyz - P.xyz)), 0.0), 2.2000000476837158203125) * _158) * _195) + (color * (max(_158 * _195, 0.0) + 0.25)), 1.0);\n"
 "    }\n"
 "    else\n"
 "    {\n"
@@ -149,14 +140,11 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
 "}\n"
     ;
       desc.fs.entry = "main";
-      desc.fs.uniform_blocks[0].size = 48;
+      desc.fs.uniform_blocks[0].size = 32;
       desc.fs.uniform_blocks[0].layout = SG_UNIFORMLAYOUT_STD140;
       desc.fs.uniform_blocks[0].uniforms[0].name = "fs_light_params";
       desc.fs.uniform_blocks[0].uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
-      desc.fs.uniform_blocks[0].uniforms[0].array_count = 3;
-      desc.fs.images[0].name = "shadowMap";
-      desc.fs.images[0].image_type = SG_IMAGETYPE_2D;
-      desc.fs.images[0].sampler_type = SG_SAMPLERTYPE_FLOAT;
+      desc.fs.uniform_blocks[0].uniforms[0].array_count = 2;
       desc.label = "color_shader";
     }
     return &desc;
@@ -174,12 +162,10 @@ static inline const sg_shader_desc* shadow_shader_desc(sg_backend backend) {
 "\n"
 "uniform vec4 vs_shadow_params[4];\n"
 "layout(location = 0) in vec4 position;\n"
-"out vec2 projZW;\n"
 "\n"
 "void main()\n"
 "{\n"
-"    gl_Position = mat4(vs_shadow_params[0], vs_shadow_params[1], vs_shadow_params[2], vs_shadow_params[3]) * position;\n"
-"    projZW = gl_Position.zw;\n"
+"    gl_Position = position;\n"
 "}\n"
     ;
       desc.vs.entry = "main";
@@ -190,19 +176,11 @@ static inline const sg_shader_desc* shadow_shader_desc(sg_backend backend) {
       desc.vs.uniform_blocks[0].uniforms[0].array_count = 4;
       desc.fs.source = "#version 330\n"
 "\n"
-"in vec2 projZW;\n"
 "layout(location = 0) out vec4 fragColor;\n"
-"\n"
-"vec4 encodeDepth(float v)\n"
-"{\n"
-"    vec4 _25 = fract(vec4(1.0, 255.0, 65025.0, 16581375.0) * v);\n"
-"    return _25 - (_25.yzww * vec4(0.0039215688593685626983642578125, 0.0039215688593685626983642578125, 0.0039215688593685626983642578125, 0.0));\n"
-"}\n"
 "\n"
 "void main()\n"
 "{\n"
-    "float param = projZW.x / projZW.y;\n"
-    "fragColor = encodeDepth(param);\n"
+    "fragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
 "}"
     ;
       desc.fs.entry = "main";
@@ -379,7 +357,6 @@ void init(void) {
     state.deflt.bind = (sg_bindings){
         .vertex_buffers[0] = vbuf,
         .index_buffer = ibuf,
-        .fs_images[SLOT_shadowMap] = color_img
     };
 
     state.ry = 0.0f;
@@ -417,7 +394,6 @@ void frame(void) {
     /* Initialise fragment uniforms for light shader */
     const fs_light_params_t fs_light_params = {
         .lightDir = HMM_NormalizeVec3(light_dir.XYZ),
-        .shadowMapSize = HMM_Vec2(2048,2048),
         .eyePos = HMM_Vec3(5.0f,5.0f,5.0f)
     };
 
