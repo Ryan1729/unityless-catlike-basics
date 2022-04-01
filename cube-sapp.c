@@ -284,7 +284,7 @@ void frame(void) {
             .mvp = HMM_MultiplyMat4(view_proj,scale),
             .lightMVP = HMM_MultiplyMat4(light_view_proj,scale),
             .model = HMM_Mat4d(1.0f),
-            .diffColor = HMM_Vec3(0.5f,0.5f,0.5f)
+            .diffColor = HMM_Vec3(0.25f,0.5f,0.75f)
         };
         sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_light_params, &SG_RANGE(vs_light_params));
         sg_draw(36, 6, 1);
@@ -295,7 +295,7 @@ void frame(void) {
             .lightMVP = HMM_MultiplyMat4(light_view_proj,translate),
             .model = translate,
             .mvp = HMM_MultiplyMat4(view_proj,translate),
-            .diffColor = HMM_Vec3(1.0f,1.0f,1.0f)
+            .diffColor = HMM_Vec3(1.0f,1.0f,0.0f)
         };
         sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_light_params, &SG_RANGE(vs_light_params));
         sg_draw(0, 36, 1);
