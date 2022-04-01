@@ -18,15 +18,8 @@
     #define SOKOL_SHDC_ALIGN(a) __attribute__((aligned(a)))
   #endif
 #endif
-#define ATTR_shadowVS_position (0)
 #define ATTR_colorVS_position (0)
 #define ATTR_colorVS_normal (1)
-#define SLOT_vs_shadow_params (0)
-#pragma pack(push,1)
-SOKOL_SHDC_ALIGN(16) typedef struct vs_shadow_params_t {
-    hmm_mat4 mvp;
-} vs_shadow_params_t;
-#pragma pack(pop)
 #define SLOT_vs_light_params (0)
 #pragma pack(push,1)
 SOKOL_SHDC_ALIGN(16) typedef struct vs_light_params_t {
@@ -132,45 +125,6 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
   }
   return 0;
 }
-static inline const sg_shader_desc* shadow_shader_desc(sg_backend backend) {
-  if (backend == SG_BACKEND_GLCORE33) {
-    static sg_shader_desc desc;
-    static bool valid;
-    if (!valid) {
-      valid = true;
-      desc.attrs[0].name = "position";
-      desc.vs.source = "#version 330\n"
-"\n"
-"uniform vec4 vs_shadow_params[4];\n"
-"layout(location = 0) in vec4 position;\n"
-"\n"
-"void main()\n"
-"{\n"
-"    gl_Position = position;\n"
-"}\n"
-    ;
-      desc.vs.entry = "main";
-      desc.vs.uniform_blocks[0].size = 64;
-      desc.vs.uniform_blocks[0].layout = SG_UNIFORMLAYOUT_STD140;
-      desc.vs.uniform_blocks[0].uniforms[0].name = "vs_shadow_params";
-      desc.vs.uniform_blocks[0].uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
-      desc.vs.uniform_blocks[0].uniforms[0].array_count = 4;
-      desc.fs.source = "#version 330\n"
-"\n"
-"layout(location = 0) out vec4 fragColor;\n"
-"\n"
-"void main()\n"
-"{\n"
-    "fragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
-"}"
-    ;
-      desc.fs.entry = "main";
-      desc.label = "shadow_shader";
-    }
-    return &desc;
-  }
-  return 0;
-}
 
 #define SCREEN_SAMPLE_COUNT (4)
 
@@ -198,32 +152,6 @@ void init(void) {
     state.deflt.pass_action = (sg_pass_action) {
         .colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.0f, 0.25f, 1.0f, 1.0f } }
     };
-
-    /* shadow pass action: clear to white */
-    state.shadows.pass_action = (sg_pass_action) {
-        .colors[0] = { .action = SG_ACTION_CLEAR, .value = { 1.0f, 1.0f, 1.0f, 1.0f } }
-    };
-
-    /* a render pass with one color- and one depth-attachment image */
-    sg_image_desc img_desc = {
-        .render_target = true,
-        .width = 2048,
-        .height = 2048,
-        .pixel_format = SG_PIXELFORMAT_RGBA8,
-        .min_filter = SG_FILTER_LINEAR,
-        .mag_filter = SG_FILTER_LINEAR,
-        .sample_count = 1,
-        .label = "shadow-map-color-image"
-    };
-    sg_image color_img = sg_make_image(&img_desc);
-    img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
-    img_desc.label = "shadow-map-depth-image";
-    sg_image depth_img = sg_make_image(&img_desc);
-    state.shadows.pass = sg_make_pass(&(sg_pass_desc){
-        .color_attachments[0].image = color_img,
-        .depth_stencil_attachment.image = depth_img,
-        .label = "shadow-map-pass"
-    });
 
     /* cube vertex buffer with positions & normals */
     float vertices[] = {
@@ -284,31 +212,6 @@ void init(void) {
         .label = "cube-indices"
     });
 
-    /* pipeline-state-object for shadows-rendered cube, don't need texture coord here */
-    state.shadows.pip = sg_make_pipeline(&(sg_pipeline_desc){
-        .layout = {
-            /* need to provide stride, because the buffer's normal vector is skipped */
-            .buffers[0].stride = 6 * sizeof(float),
-            /* but don't need to provide attr offsets, because pos and normal are continuous */
-            .attrs = {
-                [ATTR_shadowVS_position].format = SG_VERTEXFORMAT_FLOAT3
-            }
-        },
-        .shader = sg_make_shader(shadow_shader_desc(sg_query_backend())),
-        .index_type = SG_INDEXTYPE_UINT16,
-        /* Cull front faces in the shadow map pass */
-        .cull_mode = SG_CULLMODE_FRONT,
-        .sample_count = 1,
-        .depth = {
-            .pixel_format = SG_PIXELFORMAT_DEPTH,
-            .compare = SG_COMPAREFUNC_LESS_EQUAL,
-            .write_enabled = true,
-        },
-        .colors[0].pixel_format = SG_PIXELFORMAT_RGBA8,
-        .label = "shadow-map-pipeline"
-    });
-
-    /* and another pipeline-state-object for the default pass */
     state.deflt.pip = sg_make_pipeline(&(sg_pipeline_desc){
         .layout = {
             /* don't need to provide buffer stride or attr offsets, no gaps here */
@@ -328,13 +231,7 @@ void init(void) {
         .label = "default-pipeline"
     });
 
-    /* the resource bindings for rendering the cube into the shadow map render target */
-    state.shadows.bind = (sg_bindings){
-        .vertex_buffers[0] = vbuf,
-        .index_buffer = ibuf
-    };
-
-    /* resource bindings to render the cube, using the shadow map render target as texture */
+    /* resource bindings to render the cube */
     state.deflt.bind = (sg_bindings){
         .vertex_buffers[0] = vbuf,
         .index_buffer = ibuf,
@@ -344,7 +241,6 @@ void init(void) {
 }
 
 void frame(void) {
-
     const float t = (float)(sapp_frame_duration() * 60.0);
     state.ry += t;
 
@@ -378,21 +274,6 @@ void frame(void) {
         .eyePos = HMM_Vec3(5.0f,5.0f,5.0f)
     };
 
-    /* the shadow map pass, render the vertices into the depth image */
-    sg_begin_pass(state.shadows.pass, &state.shadows.pass_action);
-    sg_apply_pipeline(state.shadows.pip);
-    sg_apply_bindings(&state.shadows.bind);
-    {
-        /* Render the cube into the shadow map */
-        const vs_shadow_params_t vs_shadow_params = {
-            .mvp = HMM_MultiplyMat4(light_view_proj,translate)
-        };
-        sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_shadow_params, &SG_RANGE(vs_shadow_params));
-        sg_draw(0, 36, 1);
-    }
-    sg_end_pass();
-
-    /* and the display-pass, rendering the scene, using the previously rendered shadow map as a texture */
     sg_begin_default_pass(&state.deflt.pass_action, sapp_width(), sapp_height());
     sg_apply_pipeline(state.deflt.pip);
     sg_apply_bindings(&state.deflt.bind);
