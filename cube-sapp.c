@@ -25,7 +25,6 @@
 SOKOL_SHDC_ALIGN(16) typedef struct vs_light_params_t {
     hmm_mat4 model;
     hmm_mat4 mvp;
-    hmm_mat4 lightMVP;
     hmm_vec3 diffColor;
     uint8_t _pad_204[4];
 } vs_light_params_t;
@@ -50,9 +49,8 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
       desc.attrs[1].name = "normal";
       desc.vs.source = "#version 330\n"
 "\n"
-"uniform vec4 vs_light_params[13];\n"
+"uniform vec4 vs_light_params[9];\n"
 "layout(location = 0) in vec4 position;\n"
-"out vec4 lightProjPos;\n"
 "out vec4 P;\n"
 "out vec3 N;\n"
 "layout(location = 1) in vec3 normal;\n"
@@ -62,26 +60,23 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
 "{\n"
 "    mat4 mvp = mat4(vs_light_params[4], vs_light_params[5], vs_light_params[6], vs_light_params[7]);\n"
 "    gl_Position = mvp * position;\n"
-"    mat4 lightMVP = mat4(vs_light_params[8], vs_light_params[9], vs_light_params[10], vs_light_params[11]);\n"
-"    lightProjPos = lightMVP * position;\n"
 "    mat4 model = mat4(vs_light_params[0], vs_light_params[1], vs_light_params[2], vs_light_params[3]);\n"
 "    P = model * position;\n"
 "    N = (model * vec4(normal, 0.0)).xyz;\n"
-"    color = vs_light_params[12].xyz;\n"
+"    color = vs_light_params[8].xyz;\n"
 "}\n"
       ;
       desc.vs.entry = "main";
-      desc.vs.uniform_blocks[0].size = 208;
+      desc.vs.uniform_blocks[0].size = 144;
       desc.vs.uniform_blocks[0].layout = SG_UNIFORMLAYOUT_STD140;
       desc.vs.uniform_blocks[0].uniforms[0].name = "vs_light_params";
       desc.vs.uniform_blocks[0].uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
-      desc.vs.uniform_blocks[0].uniforms[0].array_count = 13;
+      desc.vs.uniform_blocks[0].uniforms[0].array_count = 9;
       desc.fs.source = "#version 330\n"
 "\n"
 "uniform vec4 fs_light_params[2];\n"
 "\n"
 "in vec3 N;\n"
-"in vec4 lightProjPos;\n"
 "in vec4 P;\n"
 "layout(location = 0) out vec4 fragColor;\n"
 "in vec3 color;\n"
@@ -140,12 +135,6 @@ static inline const sg_shader_desc* color_shader_desc(sg_backend backend) {
 static struct {
     struct {
         sg_pass_action pass_action;
-        sg_pass pass;
-        sg_pipeline pip;
-        sg_bindings bind;
-    } shadows;
-    struct {
-        sg_pass_action pass_action;
         sg_pipeline pip;
         sg_bindings bind;
     } deflt;
@@ -194,11 +183,6 @@ void init(void) {
         -1.0f,  1.0f,  1.0f,    0.0f, 1.0f, 0.0f,
          1.0f,  1.0f,  1.0f,    0.0f, 1.0f, 0.0f,
          1.0f,  1.0f, -1.0f,    0.0f, 1.0f, 0.0f,
-
-        -1.0f,  0.0f, -1.0f,    0.0f, 1.0f, 0.0f,   //PLANE GEOMETRY
-        -1.0f,  0.0f,  1.0f,    0.0f, 1.0f, 0.0f,
-         1.0f,  0.0f,  1.0f,    0.0f, 1.0f, 0.0f,
-         1.0f,  0.0f, -1.0f,    0.0f, 1.0f, 0.0f,
     };
     sg_buffer vbuf = sg_make_buffer(&(sg_buffer_desc){
         .data = SG_RANGE(vertices),
@@ -213,7 +197,6 @@ void init(void) {
         14, 13, 12,  15, 14, 12,
         16, 17, 18,  16, 18, 19,
         22, 21, 20,  23, 22, 20,
-        26, 25, 24,  27, 26, 24
     };
     sg_buffer ibuf = sg_make_buffer(&(sg_buffer_desc){
         .type = SG_BUFFERTYPE_INDEXBUFFER,
@@ -256,26 +239,11 @@ void frame(void) {
     /* Calculate matrices for shadow pass */
     const hmm_mat4 rym = HMM_Rotate(state.ry, HMM_Vec3(0.0f,1.0f,0.0f));
     const hmm_vec4 light_dir = HMM_MultiplyMat4ByVec4(rym, HMM_Vec4(50.0f,50.0f,-50.0f,0.0f));
-    const hmm_mat4 light_view = HMM_LookAt(light_dir.XYZ, HMM_Vec3(0.0f, 0.0f, 0.0f), HMM_Vec3(0.0f, 1.0f, 0.0f));
-
-    /* Configure a bias matrix for converting view-space coordinates into uv coordinates */
-    hmm_mat4 light_proj = { {
-        { 0.5f, 0.0f, 0.0f, 0 },
-        { 0.0f, 0.5f, 0.0f, 0 },
-        { 0.0f, 0.0f, 0.5f, 0 },
-        { 0.5f, 0.5f, 0.5f, 1 }
-    } };
-    light_proj = HMM_MultiplyMat4(light_proj, HMM_Orthographic(-4.0f, 4.0f, -4.0f, 4.0f, 0, 200.0f));
-    const hmm_mat4 light_view_proj = HMM_MultiplyMat4(light_proj, light_view);
 
     /* Calculate matrices for camera pass */
     const hmm_mat4 proj = HMM_Perspective(60.0f, sapp_widthf()/sapp_heightf(), 0.01f, 100.0f);
     const hmm_mat4 view = HMM_LookAt(HMM_Vec3(5.0f, 5.0f, 5.0f), HMM_Vec3(0.0f, 0.0f, 0.0f), HMM_Vec3(0.0f, 1.0f, 0.0f));
     const hmm_mat4 view_proj = HMM_MultiplyMat4(proj, view);
-
-    /* Calculate transform matrices for plane and cube */
-    const hmm_mat4 scale = HMM_Scale(HMM_Vec3(5,0,5));
-    const hmm_mat4 translate = HMM_Translate(HMM_Vec3(0,1.5f,0));
 
     /* Initialise fragment uniforms for light shader */
     const fs_light_params_t fs_light_params = {
@@ -288,22 +256,10 @@ void frame(void) {
     sg_apply_bindings(&state.deflt.bind);
     sg_apply_uniforms(SG_SHADERSTAGE_FS, SLOT_fs_light_params, &SG_RANGE(fs_light_params));
     {
-        /* Render the plane in the light pass */
-        const vs_light_params_t vs_light_params = {
-            .mvp = HMM_MultiplyMat4(view_proj,scale),
-            .lightMVP = HMM_MultiplyMat4(light_view_proj,scale),
-            .model = HMM_Mat4d(1.0f),
-            .diffColor = HMM_Vec3(0.25f,0.5f,0.75f)
-        };
-        sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_light_params, &SG_RANGE(vs_light_params));
-        sg_draw(36, 6, 1);
-    }
-    {
         /* Render the cube in the light pass */
         const vs_light_params_t vs_light_params = {
-            .lightMVP = HMM_MultiplyMat4(light_view_proj,translate),
-            .model = translate,
-            .mvp = HMM_MultiplyMat4(view_proj,translate),
+            .model = HMM_Mat4d(1.0),
+            .mvp = view_proj,
             .diffColor = HMM_Vec3(1.0f,1.0f,0.0f)
         };
         sg_apply_uniforms(SG_SHADERSTAGE_VS, SLOT_vs_light_params, &SG_RANGE(vs_light_params));
