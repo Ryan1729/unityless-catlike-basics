@@ -3,4 +3,5 @@
 
 pub mod shaders;
 pub use shaders::textured;
+pub mod checkerboard_image;
 pub mod white_image;
