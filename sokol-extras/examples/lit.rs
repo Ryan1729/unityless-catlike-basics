@@ -3,8 +3,13 @@ use sokol_bindings::{
     sapp::{self, IconDesc},
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, Action, Bindings, Color, ColorAttachmentAction, PassAction, Pipeline, PipelineDesc},
+    Int,
 };
 use sokol_extras::{shaders::lit, checkerboard_image};
+use math::{
+    mat4::Mat4,
+    vec3::{vec3},
+};
 
 #[derive(Default)]
 struct State {
@@ -12,17 +17,63 @@ struct State {
     pipe: Pipeline,
 }
 
-const INDICES: [u16; 3] = [0, 1, 2];
+const CUBE_INDEX_COUNT: Int = 36;
+
+const INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
+    0, 1, 2,  0, 2, 3,
+    6, 5, 4,  7, 6, 4,
+    8, 9, 10,  8, 10, 11,
+    14, 13, 12,  15, 14, 12,
+    16, 17, 18,  16, 18, 19,
+    22, 21, 20,  23, 22, 20
+];
 
 fn init(state: &mut State) {
     setup_default_context();
 
-    const VERTICES: [lit::Vertex; 3] = lit::vertex_array![
-        /* pos                    color       uvs */
-        { -1./4., -1./4., -1./4., 0xFFFF0000,     0,     0 },
-        {     0.,  1./2., -1./4., 0xFF00FF00, 32767, 32767 },
-        {  1./4., -1./4., -1./4., 0xFF0000FF, 32767,     0 },
-    ];
+    const VERTICES: [lit::Vertex; 24] = {
+        macro_rules! m {
+            (0/1) => {0};
+            (1/1) => {32767};
+            (1/4) => {32767/4};
+            (1/3) => {32767/3};
+            (1/2) => {32767/2};
+            (2/3) => {m!(1/3) * 2};
+            (3/4) => {m!(1/4) * 3};
+        }
+        lit::vertex_array![
+            /* pos                  color       uvs */
+            { -1., -1., -1.,  0xFF00FF00, m!(0/1), m!(1/3) },
+            {  1., -1., -1.,  0xFF00FF00, m!(1/4), m!(1/3) },
+            {  1.,  1., -1.,  0xFF00FF00, m!(1/2), m!(1/3) },
+            { -1.,  1., -1.,  0xFF00FF00, m!(3/4), m!(1/3) },
+
+            { -1., -1.,  1.,  0xFF00FF00, m!(0/1), m!(2/3) },
+            {  1., -1.,  1.,  0xFF00FF00, m!(1/4), m!(2/3) },
+            {  1.,  1.,  1.,  0xFF00FF00, m!(1/2), m!(2/3) },
+            { -1.,  1.,  1.,  0xFF00FF00, m!(3/4), m!(2/3) },
+
+            { -1., -1., -1.,  0xFF00FF00, m!(3/4), m!(1/3) },
+            { -1.,  1., -1.,  0xFF00FF00, m!(3/4), m!(1/3) },
+            { -1.,  1.,  1.,  0xFF00FF00, m!(1/1), m!(2/3) },
+            { -1., -1.,  1.,  0xFF00FF00, m!(1/1), m!(2/3) },
+
+            {  1., -1., -1.,  0xFF00FF00, m!(1/4), m!(1/3) },
+            {  1.,  1., -1.,  0xFF00FF00, m!(1/2), m!(1/3) },
+            {  1.,  1.,  1.,  0xFF00FF00, m!(1/2), m!(2/3) },
+            {  1., -1.,  1.,  0xFF00FF00, m!(1/4), m!(2/3) },
+
+            { -1., -1., -1.,  0xFF00FF00, m!(0/1), m!(1/3) },
+            { -1., -1.,  1.,  0xFF00FF00, m!(0/1), m!(2/3) },
+            {  1., -1.,  1.,  0xFF00FF00, m!(1/4), m!(2/3) },
+            {  1., -1., -1.,  0xFF00FF00, m!(1/4), m!(1/3) },
+
+            { -1.,  1., -1.,  0xFF00FF00, m!(3/4), m!(1/3) },
+            { -1.,  1.,  1.,  0xFF00FF00, m!(3/4), m!(2/3) },
+            {  1.,  1.,  1.,  0xFF00FF00, m!(1/2), m!(2/3) },
+            {  1.,  1., -1.,  0xFF00FF00, m!(1/2), m!(1/3) },
+        ]
+    };
 
     state.bind.vertex_buffers[0] = sg::make_immutable_vertex_buffer!(
         VERTICES
@@ -67,12 +118,11 @@ fn frame(state: &mut State) {
         sg::apply_bindings(&state.bind);
     }
 
-    lit::apply_uniforms([
-        1., 0., 0., 0.,
-        0., 1., 0., 0.,
-        0., 0., 1., 0.,
-        0., 0., 0., 1.,
-    ]);
+    let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 100.));
+    let view = Mat4::look_at(vec3!(5., 5., 5.), vec3!(), vec3!(y));
+    let view_proj = proj * view;
+
+    lit::apply_uniforms(view_proj.to_column_major());
 
     unsafe { sg::draw(0, INDICES.len() as _, 1); }
 
