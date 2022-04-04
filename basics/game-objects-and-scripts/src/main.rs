@@ -9,7 +9,7 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{textured, white_image};
+use sokol_extras::{shaders::textured, white_image};
 
 mod skybox;
 mod decoded;

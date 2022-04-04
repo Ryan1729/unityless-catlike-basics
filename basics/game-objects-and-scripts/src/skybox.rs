@@ -10,7 +10,7 @@ use sokol_bindings::{
     Int,
 };
 use math::mat4::Mat4;
-use sokol_extras::textured;
+use sokol_extras::shaders::textured;
 
 #[derive(Default)]
 pub struct State {

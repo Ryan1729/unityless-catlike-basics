@@ -35,11 +35,11 @@ impl Default for Vertex {
 }
 
 #[macro_export]
-macro_rules! _textured_vertex {
+macro_rules! _lit_vertex {
     (
         $x: expr, $y: expr, $z: expr, $color: expr, $u: expr, $v: expr $(,)?
     ) => {
-        $crate::shaders::textured::Vertex {
+        $crate::shaders::lit::Vertex {
             x: $x,
             y: $y,
             z: $z,
@@ -49,11 +49,11 @@ macro_rules! _textured_vertex {
         }
     }
 }
-pub use _textured_vertex as vertex;
+pub use _lit_vertex as vertex;
 
 
 #[macro_export]
-macro_rules! _textured_vertex_array {
+macro_rules! _lit_vertex_array {
     (
         $(
             {$x: expr, $y: expr, $z: expr, $color: expr, $u: expr, $v: expr $(,)?}
@@ -63,7 +63,7 @@ macro_rules! _textured_vertex_array {
     ) => {
         [
             $(
-                $crate::shaders::textured::Vertex {
+                $crate::shaders::lit::Vertex {
                     x: $x,
                     y: $y,
                     z: $z,
@@ -75,7 +75,7 @@ macro_rules! _textured_vertex_array {
         ]
     }
 }
-pub use _textured_vertex_array as vertex_array;
+pub use _lit_vertex_array as vertex_array;
 
 const ATTR_VS_POSITION: u8 = 0;
 const ATTR_VS_COLOR0: u8 = 1;
@@ -130,7 +130,7 @@ frag_color = texture(tex, uv) * color;
     desc.fs.images[0].name = cstr!("tex");
     desc.fs.images[0].image_type = sg::ImageType::_2D as _;
     desc.fs.images[0].sampler_type = sg::SamplerType::Float as _;
-    desc.label = cstr!("textured_shader");
+    desc.label = cstr!("lit_shader");
 
     desc
 }

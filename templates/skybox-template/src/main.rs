@@ -9,7 +9,7 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{textured, white_image};
+use sokol_extras::{shaders::textured, white_image};
 
 mod skybox;
 mod decoded;
@@ -33,12 +33,9 @@ const NEAR: f32 = 0.01;
 // An f32 has 24 mantissa bits, so 2 to the 24th power seems reasonable here.
 const FAR: f32 = 16777216.0;
 
-fn gen_mesh() -> textured::IndexedMesh<
-    {math::geom::CUBE_POINT_COUNT_USIZE},
-    {math::geom::CUBE_INDEX_COUNT_USIZE},
-> {
-    let mesh = math::geom::gen_cube_mesh(1./8.);
-
+const MODEL_VERTICIES: [textured::Vertex; 24] = {
+    // Short for Cube Scale.
+    const C_S: f32 = 1./8.;
     macro_rules! m {
         (0/1) => {0};
         (1/1) => {32767};
@@ -48,51 +45,50 @@ fn gen_mesh() -> textured::IndexedMesh<
         (2/3) => {m!(1/3) * 2};
         (3/4) => {m!(1/4) * 3};
     }
+    textured::vertex_array![
+        /* pos                  color       uvs */
+        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(0/1), m!(1/3) },
+        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
 
-    const UVS: [(i16, i16); math::geom::CUBE_POINT_COUNT_USIZE] = [
-        (m!(0/1), m!(1/3)),
-        (m!(1/4), m!(1/3)),
-        (m!(1/2), m!(1/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(0/1), m!(2/3)),
-        (m!(1/4), m!(2/3)),
-        (m!(1/2), m!(2/3)),
-        (m!(3/4), m!(2/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(1/1), m!(2/3)),
-        (m!(1/1), m!(2/3)),
-        (m!(1/4), m!(1/3)),
-        (m!(1/2), m!(1/3)),
-        (m!(1/2), m!(2/3)),
-        (m!(1/4), m!(2/3)),
-        (m!(0/1), m!(1/3)),
-        (m!(0/1), m!(2/3)),
-        (m!(1/4), m!(2/3)),
-        (m!(1/4), m!(1/3)),
-        (m!(3/4), m!(1/3)),
-        (m!(3/4), m!(2/3)),
-        (m!(1/2), m!(2/3)),
-        (m!(1/2), m!(1/3)),
-    ];
+        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
+        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(3/4), m!(2/3) },
 
-    let mut vertices = [textured::VERTEX_DEFAULT; math::geom::CUBE_POINT_COUNT_USIZE];
-    for (i, point) in mesh.points.iter().enumerate() {
-        vertices[i] = textured::vertex!{
-            point.x,
-            point.y,
-            point.z,
-            0xFF00FF00,
-            UVS[i].0,
-            UVS[i].1,
-        };
-    }
+        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(1/1), m!(2/3) },
+        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(1/1), m!(2/3) },
 
-    textured::IndexedMesh {
-        vertices,
-        indices: mesh.indices,
-    }
-}
+        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+
+        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(0/1), m!(1/3) },
+        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+
+        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(3/4), m!(2/3) },
+        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
+        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+    ]
+};
+
+const CUBE_INDEX_COUNT: Int = 36;
+
+const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
+    0, 1, 2,  0, 2, 3,
+    6, 5, 4,  7, 6, 4,
+    8, 9, 10,  8, 10, 11,
+    14, 13, 12,  15, 14, 12,
+    16, 17, 18,  16, 18, 19,
+    22, 21, 20,  23, 22, 20
+];
 
 fn init(state: &mut State) {
     state.eye = vec3!(0., 1.5, 1./16.);
@@ -102,20 +98,14 @@ fn init(state: &mut State) {
 
     skybox::init(&mut state.skybox);
 
-    let mesh = gen_mesh();
-
-    let vertices = mesh.vertices;
-
     state.model.bind.vertex_buffers[0] = sg::make_immutable_vertex_buffer!(
-        vertices,
+        MODEL_VERTICIES
         "model-vertices"
     );
 
-    let indices = mesh.indices;
-
     state.model.bind.index_buffer = sg::make_immutable_index_buffer!(
-        indices,
-        "model-indices"
+        CUBE_INDICES
+        "cube-indices"
     );
 
     state.model.bind.fs_images[textured::SLOT_TEX as usize] = white_image::make();
@@ -128,7 +118,7 @@ fn init(state: &mut State) {
         index_type: sg::IndexType::UInt16 as _,
         cull_mode: sg::CullMode::Back as _,
         depth,
-        label: cstr!("model-pipeline"),
+        label: cstr!("cube-pipeline"),
         ..PipelineDesc::default()
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
@@ -169,7 +159,7 @@ fn draw_model(model: &ModelState, view_proj: Mat4) {
     let mvp = view_proj;
     textured::apply_uniforms(mvp.to_column_major());
 
-    unsafe { sg::draw(0, math::geom::CUBE_INDEX_COUNT as Int, 1); }
+    unsafe { sg::draw(0, CUBE_INDEX_COUNT, 1); }
 }
 
 fn cleanup(_state: &mut State) {

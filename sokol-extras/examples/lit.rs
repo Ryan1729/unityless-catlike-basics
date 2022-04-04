@@ -4,7 +4,7 @@ use sokol_bindings::{
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, Action, Bindings, Color, ColorAttachmentAction, PassAction, Pipeline, PipelineDesc},
 };
-use sokol_extras::{shaders::textured, checkerboard_image};
+use sokol_extras::{shaders::lit, checkerboard_image};
 
 #[derive(Default)]
 struct State {
@@ -17,7 +17,7 @@ const INDICES: [u16; 3] = [0, 1, 2];
 fn init(state: &mut State) {
     setup_default_context();
 
-    const VERTICES: [textured::Vertex; 3] = textured::vertex_array![
+    const VERTICES: [lit::Vertex; 3] = lit::vertex_array![
         /* pos                    color       uvs */
         { -1./4., -1./4., -1./4., 0xFFFF0000,     0,     0 },
         {     0.,  1./2., -1./4., 0xFF00FF00, 32767, 32767 },
@@ -34,9 +34,9 @@ fn init(state: &mut State) {
         "indices"
     );
 
-    state.bind.fs_images[textured::SLOT_TEX as usize] = checkerboard_image::make();
+    state.bind.fs_images[lit::SLOT_TEX as usize] = checkerboard_image::make();
 
-    let (shader, layout, depth) = textured::make_shader_etc(query_backend());
+    let (shader, layout, depth) = lit::make_shader_etc(query_backend());
 
     let pipeline_desc = PipelineDesc{
         layout,
@@ -67,7 +67,7 @@ fn frame(state: &mut State) {
         sg::apply_bindings(&state.bind);
     }
 
-    textured::apply_uniforms([
+    lit::apply_uniforms([
         1., 0., 0., 0.,
         0., 1., 0., 0.,
         0., 0., 1., 0.,
