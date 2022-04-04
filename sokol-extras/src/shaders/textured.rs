@@ -3,12 +3,7 @@ use sokol_bindings::{
     sg::{self, Backend, DepthState, LayoutDesc, ShaderDesc},
 };
 
-use crate::shaders::Index;
-
-/// From most significant to least significant. So in a hex literal that's
-/// `0xAABBGGRR`, so `0xFFC08040` has full alpha, around 3/4 blue, around half green
-/// and adound 1/4 red.
-pub type ABGR = u32;
+use crate::shaders::{Index, ABGR};
 
 pub struct Vertex {
     pub x: f32,
