@@ -114,9 +114,7 @@ impl Vec3 {
 
         self
     }
-}
 
-impl Vec3 {
     pub fn length(self) -> Element {
         self.length_squared().sqrt()
     }

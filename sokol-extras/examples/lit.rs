@@ -5,16 +5,19 @@ use sokol_bindings::{
     sg::{self, begin_default_pass, end_pass, commit, query_backend, Action, Bindings, Color, ColorAttachmentAction, PassAction, Pipeline, PipelineDesc},
     Int,
 };
-use sokol_extras::{shaders::lit, checkerboard_image};
+use sokol_extras::shaders::lit;
 use math::{
     mat4::Mat4,
-    vec3::{vec3},
+    vec3::vec3,
+    vec4::vec4,
+    angle::Radians,
 };
 
 #[derive(Default)]
 struct State {
     bind: Bindings,
     pipe: Pipeline,
+    ry: f32,
 }
 
 const CUBE_INDEX_COUNT: Int = 36;
@@ -85,8 +88,6 @@ fn init(state: &mut State) {
         "indices"
     );
 
-    state.bind.fs_images[lit::SLOT_TEX as usize] = checkerboard_image::make();
-
     let (shader, layout, depth) = lit::make_shader_etc(query_backend());
 
     let pipeline_desc = PipelineDesc{
@@ -105,7 +106,7 @@ fn frame(state: &mut State) {
     let mut pass_action = PassAction::default();
     pass_action.colors[0] = ColorAttachmentAction {
         action: Action::Clear,
-        value: Color{ r: 0.25, g: 0.5, b: 0.75, a: 1. },
+        value: Color{ r: 0., g: 0.25, b: 1., a: 1. },
     };
 
     let w = sapp::width();
@@ -118,11 +119,28 @@ fn frame(state: &mut State) {
         sg::apply_bindings(&state.bind);
     }
 
-    let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 100.));
-    let view = Mat4::look_at(vec3!(5., 5., 5.), vec3!(), vec3!(y));
-    let view_proj = proj * view;
+    let rym = Mat4::rotation(Radians(state.ry), vec3!(y));
+    let light_dir = rym * vec4!(50., 50., -50., 0.);
 
-    lit::apply_uniforms(view_proj.to_column_major());
+    let eye_pos = vec3!(5., 5., 5.);
+
+    let model = Mat4::identity();
+    let proj = Mat4::perspective(60., w as f32/h as f32, (0.01, 100.));
+    let view = Mat4::look_at(eye_pos, vec3!(), vec3!(y));
+    let mvp = model * (proj * view);
+
+    let vs_params = lit::VSParams {
+        model,
+        mvp,
+        diffuse_colour: vec3!(1., 1., 0.),
+    };
+
+    let fs_params = lit::FSParams {
+        light_dir: light_dir.xyz().normalize(),
+        eye_pos,
+    };
+
+    lit::apply_uniforms(vs_params, fs_params);
 
     unsafe { sg::draw(0, INDICES.len() as _, 1); }
 

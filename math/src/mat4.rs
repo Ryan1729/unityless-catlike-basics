@@ -2,6 +2,7 @@ use core::ops::{Index, IndexMut, Mul, MulAssign};
 use crate::{
     angle::Angle,
     vec3::{vec3, Vec3},
+    vec4::{Vec4},
 };
 
 pub type Element = f32;
@@ -155,8 +156,8 @@ impl Mul for Mat4 {
 
         // TODO add SSE version
 
-        for column in 0..WIDTH {
-            for row in 0..HEIGHT {
+        for row in 0..HEIGHT {
+            for column in 0..WIDTH {
                 let mut sum = 0.;
 
                 // This assumes `WIDTH == HEIGHT == 4`, which is unlikely to change.
@@ -213,6 +214,27 @@ fn mat4_mul_works_on_this_asymmetrical_example() {
     ]);
 
     assert_eq!(initial * Mat4::identity(), initial);
+}
+
+impl Mul<Vec4> for Mat4 {
+    type Output = Vec4;
+
+    fn mul(self, other: Vec4) -> Self::Output {
+       let mut output = Vec4::default();
+
+        for row in 0..HEIGHT {
+            let mut sum = 0.;
+
+            for column in 0..WIDTH {
+                sum += self[row_col!(row, column)]
+                        * other[column];
+            }
+
+            output[row] = sum;
+        }
+
+        output
+    }
 }
 
 impl Mat4 {
