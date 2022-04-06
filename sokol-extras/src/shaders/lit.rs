@@ -3,28 +3,20 @@ use sokol_bindings::{
     sg::{self, Backend, DepthState, LayoutDesc, ShaderDesc},
 };
 
-use crate::shaders::{Index, ABGR};
+use crate::shaders::Index;
 use math::{
     mat4::Mat4,
-    vec3::Vec3,
+    vec3::{vec3, Vec3},
 };
 
 pub struct Vertex {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-    pub color: ABGR,
-    pub u: i16,
-    pub v: i16,
+    pub position: Vec3,
+    pub normal: Vec3,
 }
 
 pub const VERTEX_DEFAULT: Vertex = Vertex {
-    x: 0.,
-    y: 0.,
-    z: 0.,
-    color: 0xFF000000,
-    u: 0,
-    v: 0,
+    position: vec3!(),
+    normal: vec3!(),
 };
 
 impl Default for Vertex {
@@ -36,15 +28,11 @@ impl Default for Vertex {
 #[macro_export]
 macro_rules! _lit_vertex {
     (
-        $x: expr, $y: expr, $z: expr, $color: expr, $u: expr, $v: expr $(,)?
+        $px: expr, $py: expr, $pz: expr, $nx: expr, $ny: expr, $nz: expr $(,)?
     ) => {
         $crate::shaders::lit::Vertex {
-            x: $x,
-            y: $y,
-            z: $z,
-            color: $color,
-            u: $u,
-            v: $v,
+            position: vec3!($px, $py, $pz),
+            normal: vec3!($nx, $ny, $nz),
         }
     }
 }
@@ -55,7 +43,7 @@ pub use _lit_vertex as vertex;
 macro_rules! _lit_vertex_array {
     (
         $(
-            {$x: expr, $y: expr, $z: expr, $color: expr, $u: expr, $v: expr $(,)?}
+            {$px: expr, $py: expr, $pz: expr, $nx: expr, $ny: expr, $nz: expr $(,)?}
         ),*
 
         $(,)?
@@ -63,12 +51,8 @@ macro_rules! _lit_vertex_array {
         [
             $(
                 $crate::shaders::lit::Vertex {
-                    x: $x,
-                    y: $y,
-                    z: $z,
-                    color: $color,
-                    u: $u,
-                    v: $v,
+                    position: vec3!($px, $py, $pz),
+                    normal: vec3!($nx, $ny, $nz),
                 }
             ),*
         ]

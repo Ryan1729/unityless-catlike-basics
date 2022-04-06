@@ -3,7 +3,7 @@ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[macro_export]
 macro_rules! _vec3 {
     () => {
-        $crate::vec3::Vec3::default()
+        $crate::vec3::DEFAULT;
     };
     (x) => {
         $crate::vec3::Vec3 { x: 1., y: 0., z: 0. }
@@ -25,11 +25,23 @@ pub use _vec3 as vec3;
 
 pub type Element = f32;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub struct Vec3 {
     pub x: Element,
     pub y: Element,
     pub z: Element,
+}
+
+pub const DEFAULT: Vec3 = Vec3 {
+    x: 0.,
+    y: 0.,
+    z: 0.,
+};
+
+impl Default for Vec3 {
+    fn default() -> Self {
+        DEFAULT
+    }
 }
 
 impl core::fmt::Display for Vec3 {
