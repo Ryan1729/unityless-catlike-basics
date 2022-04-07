@@ -5,7 +5,10 @@ use sokol_bindings::{
     sg::{self, begin_default_pass, end_pass, commit, query_backend, Action, Bindings, Color, ColorAttachmentAction, PassAction, Pipeline, PipelineDesc},
     Int,
 };
-use sokol_extras::shaders::lit;
+use sokol_extras::{
+    checkerboard_5x_image,
+    shaders::textured_lit,
+};
 use math::{
     mat4::Mat4,
     vec3::vec3,
@@ -34,38 +37,38 @@ const INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
 fn init(state: &mut State) {
     setup_default_context();
 
-    const VERTICES: [lit::Vertex; 24] = {
-        lit::vertex_array![
-            /* pos            normals             */
-            { -1., -1., -1.,    0., 0., -1. },  //CUBE BACK FACE
-            {  1., -1., -1.,    0., 0., -1. },
-            {  1.,  1., -1.,    0., 0., -1. },
-            { -1.,  1., -1.,    0., 0., -1. },
+    const VERTICES: [textured_lit::Vertex; 24] = {
+        textured_lit::vertex_array![
+            /* pos              normals       color       uvs */
+            { -1., -1., -1.,    0., 0., -1., 0xFFFFFFFF,     0,     0 }, //CUBE BACK FACE
+            {  1., -1., -1.,    0., 0., -1., 0xFFFFFFFF, 32767,     0 },
+            {  1.,  1., -1.,    0., 0., -1., 0xFFFFFFFF, 32767, 32767 },
+            { -1.,  1., -1.,    0., 0., -1., 0xFFFFFFFF,     0, 32767 },
 
-            { -1., -1.,  1.,    0., 0., 1. },   //CUBE FRONT FACE
-            {  1., -1.,  1.,    0., 0., 1. },
-            {  1.,  1.,  1.,    0., 0., 1. },
-            { -1.,  1.,  1.,    0., 0., 1. },
+            { -1., -1.,  1.,    0., 0., 1., 0xFF0000FF,     0,     0 }, //CUBE FRONT FACE
+            {  1., -1.,  1.,    0., 0., 1., 0xFF00FF00, 32767,     0 },
+            {  1.,  1.,  1.,    0., 0., 1., 0xFFFFFFFF, 32767, 32767 },
+            { -1.,  1.,  1.,    0., 0., 1., 0xFFFF0000,     0, 32767 },
 
-            { -1., -1., -1.,    -1., 0., 0. },  //CUBE LEFT FACE
-            { -1.,  1., -1.,    -1., 0., 0. },
-            { -1.,  1.,  1.,    -1., 0., 0. },
-            { -1., -1.,  1.,    -1., 0., 0. },
+            { -1., -1., -1.,    -1., 0., 0., 0xFFFFFFFF,     0,     0 }, //CUBE LEFT FACE
+            { -1.,  1., -1.,    -1., 0., 0., 0xFFFFFFFF, 32767,     0 },
+            { -1.,  1.,  1.,    -1., 0., 0., 0xFFFFFFFF, 32767, 32767 },
+            { -1., -1.,  1.,    -1., 0., 0., 0xFFFFFFFF,     0, 32767 },
 
-            {  1., -1., -1.,    1., 0., 0. },   //CUBE RIGHT FACE
-            {  1.,  1., -1.,    1., 0., 0. },
-            {  1.,  1.,  1.,    1., 0., 0. },
-            {  1., -1.,  1.,    1., 0., 0. },
+            {  1., -1., -1.,    1., 0., 0., 0xFFFFFFFF,     0,     0 }, //CUBE RIGHT FACE
+            {  1.,  1., -1.,    1., 0., 0., 0xFFFFFFFF, 32767,     0 },
+            {  1.,  1.,  1.,    1., 0., 0., 0xFFFFFFFF, 32767, 32767 },
+            {  1., -1.,  1.,    1., 0., 0., 0xFFFFFFFF,     0, 32767 },
 
-            { -1., -1., -1.,    0., -1., 0. },  //CUBE BOTTOM FACE
-            { -1., -1.,  1.,    0., -1., 0. },
-            {  1., -1.,  1.,    0., -1., 0. },
-            {  1., -1., -1.,    0., -1., 0. },
+            { -1., -1., -1.,    0., -1., 0., 0xFFFFFFFF,     0,     0 }, //CUBE BOTTOM FACE
+            { -1., -1.,  1.,    0., -1., 0., 0xFFFFFFFF,     0, 32767 },
+            {  1., -1.,  1.,    0., -1., 0., 0xFFFFFFFF, 32767, 32767 },
+            {  1., -1., -1.,    0., -1., 0., 0xFFFFFFFF, 32767,     0 },
 
-            { -1.,  1., -1.,    0., 1., 0. },   //CUBE TOP FACE
-            { -1.,  1.,  1.,    0., 1., 0. },
-            {  1.,  1.,  1.,    0., 1., 0. },
-            {  1.,  1., -1.,    0., 1., 0. },
+            { -1.,  1., -1.,    0., 1., 0., 0xFFFFFFFF,     0,     0 }, //CUBE TOP FACE
+            { -1.,  1.,  1.,    0., 1., 0., 0xFFFFFFFF,     0, 32767 },
+            {  1.,  1.,  1.,    0., 1., 0., 0xFFFFFFFF, 32767, 32767 },
+            {  1.,  1., -1.,    0., 1., 0., 0xFFFFFFFF, 32767,     0 },
         ]
     };
 
@@ -79,7 +82,10 @@ fn init(state: &mut State) {
         "indices"
     );
 
-    let (shader, layout, depth) = lit::make_shader_etc(query_backend());
+    state.bind.fs_images[textured_lit::SLOT_TEX as usize]
+        = checkerboard_5x_image::make();
+
+    let (shader, layout, depth) = textured_lit::make_shader_etc(query_backend());
 
     let pipeline_desc = PipelineDesc{
         layout,
@@ -122,18 +128,18 @@ fn frame(state: &mut State) {
     let view = Mat4::look_at(eye_pos, vec3!(), vec3!(y));
     let mvp = model * (proj * view);
 
-    let vs_params = lit::VSParams {
+    let vs_params = textured_lit::VSParams {
         model,
         mvp,
         diffuse_colour: vec3!(1., 1., 0.),
     };
 
-    let fs_params = lit::FSParams {
+    let fs_params = textured_lit::FSParams {
         light_dir: light_dir.xyz().normalize(),
         eye_pos,
     };
 
-    lit::apply_uniforms(vs_params, fs_params);
+    textured_lit::apply_uniforms(vs_params, fs_params);
 
     unsafe { sg::draw(0, INDICES.len() as _, 1); }
 

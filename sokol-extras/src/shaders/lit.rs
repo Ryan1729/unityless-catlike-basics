@@ -9,6 +9,7 @@ use math::{
     vec3::{vec3, Vec3},
 };
 
+#[repr(C)]
 pub struct Vertex {
     pub position: Vec3,
     pub normal: Vec3,
@@ -101,7 +102,7 @@ void main()
 
     desc.fs.source = cstr!("#version 330
 
-uniform vec4 fs_light_params[2];
+uniform vec4 fs_params[2];
 
 in vec3 N;
 in vec4 P;
@@ -120,12 +121,12 @@ float gammaToLinear(float c)
 
 void main()
 {
-    vec3 lightDir = normalize(fs_light_params[0].xyz);
+    vec3 lightDir = normalize(fs_params[0].xyz);
     vec3 normal = normalize(N);
     float incidentLightFrac = dot(normal, lightDir);
     if (incidentLightFrac > 0.0)
     {
-        vec3 eye = fs_light_params[1].xyz;
+        vec3 eye = fs_params[1].xyz;
         float reflectedLightFrac = dot(
             reflect(-lightDir, normal),
             normalize(eye - P.xyz)
@@ -147,7 +148,7 @@ void main()
     desc.fs.entry = cstr!("main");
     desc.fs.uniform_blocks[0].size = 32;
     desc.fs.uniform_blocks[0].layout = sg::UniformLayout::Std140 as _;
-    desc.fs.uniform_blocks[0].uniforms[0].name = cstr!("fs_light_params");
+    desc.fs.uniform_blocks[0].uniforms[0].name = cstr!("fs_params");
     desc.fs.uniform_blocks[0].uniforms[0].type_ = sg::UniformType::Float4 as _;
     desc.fs.uniform_blocks[0].uniforms[0].array_count = 2;
     desc.label = cstr!("lit_shader");

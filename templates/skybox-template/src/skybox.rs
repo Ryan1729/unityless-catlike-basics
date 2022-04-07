@@ -45,32 +45,32 @@ const SKYBOX_VERTICIES: [textured::Vertex; 24] = {
     }
     textured::vertex_array![
         /* pos                  color       uvs */
-        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(0/1), m!(1/3) },
+        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(0/1), m!(1/3) }, //CUBE BACK FACE
         {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) },
         {  C_S,  C_S, -C_S,  0xFFFFFFFF, m!(1/2), m!(1/3) },
         { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
 
-        { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(0/1), m!(2/3) },
+        { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(0/1), m!(2/3) }, //CUBE FRONT FACE
         {  C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/4), m!(2/3) },
         {  C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/2), m!(2/3) },
         { -C_S,  C_S,  C_S,  0xFFFFFFFF, m!(3/4), m!(2/3) },
 
-        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) }, //CUBE LEFT FACE
         { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
         { -C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/1), m!(2/3) },
         { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/1), m!(2/3) },
 
-        {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) },
+        {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) }, //CUBE RIGHT FACE
         {  C_S,  C_S, -C_S,  0xFFFFFFFF, m!(1/2), m!(1/3) },
         {  C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/2), m!(2/3) },
         {  C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/4), m!(2/3) },
 
-        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(0/1), m!(1/3) },
+        { -C_S, -C_S, -C_S,  0xFFFFFFFF, m!(0/1), m!(1/3) }, //CUBE BOTTOM FACE
         { -C_S, -C_S,  C_S,  0xFFFFFFFF, m!(0/1), m!(2/3) },
         {  C_S, -C_S,  C_S,  0xFFFFFFFF, m!(1/4), m!(2/3) },
         {  C_S, -C_S, -C_S,  0xFFFFFFFF, m!(1/4), m!(1/3) },
 
-        { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) },
+        { -C_S,  C_S, -C_S,  0xFFFFFFFF, m!(3/4), m!(1/3) }, //CUBE TOP FACE
         { -C_S,  C_S,  C_S,  0xFFFFFFFF, m!(3/4), m!(2/3) },
         {  C_S,  C_S,  C_S,  0xFFFFFFFF, m!(1/2), m!(2/3) },
         {  C_S,  C_S, -C_S,  0xFFFFFFFF, m!(1/2), m!(1/3) },

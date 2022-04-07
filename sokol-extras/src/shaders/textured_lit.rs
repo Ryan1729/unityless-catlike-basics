@@ -3,20 +3,27 @@ use sokol_bindings::{
     sg::{self, Backend, DepthState, LayoutDesc, ShaderDesc},
 };
 
-use crate::shaders::Index;
+use crate::shaders::{ABGR, Index};
 use math::{
     mat4::Mat4,
     vec3::{vec3, Vec3},
 };
 
+#[repr(C)]
 pub struct Vertex {
     pub position: Vec3,
     pub normal: Vec3,
+    pub color: ABGR,
+    pub u: i16,
+    pub v: i16,
 }
 
 pub const VERTEX_DEFAULT: Vertex = Vertex {
     position: vec3!(),
     normal: vec3!(),
+    color: 0xFFFFFFFF,
+    u: 0,
+    v: 0,
 };
 
 impl Default for Vertex {
@@ -26,42 +33,57 @@ impl Default for Vertex {
 }
 
 #[macro_export]
-macro_rules! _lit_vertex {
+macro_rules! _textured_lit_vertex {
     (
-        $px: expr, $py: expr, $pz: expr, $nx: expr, $ny: expr, $nz: expr $(,)?
+        $px: expr, $py: expr, $pz: expr,
+        $nx: expr, $ny: expr, $nz: expr,
+        $color: expr, $u: expr, $v: expr $(,)?
     ) => {
-        $crate::shaders::lit::Vertex {
+        $crate::shaders::textured_lit::Vertex {
             position: vec3!($px, $py, $pz),
             normal: vec3!($nx, $ny, $nz),
+            color: $color,
+            u: $u,
+            v: $v,
         }
     }
 }
-pub use _lit_vertex as vertex;
+pub use _textured_lit_vertex as vertex;
 
 
 #[macro_export]
-macro_rules! _lit_vertex_array {
+macro_rules! _textured_lit_vertex_array {
     (
         $(
-            {$px: expr, $py: expr, $pz: expr, $nx: expr, $ny: expr, $nz: expr $(,)?}
+            {
+                $px: expr, $py: expr, $pz: expr,
+                $nx: expr, $ny: expr, $nz: expr,
+                $color: expr, $u: expr, $v: expr $(,)?
+            }
         ),*
 
         $(,)?
     ) => {
         [
             $(
-                $crate::shaders::lit::Vertex {
+                $crate::shaders::textured_lit::Vertex {
                     position: vec3!($px, $py, $pz),
                     normal: vec3!($nx, $ny, $nz),
+                    color: $color,
+                    u: $u,
+                    v: $v,
                 }
             ),*
         ]
     }
 }
-pub use _lit_vertex_array as vertex_array;
+pub use _textured_lit_vertex_array as vertex_array;
 
 const ATTR_VS_POSITION: u8 = 0;
 const ATTR_VS_NORMAL: u8 = 1;
+const ATTR_VS_COLOR0: u8 = 2;
+const ATTR_VS_TEXCOORD0: u8 = 3;
+pub const SLOT_TEX: u8 = 0;
 pub const SLOT_FS_PARAMS: u8 = 0;
 pub const SLOT_VS_PARAMS: u8 = 0;
 
@@ -73,15 +95,21 @@ fn shader_desc(backend: Backend) -> ShaderDesc {
 
     desc.attrs[ATTR_VS_POSITION as usize].name = cstr!("position");
     desc.attrs[ATTR_VS_NORMAL as usize].name = cstr!("normal");
+    desc.attrs[ATTR_VS_COLOR0 as usize].name = cstr!("color0");
+    desc.attrs[ATTR_VS_TEXCOORD0 as usize].name = cstr!("texcoord0");
 
     desc.vs.source = cstr!("#version 330
 
 uniform vec4 vs_params[9];
 layout(location = 0) in vec4 position;
 layout(location = 1) in vec3 normal;
+layout(location = 2) in vec4 color0;
+layout(location = 3) in vec2 texcoord0;
+out vec4 vertexColor;
+out vec2 uv;
 out vec4 P;
 out vec3 N;
-out vec3 color;
+out vec3 diffuseColor;
 
 void main()
 {
@@ -90,7 +118,10 @@ void main()
     mat4 model = mat4(vs_params[0], vs_params[1], vs_params[2], vs_params[3]);
     P = model * position;
     N = (model * vec4(normal, 0.0)).xyz;
-    color = vs_params[8].xyz;
+    diffuseColor = vs_params[8].xyz;
+
+    vertexColor = color0;
+    uv = texcoord0;
 }");
     desc.vs.uniform_blocks[0].size = 144;
     desc.vs.uniform_blocks[0].layout = sg::UniformLayout::Std140 as _;
@@ -101,12 +132,14 @@ void main()
 
     desc.fs.source = cstr!("#version 330
 
-uniform vec4 fs_light_params[2];
-
+uniform vec4 fs_params[2];
+uniform sampler2D tex;
 in vec3 N;
 in vec4 P;
 layout(location = 0) out vec4 fragColor;
-in vec3 color;
+in vec4 vertexColor;
+in vec2 uv;
+in vec3 diffuseColor;
 
 vec4 linearToGamma(vec4 c)
 {
@@ -120,12 +153,12 @@ float gammaToLinear(float c)
 
 void main()
 {
-    vec3 lightDir = normalize(fs_light_params[0].xyz);
+    vec3 lightDir = normalize(fs_params[0].xyz);
     vec3 normal = normalize(N);
     float incidentLightFrac = dot(normal, lightDir);
     if (incidentLightFrac > 0.0)
     {
-        vec3 eye = fs_light_params[1].xyz;
+        vec3 eye = fs_params[1].xyz;
         float reflectedLightFrac = dot(
             reflect(-lightDir, normal),
             normalize(eye - P.xyz)
@@ -135,21 +168,26 @@ void main()
                 gammaToLinear(max(reflectedLightFrac, 0.0))
                 * incidentLightFrac
             )
-            + (color * (incidentLightFrac + 0.25)),
+            + (diffuseColor * (incidentLightFrac + 0.25)),
             1.0
         );
     } else {
-        fragColor = vec4(color * 0.25, 1.0);
+        fragColor = vec4(diffuseColor * 0.25, 1.0);
     }
     fragColor = linearToGamma(fragColor);
+
+    fragColor *= texture(tex, uv) * vertexColor;
 }");
 
     desc.fs.entry = cstr!("main");
     desc.fs.uniform_blocks[0].size = 32;
     desc.fs.uniform_blocks[0].layout = sg::UniformLayout::Std140 as _;
-    desc.fs.uniform_blocks[0].uniforms[0].name = cstr!("fs_light_params");
+    desc.fs.uniform_blocks[0].uniforms[0].name = cstr!("fs_params");
     desc.fs.uniform_blocks[0].uniforms[0].type_ = sg::UniformType::Float4 as _;
     desc.fs.uniform_blocks[0].uniforms[0].array_count = 2;
+    desc.fs.images[0].name = cstr!("tex");
+    desc.fs.images[0].image_type = sg::ImageType::_2D as _;
+    desc.fs.images[0].sampler_type = sg::SamplerType::Float as _;
     desc.label = cstr!("lit_shader");
 
     desc
@@ -161,6 +199,8 @@ fn layout_desc() -> LayoutDesc {
 
     layout.attrs[ATTR_VS_POSITION as usize].format = VertexFormat::Float3 as _;
     layout.attrs[ATTR_VS_NORMAL as usize].format = VertexFormat::Float3 as _;
+    layout.attrs[ATTR_VS_COLOR0 as usize].format = VertexFormat::UByte4N as _;
+    layout.attrs[ATTR_VS_TEXCOORD0 as usize].format = VertexFormat::Short2N as _;
 
     layout
 }

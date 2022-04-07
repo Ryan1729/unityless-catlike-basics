@@ -3,4 +3,5 @@
 
 pub mod shaders;
 pub mod checkerboard_image;
+pub mod checkerboard_5x_image;
 pub mod white_image;

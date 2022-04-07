@@ -5,6 +5,7 @@ use sokol_bindings::{
 
 use crate::shaders::{Index, ABGR};
 
+#[repr(C)]
 pub struct Vertex {
     pub x: f32,
     pub y: f32,
