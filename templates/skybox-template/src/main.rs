@@ -9,7 +9,7 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{shaders::textured, white_image};
+use sokol_extras::{shaders::textured_lit, white_image};
 
 mod skybox;
 mod decoded;
@@ -33,7 +33,7 @@ const NEAR: f32 = 0.01;
 // An f32 has 24 mantissa bits, so 2 to the 24th power seems reasonable here.
 const FAR: f32 = 16777216.0;
 
-const MODEL_VERTICIES: [textured::Vertex; 24] = {
+const MODEL_VERTICIES: [textured_lit::Vertex; 24] = {
     // Short for Cube Scale.
     const C_S: f32 = 1./8.;
     macro_rules! m {
@@ -45,37 +45,37 @@ const MODEL_VERTICIES: [textured::Vertex; 24] = {
         (2/3) => {m!(1/3) * 2};
         (3/4) => {m!(1/4) * 3};
     }
-    textured::vertex_array![
-        /* pos                  color       uvs */
-        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(0/1), m!(1/3) },
-        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
-        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
-        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
+    textured_lit::vertex_array![
+        /* pos              normals       color       uvs */
+        { -C_S, -C_S, -C_S, 0., 0., -1., 0xFF00FF00, m!(0/1), m!(1/3) },
+        {  C_S, -C_S, -C_S, 0., 0., -1., 0xFF00FF00, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S, 0., 0., -1., 0xFF00FF00, m!(1/2), m!(1/3) },
+        { -C_S,  C_S, -C_S, 0., 0., -1., 0xFF00FF00, m!(3/4), m!(1/3) },
 
-        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(0/1), m!(2/3) },
-        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
-        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
-        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(3/4), m!(2/3) },
+        { -C_S, -C_S,  C_S, 0., 0.,  1., 0xFF00FF00, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S, 0., 0.,  1., 0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S,  C_S,  C_S, 0., 0.,  1., 0xFF00FF00, m!(1/2), m!(2/3) },
+        { -C_S,  C_S,  C_S, 0., 0.,  1., 0xFF00FF00, m!(3/4), m!(2/3) },
 
-        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
-        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
-        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(1/1), m!(2/3) },
-        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(1/1), m!(2/3) },
+        { -C_S, -C_S, -C_S, -1., 0., 0., 0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S, -C_S, -1., 0., 0., 0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S, -1., 0., 0., 0xFF00FF00, m!(1/1), m!(2/3) },
+        { -C_S, -C_S,  C_S, -1., 0., 0., 0xFF00FF00, m!(1/1), m!(2/3) },
 
-        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
-        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
-        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
-        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S, -C_S, -C_S,  1., 0., 0., 0xFF00FF00, m!(1/4), m!(1/3) },
+        {  C_S,  C_S, -C_S,  1., 0., 0., 0xFF00FF00, m!(1/2), m!(1/3) },
+        {  C_S,  C_S,  C_S,  1., 0., 0., 0xFF00FF00, m!(1/2), m!(2/3) },
+        {  C_S, -C_S,  C_S,  1., 0., 0., 0xFF00FF00, m!(1/4), m!(2/3) },
 
-        { -C_S, -C_S, -C_S,  0xFF00FF00, m!(0/1), m!(1/3) },
-        { -C_S, -C_S,  C_S,  0xFF00FF00, m!(0/1), m!(2/3) },
-        {  C_S, -C_S,  C_S,  0xFF00FF00, m!(1/4), m!(2/3) },
-        {  C_S, -C_S, -C_S,  0xFF00FF00, m!(1/4), m!(1/3) },
+        { -C_S, -C_S, -C_S, 0., -1., 0., 0xFF00FF00, m!(0/1), m!(1/3) },
+        { -C_S, -C_S,  C_S, 0., -1., 0., 0xFF00FF00, m!(0/1), m!(2/3) },
+        {  C_S, -C_S,  C_S, 0., -1., 0., 0xFF00FF00, m!(1/4), m!(2/3) },
+        {  C_S, -C_S, -C_S, 0., -1., 0., 0xFF00FF00, m!(1/4), m!(1/3) },
 
-        { -C_S,  C_S, -C_S,  0xFF00FF00, m!(3/4), m!(1/3) },
-        { -C_S,  C_S,  C_S,  0xFF00FF00, m!(3/4), m!(2/3) },
-        {  C_S,  C_S,  C_S,  0xFF00FF00, m!(1/2), m!(2/3) },
-        {  C_S,  C_S, -C_S,  0xFF00FF00, m!(1/2), m!(1/3) },
+        { -C_S,  C_S, -C_S, 0.,  1., 0., 0xFF00FF00, m!(3/4), m!(1/3) },
+        { -C_S,  C_S,  C_S, 0.,  1., 0., 0xFF00FF00, m!(3/4), m!(2/3) },
+        {  C_S,  C_S,  C_S, 0.,  1., 0., 0xFF00FF00, m!(1/2), m!(2/3) },
+        {  C_S,  C_S, -C_S, 0.,  1., 0., 0xFF00FF00, m!(1/2), m!(1/3) },
     ]
 };
 
@@ -108,9 +108,9 @@ fn init(state: &mut State) {
         "cube-indices"
     );
 
-    state.model.bind.fs_images[textured::SLOT_TEX as usize] = white_image::make();
+    state.model.bind.fs_images[textured_lit::SLOT_TEX as usize] = white_image::make();
 
-    let (shader, layout, depth) = textured::make_shader_etc(query_backend());
+    let (shader, layout, depth) = textured_lit::make_shader_etc(query_backend());
 
     let pipeline_desc = PipelineDesc{
         layout,
@@ -143,21 +143,37 @@ fn frame(state: &mut State) {
 
     skybox::draw(&state.skybox, view_proj);
 
-    draw_model(&state.model, view_proj);
+    draw_model(&state.model, state.eye, view_proj);
 
     end_pass();
 
     commit();
 }
 
-fn draw_model(model: &ModelState, view_proj: Mat4) {
+fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
     unsafe {
         sg::apply_pipeline(model.pipe);
         sg::apply_bindings(&model.bind);
     }
 
-    let mvp = view_proj;
-    textured::apply_uniforms(mvp.to_column_major());
+    let model = Mat4::identity();
+
+    let mvp = model * view_proj;
+
+    let vs_params = textured_lit::VSParams {
+        model,
+        mvp,
+        diffuse_colour: vec3!(1., 1., 1.),
+    };
+
+    let fs_params = textured_lit::FSParams {
+        // Making the light_dir the same as the eye_pos causes lighting changes
+        // whenever the eye_pos changes, which showcases the lighting.
+        light_dir: eye_pos,
+        eye_pos,
+    };
+
+    textured_lit::apply_uniforms(vs_params, fs_params);
 
     unsafe { sg::draw(0, CUBE_INDEX_COUNT, 1); }
 }
