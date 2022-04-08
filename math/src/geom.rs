@@ -230,15 +230,14 @@ pub fn gen_cylinder_mesh(scale: Scale)
             z: top_z,
         };
         points[i] = p;
-
-        normals[i] = top_normal;
-
         points[i + RING_POINT_COUNT as usize] = Point {
             z: bottom_z,
             ..p
         };
 
-        normals[i + RING_POINT_COUNT as usize] = bottom_normal;
+        let normal = normal!(scale.x * cos, scale.y * sin, 0.);
+        normals[i] = normal;
+        normals[i + RING_POINT_COUNT as usize] = normal;
     }
 
     points[BOTTOM_DISC_CENTER as usize] = Point {

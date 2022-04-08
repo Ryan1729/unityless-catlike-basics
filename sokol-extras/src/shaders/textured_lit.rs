@@ -10,6 +10,7 @@ use math::{
 };
 
 #[repr(C)]
+#[derive(Debug)]
 pub struct Vertex {
     pub position: Vec3,
     pub normal: Vec3,

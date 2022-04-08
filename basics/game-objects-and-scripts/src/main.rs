@@ -61,7 +61,7 @@ fn gen_mesh() -> textured_lit::IndexedMesh<
             0,
         };
     }
-
+dbg!(&vertices);
     textured_lit::IndexedMesh {
         vertices,
         indices: mesh.indices,
