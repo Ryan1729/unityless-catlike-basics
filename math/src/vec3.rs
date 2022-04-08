@@ -3,7 +3,7 @@ use core::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 #[macro_export]
 macro_rules! _vec3 {
     () => {
-        $crate::vec3::DEFAULT;
+        $crate::vec3::DEFAULT
     };
     (x) => {
         $crate::vec3::Vec3 { x: 1., y: 0., z: 0. }
@@ -13,6 +13,15 @@ macro_rules! _vec3 {
     };
     (z) => {
         $crate::vec3::Vec3 { x: 0., y: 0., z: 1. }
+    };
+    (-x) => {
+        $crate::vec3::Vec3 { x: -1., y: 0., z: 0. }
+    };
+    (-y) => {
+        $crate::vec3::Vec3 { x: 0., y: -1., z: 0. }
+    };
+    (-z) => {
+        $crate::vec3::Vec3 { x: 0., y: 0., z: -1. }
     };
     ($x: literal $y: literal $z: literal) => {
         $crate::vec3::Vec3 { x: $x, y: $y, z: $z }
@@ -113,6 +122,10 @@ impl Mul<Element> for Vec3 {
 }
 
 impl Vec3 {
+    /// Returns a new `Vec3` that has a length of `1.0`, unless the passed in `Vec3`
+    /// is the all zeroes `Vec3`. In that case, the same `Vec3` will be returned.
+    // TODO would a method that returns a `Result` be better? Should this be called
+    // `normalized_or_zero` instead?
     pub fn normalize(mut self) -> Self {
         let length = self.length();
 
@@ -149,3 +162,61 @@ impl Vec3 {
         }
     }
 }
+
+/// A wrapper around `Vec3` that guarentees that it is if the contained `Vec3` has
+/// had `Vec3::normalize` called on it. This guarentee means the inner `Vec3` either
+/// has length one, or zero. Defaults to containing the all zero `Vec3`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)]
+pub struct Normal(Vec3);
+
+impl From<Vec3> for Normal {
+    fn from(v: Vec3) -> Self {
+        Self(v.normalize())
+    }
+}
+
+impl From<Normal> for Vec3 {
+    fn from(normal: Normal) -> Self {
+        normal.0
+    }
+}
+
+pub const DEFAULT_NORMAL: Normal = Normal(vec3!());
+
+pub const X_AXIS: Normal = Normal(vec3!(x));
+pub const NEG_X_AXIS: Normal = Normal(vec3!(-x));
+
+pub const Y_AXIS: Normal = Normal(vec3!(y));
+pub const NEG_Y_AXIS: Normal = Normal(vec3!(-y));
+
+pub const Z_AXIS: Normal = Normal(vec3!(z));
+pub const NEG_Z_AXIS: Normal = Normal(vec3!(-z));
+
+#[macro_export]
+macro_rules! _normal {
+    () => {
+        $crate::vec3::DEFAULT_NORMAL
+    };
+    (x) => {
+        $crate::vec3::X_AXIS
+    };
+    (y) => {
+        $crate::vec3::Y_AXIS
+    };
+    (z) => {
+        $crate::vec3::Z_AXIS
+    };
+    (-x) => {
+        $crate::vec3::NEG_X_AXIS
+    };
+    (-y) => {
+        $crate::vec3::NEG_Y_AXIS
+    };
+    (-z) => {
+        $crate::vec3::NEG_Z_AXIS
+    };
+    ($($tokens: tt)*) => {
+        $crate::vec3::Normal::from($crate::vec3::vec3!($($tokens)*))
+    }
+}
+pub use _normal as normal;

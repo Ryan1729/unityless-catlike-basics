@@ -1,4 +1,5 @@
 use core::ops::{Mul, MulAssign};
+use crate::vec3::{Normal, normal};
 
 pub type Coord = f32;
 
@@ -74,6 +75,7 @@ pub type Index = u16;
 
 pub struct IndexedMesh<const POINT_COUNT: usize, const INDEX_COUNT: usize> {
     pub points: [Point; POINT_COUNT],
+    pub normals: [Normal; POINT_COUNT],
     pub indices: [Index; INDEX_COUNT],
 }
 
@@ -124,6 +126,38 @@ const UNSCALED_CUBE_POINTS: [Point; CUBE_POINT_COUNT_USIZE] = [
     point!( 1.  1. -1.),
 ];
 
+const CUBE_NORMALS: [Normal; CUBE_POINT_COUNT_USIZE] = [
+    normal!(-z),
+    normal!(-z),
+    normal!(-z),
+    normal!(-z),
+
+    normal!(z),
+    normal!(z),
+    normal!(z),
+    normal!(z),
+
+    normal!(-x),
+    normal!(-x),
+    normal!(-x),
+    normal!(-x),
+
+    normal!(x),
+    normal!(x),
+    normal!(x),
+    normal!(x),
+
+    normal!(-y),
+    normal!(-y),
+    normal!(-y),
+    normal!(-y),
+
+    normal!(y),
+    normal!(y),
+    normal!(y),
+    normal!(y),
+];
+
 pub fn gen_cube_mesh(scale: Coord)
 -> IndexedMesh<CUBE_POINT_COUNT_USIZE, CUBE_INDEX_COUNT_USIZE> {
     let mut points = UNSCALED_CUBE_POINTS;
@@ -134,6 +168,7 @@ pub fn gen_cube_mesh(scale: Coord)
 
     IndexedMesh{
         points,
+        normals: CUBE_NORMALS,
         indices: CUBE_INDICES,
     }
 }
@@ -159,6 +194,7 @@ pub const CYLINDER_INDEX_COUNT_USIZE: usize = CYLINDER_INDEX_COUNT as usize;
 pub fn gen_cylinder_mesh(scale: Scale)
 -> IndexedMesh<CYLINDER_POINT_COUNT_USIZE, CYLINDER_INDEX_COUNT_USIZE> {
     let mut points = [Point::default(); CYLINDER_POINT_COUNT_USIZE];
+    let mut normals = [Normal::default(); CYLINDER_POINT_COUNT_USIZE];
 
     const TOP_RING_START: Index = 1;
     const BOTTOM_RING_START: Index = TOP_RING_START + RING_POINT_COUNT;
@@ -169,11 +205,19 @@ pub fn gen_cylinder_mesh(scale: Scale)
     let top_z = scale.z;
     let bottom_z = -top_z;
 
+    let (top_normal, bottom_normal) = if scale.z > 0. {
+        (normal!(z), normal!(-z))
+    } else {
+        (normal!(-z), normal!(z))
+    };
+
     points[0] = Point {
         x: 0.,
         y: 0.,
         z: top_z,
     };
+
+    normals[0] = top_normal;
 
     for i in 1..=RING_POINT_COUNT as usize {
         let theta = (i - 1) as Coord * TAU / RING_POINT_COUNT_COORD;
@@ -187,10 +231,14 @@ pub fn gen_cylinder_mesh(scale: Scale)
         };
         points[i] = p;
 
+        normals[i] = top_normal;
+
         points[i + RING_POINT_COUNT as usize] = Point {
             z: bottom_z,
             ..p
         };
+
+        normals[i + RING_POINT_COUNT as usize] = bottom_normal;
     }
 
     points[BOTTOM_DISC_CENTER as usize] = Point {
@@ -198,6 +246,8 @@ pub fn gen_cylinder_mesh(scale: Scale)
         y: 0.,
         z: bottom_z,
     };
+
+    normals[BOTTOM_DISC_CENTER as usize] = bottom_normal;
 
     let mut indices = [0; CYLINDER_INDEX_COUNT as usize];
 
@@ -237,6 +287,7 @@ pub fn gen_cylinder_mesh(scale: Scale)
 
     IndexedMesh{
         points,
+        normals,
         indices,
     }
 }

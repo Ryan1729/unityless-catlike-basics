@@ -9,7 +9,7 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{shaders::textured, white_image};
+use sokol_extras::{shaders::textured_lit, white_image};
 
 mod skybox;
 mod decoded;
@@ -33,7 +33,7 @@ const NEAR: f32 = 0.01;
 // An f32 has 24 mantissa bits, so 2 to the 24th power seems reasonable here.
 const FAR: f32 = 16777216.0;
 
-fn gen_mesh() -> textured::IndexedMesh<
+fn gen_mesh() -> textured_lit::IndexedMesh<
     {math::geom::CYLINDER_POINT_COUNT_USIZE},
     {math::geom::CYLINDER_INDEX_COUNT_USIZE},
 > {
@@ -44,19 +44,25 @@ fn gen_mesh() -> textured::IndexedMesh<
         z: 1./4.,
     });
 
-    let mut vertices = [textured::VERTEX_DEFAULT; math::geom::CYLINDER_POINT_COUNT_USIZE];
-    for (i, point) in mesh.points.iter().enumerate() {
-        vertices[i] = textured::vertex!{
+    let mut vertices = [textured_lit::VERTEX_DEFAULT; math::geom::CYLINDER_POINT_COUNT_USIZE];
+    for i in 0..math::geom::CYLINDER_POINT_COUNT_USIZE {
+        let point = mesh.points[i];
+        let normal = Vec3::from(mesh.normals[i]);
+
+        vertices[i] = textured_lit::vertex!{
             point.x,
             point.y,
             point.z,
+            normal.x,
+            normal.y,
+            normal.z,
             0xFFFFFFFF,
             0,
             0,
         };
     }
 
-    textured::IndexedMesh {
+    textured_lit::IndexedMesh {
         vertices,
         indices: mesh.indices,
     }
@@ -86,9 +92,9 @@ fn init(state: &mut State) {
         "model-indices"
     );
 
-    state.model.bind.fs_images[textured::SLOT_TEX as usize] = white_image::make();
+    state.model.bind.fs_images[textured_lit::SLOT_TEX as usize] = white_image::make();
 
-    let (shader, layout, depth) = textured::make_shader_etc(query_backend());
+    let (shader, layout, depth) = textured_lit::make_shader_etc(query_backend());
 
     let pipeline_desc = PipelineDesc{
         layout,
@@ -121,21 +127,37 @@ fn frame(state: &mut State) {
 
     skybox::draw(&state.skybox, view_proj);
 
-    draw_model(&state.model, view_proj);
+    draw_model(&state.model, state.eye, view_proj);
 
     end_pass();
 
     commit();
 }
 
-fn draw_model(model: &ModelState, view_proj: Mat4) {
+fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
     unsafe {
         sg::apply_pipeline(model.pipe);
         sg::apply_bindings(&model.bind);
     }
 
-    let mvp = view_proj;
-    textured::apply_uniforms(mvp.to_column_major());
+    let model = Mat4::identity();
+
+    let mvp = model * view_proj;
+
+    let vs_params = textured_lit::VSParams {
+        model,
+        mvp,
+        diffuse_colour: vec3!(1., 1., 1.),
+    };
+
+    let fs_params = textured_lit::FSParams {
+        // Making the light_dir the same as the eye_pos causes lighting changes
+        // whenever the eye_pos changes, which showcases the lighting.
+        light_dir: eye_pos,
+        eye_pos,
+    };
+
+    textured_lit::apply_uniforms(vs_params, fs_params);
 
     unsafe { sg::draw(0, math::geom::CYLINDER_INDEX_COUNT as Int, 1); }
 }
