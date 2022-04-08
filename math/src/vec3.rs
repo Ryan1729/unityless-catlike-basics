@@ -181,6 +181,15 @@ impl From<Normal> for Vec3 {
     }
 }
 
+impl Neg for Normal {
+    type Output = Self;
+
+    fn neg(mut self) -> Self::Output {
+        self.0 = -self.0;
+        self
+    }
+}
+
 pub const DEFAULT_NORMAL: Normal = Normal(vec3!());
 
 pub const X_AXIS: Normal = Normal(vec3!(x));

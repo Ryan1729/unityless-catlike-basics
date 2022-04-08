@@ -235,7 +235,7 @@ pub fn gen_cylinder_mesh(scale: Scale)
             ..p
         };
 
-        let normal = normal!(scale.x * cos, scale.y * sin, 0.);
+        let normal = -normal!(scale.x * cos, scale.y * sin, 0.);
         normals[i] = normal;
         normals[i + RING_POINT_COUNT as usize] = normal;
     }
