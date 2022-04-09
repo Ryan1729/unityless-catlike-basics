@@ -49,8 +49,6 @@ fn gen_mesh() -> textured_lit::IndexedMesh<
         let point = mesh.points[i];
         let normal = Vec3::from(mesh.normals[i]);
 
-        let colour = sokol_extras::shaders::abgr_from_vec3(normal.into());
-
         vertices[i] = textured_lit::vertex!{
             point.x,
             point.y,
@@ -58,12 +56,12 @@ fn gen_mesh() -> textured_lit::IndexedMesh<
             normal.x,
             normal.y,
             normal.z,
-            colour,
+            0xFFFFFFFF,
             0,
             0,
         };
     }
-dbg!(&vertices);
+
     textured_lit::IndexedMesh {
         vertices,
         indices: mesh.indices,
