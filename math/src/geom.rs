@@ -1,5 +1,5 @@
 use core::ops::{Mul, MulAssign};
-use crate::vec3::{Normal, normal};
+use crate::vec3::{Normal, normal, Vec3, vec3};
 
 pub type Coord = f32;
 
@@ -10,6 +10,12 @@ pub struct Point {
     pub x: Coord,
     pub y: Coord,
     pub z: Coord,
+}
+
+impl From<Point> for Vec3 {
+    fn from(Point { x, y, z, }: Point) -> Self {
+        vec3!(x, y, z)
+    }
 }
 
 impl MulAssign<Coord> for Point {
