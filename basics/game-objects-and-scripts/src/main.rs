@@ -9,7 +9,7 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{shaders::textured_lit, white_image};
+use sokol_extras::{shaders::{self, textured_lit}, white_image};
 
 mod skybox;
 mod decoded;
@@ -33,10 +33,12 @@ const NEAR: f32 = 0.01;
 // An f32 has 24 mantissa bits, so 2 to the 24th power seems reasonable here.
 const FAR: f32 = 16777216.0;
 
-fn gen_mesh() -> textured_lit::IndexedMesh<
-    {math::geom::CYLINDER_POINT_COUNT_USIZE},
-    {math::geom::CYLINDER_INDEX_COUNT_USIZE},
-> {
+struct IndexedMesh {
+    pub vertices: [textured_lit::Vertex; math::geom::CYLINDER_POINT_COUNT_USIZE],
+    pub indices: [shaders::Index; math::geom::CYLINDER_INDEX_COUNT_USIZE],
+}
+
+fn gen_mesh() -> IndexedMesh {
     use math::geom::Scale;
     let mesh = math::geom::gen_cylinder_mesh(Scale {
         x: 1./8.,
@@ -62,7 +64,7 @@ fn gen_mesh() -> textured_lit::IndexedMesh<
         };
     }
 
-    textured_lit::IndexedMesh {
+    IndexedMesh {
         vertices,
         indices: mesh.indices,
     }

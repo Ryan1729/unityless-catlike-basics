@@ -3,7 +3,7 @@ use sokol_bindings::{
     sg::{self, Backend, DepthState, LayoutDesc, ShaderDesc},
 };
 
-use crate::shaders::{Index, ABGR};
+use crate::shaders::ABGR;
 
 #[repr(C)]
 pub struct Vertex {
@@ -174,9 +174,4 @@ pub fn apply_uniforms(vs_params: VSParams) {
             &sg::range!(vs_params)
         );
     }
-}
-
-pub struct IndexedMesh<const VERTEX_COUNT: usize, const INDEX_COUNT: usize> {
-    pub vertices: [Vertex; VERTEX_COUNT],
-    pub indices: [Index; INDEX_COUNT],
 }
