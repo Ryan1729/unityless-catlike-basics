@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "basics/game-objects-and-scripts",
+    "math",
+    "sokol-bindings",
+    "sokol-bindings-sys",
+    "sokol-extras",
+    "templates/skybox-template",
+]
