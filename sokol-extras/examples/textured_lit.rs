@@ -6,7 +6,7 @@ use sokol_bindings::{
     Int,
 };
 use sokol_extras::{
-    checkerboard_5x_image,
+    images::checkerboard_5x,
     shaders::textured_lit,
 };
 use math::{
@@ -83,7 +83,7 @@ fn init(state: &mut State) {
     );
 
     state.bind.fs_images[textured_lit::SLOT_TEX as usize]
-        = checkerboard_5x_image::make();
+        = checkerboard_5x::make();
 
     let (shader, layout, depth) = textured_lit::make_shader_etc(query_backend());
 

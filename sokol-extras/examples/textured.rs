@@ -4,7 +4,7 @@ use sokol_bindings::{
     setup_default_context,
     sg::{self, begin_default_pass, end_pass, commit, query_backend, Action, Bindings, Color, ColorAttachmentAction, PassAction, Pipeline, PipelineDesc},
 };
-use sokol_extras::{shaders::textured, checkerboard_image};
+use sokol_extras::{shaders::textured, images::checkerboard};
 
 #[derive(Default)]
 struct State {
@@ -34,7 +34,7 @@ fn init(state: &mut State) {
         "indices"
     );
 
-    state.bind.fs_images[textured::SLOT_TEX as usize] = checkerboard_image::make();
+    state.bind.fs_images[textured::SLOT_TEX as usize] = checkerboard::make();
 
     let (shader, layout, depth) = textured::make_shader_etc(query_backend());
 

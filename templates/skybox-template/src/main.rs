@@ -9,7 +9,7 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{shaders::textured_lit, white_image};
+use sokol_extras::{shaders::textured_lit, images::white};
 
 mod skybox;
 mod decoded;
@@ -108,7 +108,7 @@ fn init(state: &mut State) {
         "cube-indices"
     );
 
-    state.model.bind.fs_images[textured_lit::SLOT_TEX as usize] = white_image::make();
+    state.model.bind.fs_images[textured_lit::SLOT_TEX as usize] = white::make();
 
     let (shader, layout, depth) = textured_lit::make_shader_etc(query_backend());
 
