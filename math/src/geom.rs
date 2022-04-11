@@ -228,7 +228,7 @@ pub fn gen_cylinder_mesh(scale: Scale)
     for i in 1..=RING_POINT_COUNT as usize {
         let theta = (i - 1) as Coord * TAU / RING_POINT_COUNT_COORD;
 
-        let (cos, sin) = theta.sin_cos();
+        let (sin, cos) = theta.sin_cos();
 
         let p = Point {
             x: scale.x * cos,
