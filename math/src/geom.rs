@@ -180,9 +180,10 @@ pub fn gen_cube_mesh(scale: Coord)
 }
 
 const RING_POINT_COUNT: Index = 16;
+const RING_POINT_COUNT_USIZE: usize = RING_POINT_COUNT as usize;
 const DISC_POINT_COUNT: Index = RING_POINT_COUNT + 1;
 
-pub const CYLINDER_POINT_COUNT: Index = DISC_POINT_COUNT * 2;
+pub const CYLINDER_POINT_COUNT: Index = (DISC_POINT_COUNT + RING_POINT_COUNT) * 2;
 pub const CYLINDER_POINT_COUNT_USIZE: usize = CYLINDER_POINT_COUNT as usize;
 
 pub const CYLINDER_INDEX_COUNT: Index = RING_POINT_COUNT * (
@@ -202,9 +203,20 @@ pub fn gen_cylinder_mesh(scale: Scale)
     let mut points = [Point::default(); CYLINDER_POINT_COUNT_USIZE];
     let mut normals = [Normal::default(); CYLINDER_POINT_COUNT_USIZE];
 
-    const TOP_RING_START: Index = 1;
-    const BOTTOM_RING_START: Index = TOP_RING_START + RING_POINT_COUNT;
-    const BOTTOM_DISC_CENTER: Index = BOTTOM_RING_START + RING_POINT_COUNT;
+    let mut sin_cos_table = [(0., 0.); RING_POINT_COUNT_USIZE];
+
+    for i in 0..RING_POINT_COUNT as usize {
+        let theta = i as Coord * TAU / RING_POINT_COUNT_COORD;
+        
+        sin_cos_table[i] = theta.sin_cos();
+    }
+    let sin_cos_table = sin_cos_table;
+
+    const TOP_RING_DISK_START: Index = 1;
+    const TOP_RING_SHAFT_START: Index = TOP_RING_DISK_START + RING_POINT_COUNT;
+    const BOTTOM_RING_SHAFT_START: Index = TOP_RING_SHAFT_START + RING_POINT_COUNT;
+    const BOTTOM_RING_DISK_START: Index = BOTTOM_RING_SHAFT_START + RING_POINT_COUNT;
+    const BOTTOM_DISC_CENTER: Index = BOTTOM_RING_DISK_START + RING_POINT_COUNT;
 
     const RING_POINT_COUNT_COORD: Coord = RING_POINT_COUNT as Coord;
 
@@ -225,25 +237,52 @@ pub fn gen_cylinder_mesh(scale: Scale)
 
     normals[0] = top_normal;
 
-    for i in 1..=RING_POINT_COUNT as usize {
-        let theta = (i - 1) as Coord * TAU / RING_POINT_COUNT_COORD;
+    for i in TOP_RING_DISK_START as usize..TOP_RING_SHAFT_START as usize {
+        let (sin, cos) = sin_cos_table[i - TOP_RING_DISK_START as usize];
 
-        let (sin, cos) = theta.sin_cos();
-
-        let p = Point {
+        points[i] = Point {
             x: scale.x * cos,
             y: scale.y * sin,
             z: top_z,
         };
-        points[i] = p;
-        points[i + RING_POINT_COUNT as usize] = Point {
-            z: bottom_z,
-            ..p
+
+        normals[i] = top_normal;
+    }
+
+    for i in TOP_RING_SHAFT_START as usize..BOTTOM_RING_SHAFT_START as usize {
+        let (sin, cos) = sin_cos_table[i - TOP_RING_SHAFT_START as usize];
+
+        points[i] = Point {
+            x: scale.x * cos,
+            y: scale.y * sin,
+            z: top_z,
         };
 
-        let normal = normal!(cos, sin, 0.);
-        normals[i] = normal;
-        normals[i + RING_POINT_COUNT as usize] = normal;
+        normals[i] = normal!(cos, sin, 0.);
+    }
+
+    for i in BOTTOM_RING_SHAFT_START as usize..BOTTOM_RING_DISK_START as usize {
+        let (sin, cos) = sin_cos_table[i - BOTTOM_RING_SHAFT_START as usize];
+
+        points[i] = Point {
+            x: scale.x * cos,
+            y: scale.y * sin,
+            z: bottom_z,
+        };
+
+        normals[i] = normal!(cos, sin, 0.);
+    }
+
+    for i in BOTTOM_RING_DISK_START as usize..BOTTOM_DISC_CENTER as usize {
+        let (sin, cos) = sin_cos_table[i - BOTTOM_RING_DISK_START as usize];
+
+        points[i] = Point {
+            x: scale.x * cos,
+            y: scale.y * sin,
+            z: bottom_z,
+        };
+
+        normals[i] = bottom_normal;
     }
 
     points[BOTTOM_DISC_CENTER as usize] = Point {
@@ -259,35 +298,35 @@ pub fn gen_cylinder_mesh(scale: Scale)
     // Top disc
     for index in 0..RING_POINT_COUNT {
         let i = (index * 3) as usize;
-        indices[i] = ((index + TOP_RING_START) % RING_POINT_COUNT) + 1;
-        indices[i + 1] = index + TOP_RING_START;
+        indices[i] = ((index + TOP_RING_DISK_START) % RING_POINT_COUNT) + 1;
+        indices[i + 1] = index + TOP_RING_DISK_START;
         indices[i + 2] = 0;
     }
 
     // Downward pointing edge triangles
     for index in 0..RING_POINT_COUNT {
         let i = ((index + RING_POINT_COUNT) * 3) as usize;
-        indices[i] = index + TOP_RING_START;
-        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + TOP_RING_START;
+        indices[i] = index + TOP_RING_SHAFT_START;
+        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + TOP_RING_SHAFT_START;
         // Jump up to next disc
-        indices[i + 2] = index + BOTTOM_RING_START;
+        indices[i + 2] = index + BOTTOM_RING_SHAFT_START;
     }
 
     // Upward pointing edge triangles
     for index in 0..RING_POINT_COUNT {
         let i = ((index + RING_POINT_COUNT * 2) * 3) as usize;
         // Jump back to previous disc
-        indices[i] = ((index + 1) % RING_POINT_COUNT) + TOP_RING_START;
-        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + BOTTOM_RING_START;
-        indices[i + 2] = index + BOTTOM_RING_START;
+        indices[i] = ((index + 1) % RING_POINT_COUNT) + TOP_RING_SHAFT_START;
+        indices[i + 1] = ((index + 1) % RING_POINT_COUNT) + BOTTOM_RING_SHAFT_START;
+        indices[i + 2] = index + BOTTOM_RING_SHAFT_START;
     }
 
     // Bottom disc
     for index in 0..RING_POINT_COUNT {
         let i = ((index + RING_POINT_COUNT * 3) * 3) as usize;
         indices[i] = BOTTOM_DISC_CENTER;
-        indices[i + 1] = index + BOTTOM_RING_START;
-        indices[i + 2] = ((index + 1) % RING_POINT_COUNT) + BOTTOM_RING_START;
+        indices[i + 1] = index + BOTTOM_RING_DISK_START;
+        indices[i + 2] = ((index + 1) % RING_POINT_COUNT) + BOTTOM_RING_DISK_START;
     }
 
     IndexedMesh{
