@@ -147,7 +147,7 @@ fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
 
     let model = Mat4::scale(model.scale);
 
-    let mvp = model * view_proj;
+    let mvp = view_proj * model;
 
     let vs_params = textured_lit::VSParams {
         model,
