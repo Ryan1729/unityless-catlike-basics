@@ -18,6 +18,7 @@ mod decoded;
 struct ModelState {
     bind: Bindings,
     pipe: Pipeline,
+    scale: Vec3,
 }
 
 #[derive(Default)]
@@ -108,6 +109,8 @@ fn init(state: &mut State) {
         ..PipelineDesc::default()
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
+
+    state.model.scale = vec3!(1., 1., 1.);
 }
 
 fn frame(state: &mut State) {
@@ -142,7 +145,7 @@ fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
         sg::apply_bindings(&model.bind);
     }
 
-    let model = Mat4::identity();
+    let model = Mat4::scale(model.scale);
 
     let mvp = model * view_proj;
 
@@ -167,15 +170,28 @@ fn cleanup(_state: &mut State) {
 }
 
 fn event(event: &sapp::Event, state: &mut State) {
-    use sapp::{EventKind, KeyCode};
+    use sapp::{EventKind, KeyCode, CTRL, SHIFT};
 
     const MOVE_SCALE: f32 = 1./16.;
+    const SCALE_SCALE: f32 = 2.;
 
     match event.kind {
-        EventKind::KeyDown { key_code, .. } => {
+        EventKind::KeyDown { key_code, modifiers, .. } => {
             macro_rules! do_move {
                 () => {
                     match key_code {
+                        KeyCode::Minus => match modifiers {
+                            0 => {state.model.scale.x /= SCALE_SCALE;},
+                            CTRL => {state.model.scale.y /= SCALE_SCALE;},
+                            SHIFT => {state.model.scale.z /= SCALE_SCALE;},
+                            _ => {}
+                        },
+                        KeyCode::Plus => match modifiers {
+                            0 => {state.model.scale.x *= SCALE_SCALE;},
+                            CTRL => {state.model.scale.y *= SCALE_SCALE;},
+                            SHIFT => {state.model.scale.z *= SCALE_SCALE;},
+                            _ => {}
+                        },
                         KeyCode::Right => {
                             state.eye += vec3!(x) * MOVE_SCALE;
                         },

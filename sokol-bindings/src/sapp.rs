@@ -420,7 +420,7 @@ impl From<UInt> for MouseButton {
 }
 
 #[repr(u32)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum KeyCode {
     Invalid = sys::sapp_keycode_SAPP_KEYCODE_INVALID,
     Space = sys::sapp_keycode_SAPP_KEYCODE_SPACE,
@@ -543,6 +543,11 @@ pub enum KeyCode {
     RightAlt = sys::sapp_keycode_SAPP_KEYCODE_RIGHT_ALT,
     RightSuper = sys::sapp_keycode_SAPP_KEYCODE_RIGHT_SUPER,
     Menu = sys::sapp_keycode_SAPP_KEYCODE_MENU,
+}
+
+impl KeyCode {
+    #[allow(non_upper_case_globals)]
+    pub const Plus: Self = Self::Equal;
 }
 
 impl From<UInt> for KeyCode {

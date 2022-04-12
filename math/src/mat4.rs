@@ -250,6 +250,16 @@ impl Mat4 {
     pub fn identity() -> Self {
         Self::diagonal(1.)
     }
+
+    pub fn scale(scale: Vec3) -> Self {
+        let mut output = Self::identity();
+
+        output[_0_0] = scale.x;
+        output[_1_1] = scale.y;
+        output[_2_2] = scale.z;
+
+        output
+    }
 }
 
 /// Expressed in distance from camera. `(Near, Far)`
