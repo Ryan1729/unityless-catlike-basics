@@ -153,9 +153,7 @@ fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
     };
 
     let fs_params = textured_lit::FSParams {
-        // Making the light_dir the same as the eye_pos causes lighting changes
-        // whenever the eye_pos changes, which showcases the lighting.
-        light_dir: eye_pos,
+        light_dir: vec3!(-1., 0., 1.),
         eye_pos,
     };
 
