@@ -110,7 +110,7 @@ fn init(state: &mut State) {
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
-    state.model.scale = vec3!(1., 1., 1.);
+    state.model.scale = vec3!(10., 10., 0.2);
 }
 
 fn frame(state: &mut State) {
