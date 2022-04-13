@@ -72,9 +72,6 @@ fn gen_mesh() -> IndexedMesh {
 }
 
 fn init(state: &mut State) {
-    state.eye = vec3!(0., 1.5, 1./16.);
-    state.center = vec3!();
-
     setup_default_context();
 
     skybox::init(&mut state.skybox);
@@ -111,6 +108,8 @@ fn init(state: &mut State) {
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
     state.model.scale = vec3!(10., 10., 0.2);
+    state.eye = vec3!(0., 5.5, 1./64.);
+    state.center = vec3!(0., 0., 1./4.);
 }
 
 fn frame(state: &mut State) {
@@ -172,7 +171,7 @@ fn cleanup(_state: &mut State) {
 fn event(event: &sapp::Event, state: &mut State) {
     use sapp::{EventKind, KeyCode, CTRL, SHIFT};
 
-    const MOVE_SCALE: f32 = 1./16.;
+    const MOVE_SCALE: f32 = 2.;
     const SCALE_SCALE: f32 = 2.;
 
     match event.kind {
@@ -192,29 +191,29 @@ fn event(event: &sapp::Event, state: &mut State) {
                             SHIFT => {state.model.scale.z *= SCALE_SCALE;},
                             _ => {}
                         },
-                        KeyCode::Right => {
-                            state.eye += vec3!(x) * MOVE_SCALE;
+                        KeyCode::Right | KeyCode::Down => match modifiers {
+                            0 => {state.eye.x /= MOVE_SCALE;},
+                            CTRL => {state.eye.y /= MOVE_SCALE;},
+                            SHIFT => {state.eye.z /= MOVE_SCALE;},
+                            _ => {}
                         },
-                        KeyCode::Left => {
-                            state.eye -= vec3!(x) * MOVE_SCALE;
+                        KeyCode::Left | KeyCode::Up => match modifiers {
+                            0 => {state.eye.x *= MOVE_SCALE;},
+                            CTRL => {state.eye.y *= MOVE_SCALE;},
+                            SHIFT => {state.eye.z *= MOVE_SCALE;},
+                            _ => {}
                         },
-                        KeyCode::Down => {
-                            state.eye -= vec3!(z) * MOVE_SCALE;
+                        KeyCode::D | KeyCode::S => match modifiers {
+                            0 => {state.center.x /= MOVE_SCALE;},
+                            CTRL => {state.center.y /= MOVE_SCALE;},
+                            SHIFT => {state.center.z /= MOVE_SCALE;},
+                            _ => {}
                         },
-                        KeyCode::Up => {
-                            state.eye += vec3!(z) * MOVE_SCALE;
-                        },
-                        KeyCode::D => {
-                            state.center += vec3!(x) * MOVE_SCALE;
-                        },
-                        KeyCode::A => {
-                            state.center -= vec3!(x) * MOVE_SCALE;
-                        },
-                        KeyCode::S => {
-                            state.center -= vec3!(z) * MOVE_SCALE;
-                        },
-                        KeyCode::W => {
-                            state.center += vec3!(z) * MOVE_SCALE;
+                        KeyCode::A | KeyCode::W => match modifiers {
+                            0 => {state.center.x *= MOVE_SCALE;},
+                            CTRL => {state.center.y *= MOVE_SCALE;},
+                            SHIFT => {state.center.z *= MOVE_SCALE;},
+                            _ => {}
                         },
                         _ => {}
                     }
