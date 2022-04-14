@@ -27,6 +27,7 @@ struct State {
     model: ModelState,
     eye: Vec3,
     center: Vec3,
+    time: f32,
 }
 
 // Near/Far clipping plane distances along z.
@@ -109,10 +110,15 @@ fn init(state: &mut State) {
 
     state.model.scale = vec3!(10., 10., 0.2);
     state.eye = vec3!(0., 5.5, 1./64.);
-    state.center = vec3!(0., 0., 1./4.);
+    state.center = vec3!();
 }
 
 fn frame(state: &mut State) {
+    state.time += sapp::frame_duration() as f32;
+    let (sin, cos) = state.time.sin_cos();
+    state.eye.x = sin * 10.;
+    state.eye.y = cos * 10.;
+
     let mut pass_action = PassAction::default();
     pass_action.colors[0] = ColorAttachmentAction {
         action: Action::Clear,
