@@ -117,7 +117,7 @@ fn frame(state: &mut State) {
     state.time += sapp::frame_duration() as f32;
     let (sin, cos) = state.time.sin_cos();
     state.eye.x = sin * 10.;
-    state.eye.y = cos * 10.;
+    state.eye.z = cos * 10.;
 
     let mut pass_action = PassAction::default();
     pass_action.colors[0] = ColorAttachmentAction {
