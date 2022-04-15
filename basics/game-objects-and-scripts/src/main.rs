@@ -6,6 +6,7 @@ use sokol_bindings::{
     Int,
 };
 use math::{
+    angle::{Angle, Radians},
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
@@ -21,11 +22,31 @@ struct ModelState {
     scale: Vec3,
 }
 
+type Radius = f32;
+
+#[derive(Default)]
+struct Eye {
+    x: Radians,
+    y: Radians,
+    z: Radians,
+    radius: Radius
+}
+
+impl Eye {
+    fn to_vec3(&self) -> Vec3 {
+        vec3!(
+            self.x.raw_radians().cos() * self.radius,
+            self.y.raw_radians().cos() * self.radius,
+            self.z.raw_radians().cos() * self.radius,
+        )
+    }
+}
+
 #[derive(Default)]
 struct State {
     skybox: skybox::State,
     model: ModelState,
-    eye: Vec3,
+    eye: Eye,
     center: Vec3,
     time: f32,
 }
@@ -109,15 +130,12 @@ fn init(state: &mut State) {
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
     state.model.scale = vec3!(10., 10., 0.2);
-    state.eye = vec3!(0., 5.5, 1./64.);
+    state.eye.radius = 10.;
     state.center = vec3!();
 }
 
 fn frame(state: &mut State) {
     state.time += sapp::frame_duration() as f32;
-    let (sin, cos) = state.time.sin_cos();
-    state.eye.x = sin * 10.;
-    state.eye.z = cos * 10.;
 
     let mut pass_action = PassAction::default();
     pass_action.colors[0] = ColorAttachmentAction {
@@ -137,7 +155,7 @@ fn frame(state: &mut State) {
 
     skybox::draw(&state.skybox, view_proj);
 
-    draw_model(&state.model, state.eye, view_proj);
+    draw_model(&state.model, state.eye.to_vec3(), view_proj);
 
     end_pass();
 
@@ -177,7 +195,9 @@ fn cleanup(_state: &mut State) {
 fn event(event: &sapp::Event, state: &mut State) {
     use sapp::{EventKind, KeyCode, CTRL, SHIFT};
 
-    const MOVE_SCALE: f32 = 2.;
+    const RADIUS_MOVE_SCALE: f32 = 1./16.;
+    const ANGLE_MOVE_SCALE: Radians = Radians(1./8.);
+    const CENTER_MOVE_SCALE: f32 = 1./32.;
     const SCALE_SCALE: f32 = 2.;
 
     match event.kind {
@@ -197,28 +217,34 @@ fn event(event: &sapp::Event, state: &mut State) {
                             SHIFT => {state.model.scale.z *= SCALE_SCALE;},
                             _ => {}
                         },
-                        KeyCode::Right | KeyCode::Down => match modifiers {
-                            0 => {state.eye.x /= MOVE_SCALE;},
-                            CTRL => {state.eye.y /= MOVE_SCALE;},
-                            SHIFT => {state.eye.z /= MOVE_SCALE;},
+                        KeyCode::Up => {
+                            state.eye.radius += RADIUS_MOVE_SCALE;
+                        },
+                        KeyCode::Down => {
+                            state.eye.radius -= RADIUS_MOVE_SCALE;
+                        },
+                        KeyCode::Right => match modifiers {
+                            0 => {state.eye.x -= ANGLE_MOVE_SCALE;},
+                            CTRL => {state.eye.y -= ANGLE_MOVE_SCALE;},
+                            SHIFT => {state.eye.z -= ANGLE_MOVE_SCALE;},
                             _ => {}
                         },
-                        KeyCode::Left | KeyCode::Up => match modifiers {
-                            0 => {state.eye.x *= MOVE_SCALE;},
-                            CTRL => {state.eye.y *= MOVE_SCALE;},
-                            SHIFT => {state.eye.z *= MOVE_SCALE;},
+                        KeyCode::Left => match modifiers {
+                            0 => {state.eye.x += ANGLE_MOVE_SCALE;},
+                            CTRL => {state.eye.y += ANGLE_MOVE_SCALE;},
+                            SHIFT => {state.eye.z += ANGLE_MOVE_SCALE;},
                             _ => {}
                         },
                         KeyCode::D | KeyCode::S => match modifiers {
-                            0 => {state.center.x /= MOVE_SCALE;},
-                            CTRL => {state.center.y /= MOVE_SCALE;},
-                            SHIFT => {state.center.z /= MOVE_SCALE;},
+                            0 => {state.center.x /= CENTER_MOVE_SCALE;},
+                            CTRL => {state.center.y /= CENTER_MOVE_SCALE;},
+                            SHIFT => {state.center.z /= CENTER_MOVE_SCALE;},
                             _ => {}
                         },
                         KeyCode::A | KeyCode::W => match modifiers {
-                            0 => {state.center.x *= MOVE_SCALE;},
-                            CTRL => {state.center.y *= MOVE_SCALE;},
-                            SHIFT => {state.center.z *= MOVE_SCALE;},
+                            0 => {state.center.x *= CENTER_MOVE_SCALE;},
+                            CTRL => {state.center.y *= CENTER_MOVE_SCALE;},
+                            SHIFT => {state.center.z *= CENTER_MOVE_SCALE;},
                             _ => {}
                         },
                         _ => {}
@@ -251,7 +277,7 @@ fn fail(_msg: &std::ffi::CStr, _state: &mut State) {
 }
 
 fn get_view_matrix(state: &State) -> Mat4 {
-    Mat4::look_at(state.eye, state.center, vec3!(y))
+    Mat4::look_at(state.eye.to_vec3(), state.center, vec3!(y))
 }
 
 fn main() {

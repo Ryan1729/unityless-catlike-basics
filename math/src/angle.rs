@@ -1,4 +1,4 @@
-use core::ops::{Add, AddAssign};
+use core::ops::{Add, AddAssign, Sub, SubAssign};
 
 type RawRadians = f32;
 
@@ -28,6 +28,21 @@ impl Add for Radians {
 
     fn add(mut self, other: Self) -> Self::Output {
         self += other;
+        self
+    }
+}
+
+impl SubAssign for Radians {
+    fn sub_assign(&mut self, other: Self) {
+        self.0 -= other.0;
+    }
+}
+
+impl Sub for Radians {
+    type Output = Self;
+
+    fn sub(mut self, other: Self) -> Self::Output {
+        self -= other;
         self
     }
 }
