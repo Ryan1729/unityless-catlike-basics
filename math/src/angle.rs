@@ -2,6 +2,7 @@ use core::ops::{Add, AddAssign, Sub, SubAssign};
 
 type RawRadians = f32;
 
+pub const TAU: RawRadians = std::f32::consts::TAU;
 pub const PI: RawRadians = std::f32::consts::PI;
 
 pub trait Angle {

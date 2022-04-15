@@ -130,6 +130,9 @@ fn init(state: &mut State) {
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
     state.model.scale = vec3!(10., 10., 0.2);
+    state.eye.x = Radians(-math::angle::TAU / 4.);
+    state.eye.y = Radians(4.0);
+    state.eye.z = Radians(4.375);
     state.eye.radius = 10.;
     state.center = vec3!();
 }
