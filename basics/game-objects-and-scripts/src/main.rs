@@ -289,7 +289,6 @@ fn event(event: &sapp::Event, state: &mut State) {
             ) {
                 do_move!();
             }
-            dbg!(state.light_dir);
         }
         _ => {}
     }
