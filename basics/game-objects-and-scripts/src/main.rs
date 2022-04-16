@@ -177,7 +177,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
         sg::apply_bindings(&model.bind);
     }
 
-    let model = Mat4::scale(model.scale);
+    let model = Mat4::rotation(Radians(math::angle::PI/2.), vec3!(x)) * Mat4::scale(model.scale);
 
     let mvp = view_proj * model;
 
