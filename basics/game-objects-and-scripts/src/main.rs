@@ -206,6 +206,7 @@ fn event(event: &sapp::Event, state: &mut State) {
 
     const RADIUS_MOVE_SCALE: f32 = 1./16.;
     const ANGLE_MOVE_SCALE: Radians = Radians(1./8.);
+    const LIGHT_DIR_SCALE: f32 = 1./32.;
     const CENTER_MOVE_SCALE: f32 = 1./32.;
     const SCALE_SCALE: f32 = 2.;
 
@@ -256,6 +257,18 @@ fn event(event: &sapp::Event, state: &mut State) {
                             SHIFT => {state.center.z *= CENTER_MOVE_SCALE;},
                             _ => {}
                         },
+                        KeyCode::V => match modifiers {
+                            0 => {state.light_dir.x -= LIGHT_DIR_SCALE;},
+                            CTRL => {state.light_dir.y -= LIGHT_DIR_SCALE;},
+                            SHIFT => {state.light_dir.z -= LIGHT_DIR_SCALE;},
+                            _ => {}
+                        },
+                        KeyCode::B => match modifiers {
+                            0 => {state.light_dir.x += LIGHT_DIR_SCALE;},
+                            CTRL => {state.light_dir.y += LIGHT_DIR_SCALE;},
+                            SHIFT => {state.light_dir.z += LIGHT_DIR_SCALE;},
+                            _ => {}
+                        },
                         _ => {}
                     }
                 }
@@ -276,6 +289,7 @@ fn event(event: &sapp::Event, state: &mut State) {
             ) {
                 do_move!();
             }
+            dbg!(state.light_dir);
         }
         _ => {}
     }
