@@ -47,6 +47,7 @@ struct State {
     skybox: skybox::State,
     model: ModelState,
     eye: Eye,
+    light_dir: Vec3,
     center: Vec3,
     time: f32,
 }
@@ -134,6 +135,7 @@ fn init(state: &mut State) {
     state.eye.y = Radians(4.0);
     state.eye.z = Radians(4.375);
     state.eye.radius = 10.;
+    state.light_dir = vec3!(-1., 0., 1.);
     state.center = vec3!();
 }
 
@@ -158,14 +160,18 @@ fn frame(state: &mut State) {
 
     skybox::draw(&state.skybox, view_proj);
 
-    draw_model(&state.model, state.eye.to_vec3(), view_proj);
+    draw_model(&state, view_proj);
 
     end_pass();
 
     commit();
 }
 
-fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
+fn draw_model(state: &State, view_proj: Mat4) {
+    let model = &state.model;
+    let eye_pos = state.eye.to_vec3();
+    let light_dir = state.light_dir;
+
     unsafe {
         sg::apply_pipeline(model.pipe);
         sg::apply_bindings(&model.bind);
@@ -182,7 +188,7 @@ fn draw_model(model: &ModelState, eye_pos: Vec3, view_proj: Mat4) {
     };
 
     let fs_params = textured_lit::FSParams {
-        light_dir: vec3!(-1., 0., 1.),
+        light_dir,
         eye_pos,
     };
 
