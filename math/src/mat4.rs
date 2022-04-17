@@ -348,6 +348,16 @@ impl Mat4 {
         output
     }
 
+    pub fn translate(translation: Vec3) -> Self {
+        let mut output = Mat4::identity();
+
+        output[_3_0] = translation.x;
+        output[_3_1] = translation.y;
+        output[_3_2] = translation.z;
+
+        output
+    }
+
     pub fn transpose(self) -> Self {
         Self([
             self[_0_0], self[_1_0], self[_2_0], self[_3_0],

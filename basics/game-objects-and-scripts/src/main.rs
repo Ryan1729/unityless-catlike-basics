@@ -56,25 +56,41 @@ const NEAR: f32 = 0.01;
 // An f32 has 24 mantissa bits, so 2 to the 24th power seems reasonable here.
 const FAR: f32 = 16777216.0;
 
+const CYLINDER_INDEX_START: shaders::Index = 0;
+const CYLINDER_INDEX_ONE_PAST_END: shaders::Index = CYLINDER_INDEX_START + math::geom::CYLINDER_INDEX_COUNT as shaders::Index;
+const CUBE_INDEX_START: shaders::Index = CYLINDER_INDEX_ONE_PAST_END;
+const CUBE_INDEX_ONE_PAST_END: shaders::Index = CUBE_INDEX_START + math::geom::CUBE_INDEX_COUNT as shaders::Index;
+const INDEX_LEN: usize = CUBE_INDEX_ONE_PAST_END as usize;
+
+const CYLINDER_VERTEX_START: shaders::Index = 0;
+const CYLINDER_VERTEX_ONE_PAST_END: shaders::Index = CYLINDER_VERTEX_START + math::geom::CYLINDER_POINT_COUNT as shaders::Index;
+const CUBE_VERTEX_START: shaders::Index = CYLINDER_VERTEX_ONE_PAST_END;
+const CUBE_VERTEX_ONE_PAST_END: shaders::Index = CUBE_VERTEX_START + math::geom::CUBE_POINT_COUNT as shaders::Index;
+const VERTEX_LEN: usize = CUBE_VERTEX_ONE_PAST_END as usize;
+
 struct IndexedMesh {
-    pub vertices: [textured_lit::Vertex; math::geom::CYLINDER_POINT_COUNT_USIZE],
-    pub indices: [shaders::Index; math::geom::CYLINDER_INDEX_COUNT_USIZE],
+    pub vertices: [textured_lit::Vertex; VERTEX_LEN],
+    pub indices: [shaders::Index; INDEX_LEN],
 }
 
 fn gen_mesh() -> IndexedMesh {
     use math::geom::Scale;
-    let mesh = math::geom::gen_cylinder_mesh(Scale {
+
+    let mut vertices = [textured_lit::VERTEX_DEFAULT; VERTEX_LEN];
+    let mut indices = [0; INDEX_LEN];
+
+    let cylinder_mesh = math::geom::gen_cylinder_mesh(Scale {
         x: 1./8.,
         y: 1./8.,
         z: 1./4.,
     });
 
-    let mut vertices = [textured_lit::VERTEX_DEFAULT; math::geom::CYLINDER_POINT_COUNT_USIZE];
-    for i in 0..math::geom::CYLINDER_POINT_COUNT_USIZE {
-        let point = mesh.points[i];
-        let normal = Vec3::from(mesh.normals[i]);
+    for i in CYLINDER_VERTEX_START..CYLINDER_VERTEX_ONE_PAST_END {
+        let read_i = (i - CYLINDER_VERTEX_START) as usize;
+        let point = cylinder_mesh.points[read_i];
+        let normal = Vec3::from(cylinder_mesh.normals[read_i]);
 
-        vertices[i] = textured_lit::vertex!{
+        vertices[i as usize] = textured_lit::vertex!{
             point.x,
             point.y,
             point.z,
@@ -87,9 +103,41 @@ fn gen_mesh() -> IndexedMesh {
         };
     }
 
+    for i in CYLINDER_INDEX_START..CYLINDER_INDEX_ONE_PAST_END {
+        let i = i as usize;
+        indices[i] = cylinder_mesh.indices[i - CYLINDER_INDEX_START as usize]
+            + CYLINDER_VERTEX_START as shaders::Index;
+    }
+
+    let cube_mesh = math::geom::gen_cube_mesh(1./8.);
+
+    for i in CUBE_VERTEX_START..CUBE_VERTEX_ONE_PAST_END {
+        let read_i = (i - CUBE_VERTEX_START) as usize;
+        let point = cube_mesh.points[read_i];
+        let normal = Vec3::from(cube_mesh.normals[read_i]);
+
+        vertices[i as usize] = textured_lit::vertex!{
+            point.x,
+            point.y,
+            point.z,
+            normal.x,
+            normal.y,
+            normal.z,
+            0xFFFFFFFF,
+            0,
+            0,
+        };
+    }
+
+    for i in CUBE_INDEX_START..CUBE_INDEX_ONE_PAST_END {
+        let i = i as usize;
+        indices[i] = cube_mesh.indices[i - CUBE_INDEX_START as usize]
+            + CUBE_VERTEX_START;
+    }
+
     IndexedMesh {
         vertices,
-        indices: mesh.indices,
+        indices,
     }
 }
 
@@ -175,25 +223,48 @@ fn draw_model(state: &State, view_proj: Mat4) {
         sg::apply_bindings(&model.bind);
     }
 
-    let model = Mat4::rotation(Radians(math::angle::PI/2.), vec3!(x))
-        * Mat4::scale(vec3!(10., 10., 0.2));
-
-    let mvp = view_proj * model;
-
-    let vs_params = textured_lit::VSParams {
-        model,
-        mvp,
-        diffuse_colour: vec3!(1., 1., 1.),
-    };
-
     let fs_params = textured_lit::FSParams {
         light_dir,
         eye_pos,
     };
 
-    textured_lit::apply_uniforms(vs_params, fs_params);
+    let diffuse_colour = vec3!(1., 1., 1.);
 
-    unsafe { sg::draw(0, math::geom::CYLINDER_INDEX_COUNT as Int, 1); }
+    {
+        let model = Mat4::rotation(Radians(math::angle::PI/2.), vec3!(x))
+            * Mat4::scale(vec3!(10., 10., 0.2));
+
+        textured_lit::apply_uniforms(
+            textured_lit::VSParams {
+                model,
+                mvp: view_proj * model,
+                diffuse_colour,
+            },
+            fs_params
+        );
+
+        unsafe {
+            sg::draw(CYLINDER_INDEX_START as Int, CYLINDER_INDEX_ONE_PAST_END as Int, 1);
+        }
+    }
+
+    {
+        let model = Mat4::translate(vec3!(0., 4., -0.25)) *
+            Mat4::scale(vec3!(0.5, 1., 0.1));
+
+        textured_lit::apply_uniforms(
+            textured_lit::VSParams {
+                model,
+                mvp: view_proj * model,
+                diffuse_colour,
+            },
+            fs_params
+        );
+
+        unsafe {
+            sg::draw(CUBE_INDEX_START as Int, CUBE_INDEX_ONE_PAST_END as Int, 1);
+        }
+    }
 }
 
 fn cleanup(_state: &mut State) {

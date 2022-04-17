@@ -228,11 +228,13 @@ pub fn make_shader_etc(backend: Backend) -> ShaderEtc {
     )
 }
 
+#[derive(Clone, Copy)]
 pub struct FSParams {
     pub light_dir: Vec3,
     pub eye_pos: Vec3,
 }
 
+#[derive(Clone, Copy)]
 pub struct VSParams {
     pub model: Mat4,
     pub mvp: Mat4,
