@@ -19,7 +19,6 @@ mod decoded;
 struct ModelState {
     bind: Bindings,
     pipe: Pipeline,
-    scale: Vec3,
 }
 
 type Radius = f32;
@@ -130,7 +129,6 @@ fn init(state: &mut State) {
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
-    state.model.scale = vec3!(10., 10., 0.2);
     state.eye.x = Radians(-math::angle::TAU / 4.);
     state.eye.y = Radians(4.0);
     state.eye.z = Radians(4.375);
@@ -177,7 +175,8 @@ fn draw_model(state: &State, view_proj: Mat4) {
         sg::apply_bindings(&model.bind);
     }
 
-    let model = Mat4::rotation(Radians(math::angle::PI/2.), vec3!(x)) * Mat4::scale(model.scale);
+    let model = Mat4::rotation(Radians(math::angle::PI/2.), vec3!(x))
+        * Mat4::scale(vec3!(10., 10., 0.2));
 
     let mvp = view_proj * model;
 
@@ -208,25 +207,12 @@ fn event(event: &sapp::Event, state: &mut State) {
     const ANGLE_MOVE_SCALE: Radians = Radians(1./8.);
     const LIGHT_DIR_SCALE: f32 = 1./32.;
     const CENTER_MOVE_SCALE: f32 = 1./32.;
-    const SCALE_SCALE: f32 = 2.;
 
     match event.kind {
         EventKind::KeyDown { key_code, modifiers, .. } => {
             macro_rules! do_move {
                 () => {
                     match key_code {
-                        KeyCode::Minus => match modifiers {
-                            0 => {state.model.scale.x /= SCALE_SCALE;},
-                            CTRL => {state.model.scale.y /= SCALE_SCALE;},
-                            SHIFT => {state.model.scale.z /= SCALE_SCALE;},
-                            _ => {}
-                        },
-                        KeyCode::Plus => match modifiers {
-                            0 => {state.model.scale.x *= SCALE_SCALE;},
-                            CTRL => {state.model.scale.y *= SCALE_SCALE;},
-                            SHIFT => {state.model.scale.z *= SCALE_SCALE;},
-                            _ => {}
-                        },
                         KeyCode::Up => {
                             state.eye.radius += RADIUS_MOVE_SCALE;
                         },
