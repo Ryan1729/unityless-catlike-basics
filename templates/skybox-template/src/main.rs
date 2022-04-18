@@ -145,11 +145,15 @@ fn frame(state: &mut State) {
     let view = get_view_matrix(state);
     let view_proj = proj * view;
 
-    begin_default_pass(&pass_action, sapp::width(), sapp::height());
+    begin_default_pass(&pass_action, w, h);
 
     skybox::draw(&state.skybox, view_proj);
 
     draw_model(&state.model, state.eye, view_proj);
+
+    end_pass();
+
+    begin_default_pass(&sokol_extras::debug::pass_action(), w, h);
 
     axes::draw(&state.axes, view_proj);
 
