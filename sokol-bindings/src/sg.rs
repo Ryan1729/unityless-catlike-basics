@@ -345,6 +345,52 @@ pub struct PassAction {
     pub stencil: StencilAttachmentAction,
 }
 
+pub const DEFAULT_CLEAR_RED: f32 = 0.5;
+pub const DEFAULT_CLEAR_GREEN: f32 = 0.5;
+pub const DEFAULT_CLEAR_BLUE: f32 = 0.5;
+pub const DEFAULT_CLEAR_ALPHA: f32 = 1.0;
+pub const DEFAULT_CLEAR_DEPTH: f32 = 1.0;
+pub const DEFAULT_CLEAR_STENCIL: f32 = 0.;
+
+impl PassAction {
+    /// Load the previous value for all buffers. Useful as a better starting place
+    /// than `default()` if you only want to affect a single buffer.
+    pub fn load() -> Self {
+        let mut pass_action = PassAction::default();
+            
+        pass_action.colors = [
+            ColorAttachmentAction {
+                action: Action::Load,
+                ..<_>::default()
+            },
+            ColorAttachmentAction {
+                action: Action::Load,
+                ..<_>::default()
+            },
+            ColorAttachmentAction {
+                action: Action::Load,
+                ..<_>::default()
+            },
+            ColorAttachmentAction {
+                action: Action::Load,
+                ..<_>::default()
+            },
+        ];
+    
+        pass_action.depth = DepthAttachmentAction {
+            action: Action::Load,
+            ..<_>::default()
+        };
+    
+        pass_action.stencil = StencilAttachmentAction {
+            action: Action::Load,
+            ..<_>::default()
+        };
+
+        pass_action
+    }
+}
+
 pub fn begin_default_pass(pass_action: &PassAction, width: Int, height: Int) {
     type ActionInternal = u32;
 
