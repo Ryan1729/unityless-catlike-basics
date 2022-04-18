@@ -10,7 +10,10 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{shaders::{self, textured_lit}, images::white};
+use sokol_extras::{
+    images::white,
+    shaders::{self, textured_lit},
+};
 
 mod skybox;
 mod decoded;

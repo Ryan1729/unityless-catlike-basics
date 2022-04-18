@@ -1,3 +1,4 @@
+pub mod basic;
 pub mod textured;
 pub mod lit;
 pub mod textured_lit;

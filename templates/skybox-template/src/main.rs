@@ -9,7 +9,11 @@ use math::{
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
-use sokol_extras::{shaders::textured_lit, images::white};
+use sokol_extras::{
+    debug::axes,
+    images::white,
+    shaders::textured_lit,
+};
 
 mod skybox;
 mod decoded;
@@ -23,6 +27,7 @@ struct ModelState {
 #[derive(Default)]
 struct State {
     skybox: skybox::State,
+    axes: axes::State,
     model: ModelState,
     eye: Vec3,
     center: Vec3,
@@ -97,6 +102,7 @@ fn init(state: &mut State) {
     setup_default_context();
 
     skybox::init(&mut state.skybox);
+    axes::init(&mut state.axes);
 
     state.model.bind.vertex_buffers[0] = sg::make_immutable_vertex_buffer!(
         MODEL_VERTICIES
@@ -144,6 +150,8 @@ fn frame(state: &mut State) {
     skybox::draw(&state.skybox, view_proj);
 
     draw_model(&state.model, state.eye, view_proj);
+
+    axes::draw(&state.axes, view_proj);
 
     end_pass();
 

@@ -41,6 +41,12 @@ pub struct Scale {
     pub z: Coord,
 }
 
+impl From<Scale> for Vec3 {
+    fn from(Scale { x, y, z, }: Scale) -> Self {
+        vec3!(x, y, z)
+    }
+}
+
 impl MulAssign<Scale> for Point {
     fn mul_assign(&mut self, scale: Scale) {
         self.x *= scale.x;
@@ -60,6 +66,9 @@ impl Mul<Scale> for Point {
 
 #[macro_export]
 macro_rules! _point {
+    () => {
+        $crate::geom::Point::default()
+    };
     ($x: literal $(,)? $y: literal $(,)? $z: literal $(,)?) => {
         $crate::geom::Point {
             x: $x,
@@ -76,6 +85,25 @@ macro_rules! _point {
     };
 }
 pub use _point as point;
+
+#[macro_export]
+macro_rules! _scale {
+    ($x: literal $(,)? $y: literal $(,)? $z: literal $(,)?) => {
+        $crate::geom::Scale {
+            x: $x,
+            y: $y,
+            z: $z,
+        }
+    };
+    ($x: expr, $y: expr, $z: expr $(,)?) => {
+        $crate::geom::Scale {
+            x: $x,
+            y: $y,
+            z: $z,
+        }
+    };
+}
+pub use _scale as scale;
 
 pub type Index = u16;
 
