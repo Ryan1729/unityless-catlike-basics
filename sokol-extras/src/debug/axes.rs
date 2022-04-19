@@ -47,8 +47,8 @@ fn gen_mesh() -> IndexedMesh {
     let mut vertices = [basic::VERTEX_DEFAULT; VERTEX_LEN];
     let mut indices = [0; INDEX_LEN];
 
-    let long_length = 1./16.;
-    let short_length = 1./32.;
+    let long_length = 1./64.;
+    let short_length = long_length / 4.;
 
     let cylinder_mesh = math::geom::gen_cylinder_mesh(Scale {
         x: short_length,
@@ -64,7 +64,7 @@ fn gen_mesh() -> IndexedMesh {
             point.x,
             point.y,
             point.z + long_length + short_length,
-            0xFFFF0000,
+            0xFFC00000,
         };
     }
 
@@ -86,7 +86,7 @@ fn gen_mesh() -> IndexedMesh {
             point.x,
             point.y + long_length + short_length,
             point.z,
-            0xFF00FF00,
+            0xFF00C000,
         };
     }
 
@@ -96,7 +96,7 @@ fn gen_mesh() -> IndexedMesh {
             + Y_CYLINDER_VERTEX_START as shaders::Index;
     }
 
-    let rotate_y = Mat4::rotation(Radians(TAU / 4.), vec3!(x));
+    let rotate_y = Mat4::rotation(Radians(TAU / 4.), vec3!(y));
 
     for i in X_CYLINDER_VERTEX_START..X_CYLINDER_VERTEX_ONE_PAST_END {
         let read_i = (i - X_CYLINDER_VERTEX_START) as usize;
@@ -108,7 +108,7 @@ fn gen_mesh() -> IndexedMesh {
             point.x + long_length + short_length,
             point.y,
             point.z,
-            0xFF000000 | ((point.x * 16_000_000_000.) as u32),
+            0xFF0000C0,
         };
     }
 
