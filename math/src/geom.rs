@@ -35,6 +35,7 @@ impl Mul<Coord> for Point {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Scale {
     pub x: Coord,
     pub y: Coord,
