@@ -11,6 +11,7 @@ use math::{
     vec3::{Vec3, vec3},
 };
 use sokol_extras::{
+    debug::axes,
     images::white,
     shaders::{self, textured_lit},
 };
@@ -48,6 +49,7 @@ impl Eye {
 struct State {
     skybox: skybox::State,
     model: ModelState,
+    axes: axes::State,
     eye: Eye,
     light_dir: Vec3,
     center: Vec3,
@@ -148,6 +150,7 @@ fn init(state: &mut State) {
     setup_default_context();
 
     skybox::init(&mut state.skybox);
+    axes::init(&mut state.axes);
 
     let mesh = gen_mesh();
 
@@ -210,6 +213,12 @@ fn frame(state: &mut State) {
     skybox::draw(&state.skybox, view_proj);
 
     draw_model(&state, view_proj);
+
+    end_pass();
+
+    begin_default_pass(&sokol_extras::debug::pass_action(), w, h);
+
+    axes::draw(&state.axes, view_proj);
 
     end_pass();
 
