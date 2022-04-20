@@ -218,7 +218,7 @@ fn frame(state: &mut State) {
 
     begin_default_pass(&sokol_extras::debug::pass_action(), w, h);
 
-    axes::draw(&state.axes, view_proj);
+    axes::draw(&state.axes, view_proj * Mat4::scale(vec3!(25., 25., 25.)));
 
     end_pass();
 
