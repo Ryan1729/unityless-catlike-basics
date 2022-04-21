@@ -187,7 +187,7 @@ fn init(state: &mut State) {
     state.eye.y = Radians(TAU / 4.);
     state.eye.z = Radians(0.);
     state.eye.radius = 10.;
-    state.light_dir = vec3!(1., -1., -1.);
+    state.light_dir = vec3!(1., -1., 1.);
     state.center = vec3!();
 }
 
