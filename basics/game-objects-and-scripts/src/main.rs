@@ -6,7 +6,7 @@ use sokol_bindings::{
     Int,
 };
 use math::{
-    angle::{Angle, Radians},
+    angle::{Angle, Radians, TAU},
     mat4::Mat4,
     vec3::{Vec3, vec3},
 };
@@ -183,8 +183,6 @@ fn init(state: &mut State) {
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
-    use math::angle::TAU;
-
     state.eye.x = Radians(TAU / 4.);
     state.eye.y = Radians(TAU / 4.);
     state.eye.z = Radians(0.);
@@ -245,8 +243,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
     let diffuse_colour = vec3!(1., 1., 1.);
 
     {
-        let model = Mat4::rotation(Radians(math::angle::PI/2.), vec3!(x))
-            * Mat4::scale(vec3!(10., 10., 0.2));
+        let model = Mat4::scale(vec3!(10., 10., 0.2));
 
         textured_lit::apply_uniforms(
             textured_lit::VSParams {
