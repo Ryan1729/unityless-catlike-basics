@@ -27,7 +27,7 @@ struct ModelState {
 
 type Radius = f32;
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 struct Eye {
     x: Radians,
     y: Radians,
@@ -183,9 +183,11 @@ fn init(state: &mut State) {
     };
     state.model.pipe = unsafe { sg::make_pipeline(&pipeline_desc) };
 
-    state.eye.x = Radians(-math::angle::TAU / 4.);
-    state.eye.y = Radians(4.0);
-    state.eye.z = Radians(4.375);
+    use math::angle::TAU;
+
+    state.eye.x = Radians(TAU / 4.);
+    state.eye.y = Radians(TAU / 4.);
+    state.eye.z = Radians(0.);
     state.eye.radius = 10.;
     state.light_dir = vec3!(1., -1., -1.);
     state.center = vec3!();
