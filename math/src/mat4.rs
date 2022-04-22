@@ -351,9 +351,9 @@ impl Mat4 {
     pub fn translate(translation: Vec3) -> Self {
         let mut output = Mat4::identity();
 
-        output[_3_0] = translation.x;
-        output[_3_1] = translation.y;
-        output[_3_2] = translation.z;
+        output[_0_3] = translation.x;
+        output[_1_3] = translation.y;
+        output[_2_3] = translation.z;
 
         output
     }
