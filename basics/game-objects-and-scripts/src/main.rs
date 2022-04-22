@@ -128,7 +128,7 @@ fn gen_mesh() -> IndexedMesh {
             normal.x,
             normal.y,
             normal.z,
-            0xFFFFFFFF,
+            0xFF494949,
             0,
             0,
         };
