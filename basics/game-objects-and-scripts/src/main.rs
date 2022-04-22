@@ -216,11 +216,13 @@ fn frame(state: &mut State) {
 
     end_pass();
 
-    begin_default_pass(&sokol_extras::debug::pass_action(), w, h);
+    if cfg!(feature = "debug-axes") {
+        begin_default_pass(&sokol_extras::debug::pass_action(), w, h);
 
-    axes::draw(&state.axes, view_proj * Mat4::scale(vec3!(25., 25., 25.)));
+        axes::draw(&state.axes, view_proj * Mat4::scale(vec3!(25., 25., 25.)));
 
-    end_pass();
+        end_pass();
+    }
 
     commit();
 }
@@ -260,7 +262,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
     }
 
     {
-        let model = Mat4::translate(vec3!(0., 4., -0.25)) *
+        let model = Mat4::translate(vec3!(0., 1., 0.25)) *
             Mat4::scale(vec3!(0.5, 1., 0.1));
 
         textured_lit::apply_uniforms(
