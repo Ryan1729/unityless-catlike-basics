@@ -204,7 +204,7 @@ fn frame(state: &mut State) {
     let h = sapp::height();
 
     /* compute model-view-projection matrix for vertex shader */
-    let proj = Mat4::perspective(60., w as f32/h as f32, (NEAR, FAR));
+    let proj = Mat4::perspective(Radians(TAU / 6.), w as f32/h as f32, (NEAR, FAR));
     let view = get_view_matrix(state);
     let view_proj = proj * view;
 

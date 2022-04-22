@@ -270,14 +270,14 @@ pub type AspectRatio = Element;
 
 impl Mat4 {
     pub fn perspective(
-        field_of_view: Element,
+        field_of_view: impl Angle,
         aspect_ratio: AspectRatio,
         (near, far): ClipPlanes
     ) -> Self {
         let mut output = Self::default();
 
         let tan_theta_over_2 = Element::tan(
-            field_of_view * (PI / 360.)
+            field_of_view.raw_radians() / 2.
         );
 
         output[_0_0] = 1. / tan_theta_over_2;
