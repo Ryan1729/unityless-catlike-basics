@@ -51,33 +51,40 @@ const MODEL_VERTICIES: [textured_lit::Vertex; 24] = {
         (2/3) => {m!(1/3) * 2};
         (3/4) => {m!(1/4) * 3};
     }
+
     textured_lit::vertex_array![
         /* pos              normals       color       uvs */
+        //CUBE -Z FACE
         { -C_S, -C_S, -C_S, 0., 0., -1., 0xFF00C0C0, m!(0/1), m!(1/3) },
         {  C_S, -C_S, -C_S, 0., 0., -1., 0xFF00C0C0, m!(1/4), m!(1/3) },
         {  C_S,  C_S, -C_S, 0., 0., -1., 0xFF00C0C0, m!(1/2), m!(1/3) },
         { -C_S,  C_S, -C_S, 0., 0., -1., 0xFF00C0C0, m!(3/4), m!(1/3) },
 
+        //CUBE +Z FACE
         { -C_S, -C_S,  C_S, 0., 0.,  1., 0xFF00C0C0, m!(0/1), m!(2/3) },
         {  C_S, -C_S,  C_S, 0., 0.,  1., 0xFF00C0C0, m!(1/4), m!(2/3) },
         {  C_S,  C_S,  C_S, 0., 0.,  1., 0xFF00C0C0, m!(1/2), m!(2/3) },
         { -C_S,  C_S,  C_S, 0., 0.,  1., 0xFF00C0C0, m!(3/4), m!(2/3) },
 
+        //CUBE -X FACE
         { -C_S, -C_S, -C_S, -1., 0., 0., 0xFF00C0C0, m!(3/4), m!(1/3) },
         { -C_S,  C_S, -C_S, -1., 0., 0., 0xFF00C0C0, m!(3/4), m!(1/3) },
         { -C_S,  C_S,  C_S, -1., 0., 0., 0xFF00C0C0, m!(1/1), m!(2/3) },
         { -C_S, -C_S,  C_S, -1., 0., 0., 0xFF00C0C0, m!(1/1), m!(2/3) },
 
+        //CUBE +X FACE
         {  C_S, -C_S, -C_S,  1., 0., 0., 0xFF00C0C0, m!(1/4), m!(1/3) },
         {  C_S,  C_S, -C_S,  1., 0., 0., 0xFF00C0C0, m!(1/2), m!(1/3) },
         {  C_S,  C_S,  C_S,  1., 0., 0., 0xFF00C0C0, m!(1/2), m!(2/3) },
         {  C_S, -C_S,  C_S,  1., 0., 0., 0xFF00C0C0, m!(1/4), m!(2/3) },
 
+        //CUBE -Y FACE
         { -C_S, -C_S, -C_S, 0., -1., 0., 0xFF00C0C0, m!(0/1), m!(1/3) },
         { -C_S, -C_S,  C_S, 0., -1., 0., 0xFF00C0C0, m!(0/1), m!(2/3) },
         {  C_S, -C_S,  C_S, 0., -1., 0., 0xFF00C0C0, m!(1/4), m!(2/3) },
         {  C_S, -C_S, -C_S, 0., -1., 0., 0xFF00C0C0, m!(1/4), m!(1/3) },
 
+        //CUBE +Y FACE
         { -C_S,  C_S, -C_S, 0.,  1., 0., 0xFF00C0C0, m!(3/4), m!(1/3) },
         { -C_S,  C_S,  C_S, 0.,  1., 0., 0xFF00C0C0, m!(3/4), m!(2/3) },
         {  C_S,  C_S,  C_S, 0.,  1., 0., 0xFF00C0C0, m!(1/2), m!(2/3) },
