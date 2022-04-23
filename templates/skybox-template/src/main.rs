@@ -97,7 +97,7 @@ const CUBE_INDICES: [u16; CUBE_INDEX_COUNT as usize] = [
 ];
 
 fn init(state: &mut State) {
-    state.eye = vec3!(0., 1.5, 1./16.);
+    state.eye = vec3!(0., 0., 1.);
     state.center = vec3!();
 
     setup_default_context();
