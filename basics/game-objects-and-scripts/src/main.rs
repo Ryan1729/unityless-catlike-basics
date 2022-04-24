@@ -261,8 +261,12 @@ fn draw_model(state: &State, view_proj: Mat4) {
         }
     }
 
-    {
-        let model = Mat4::translate(vec3!(0., 1., 3./64.)) *
+    for i in 0..12 {
+        let angle = i as f32 * TAU / 12.;
+
+        let model =
+            Mat4::rotation(Radians(angle), vec3!(z)) *
+            Mat4::translate(vec3!(0., 1., 3./64.)) *
             Mat4::scale(vec3!(0.5, 1., 0.1));
 
         textured_lit::apply_uniforms(
