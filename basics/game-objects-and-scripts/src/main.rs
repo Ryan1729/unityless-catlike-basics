@@ -244,6 +244,12 @@ fn draw_model(state: &State, view_proj: Mat4) {
 
     let diffuse_colour = vec3!(1., 1., 1.);
 
+    // Translation constant. An observed but currently not well understood scaling
+    // that is needed to make the numbers from the tutorial produce the expected
+    // translation amounts.
+    const T_K: f32 = 1./4.;
+
+    // Clock face
     {
         let model = Mat4::scale(vec3!(10., 10., 0.2));
 
@@ -261,26 +267,45 @@ fn draw_model(state: &State, view_proj: Mat4) {
         }
     }
 
+    macro_rules! cube {
+        ($model_matrix: expr) => {{
+            let model = $model_matrix;
+
+            textured_lit::apply_uniforms(
+                textured_lit::VSParams {
+                    model,
+                    mvp: view_proj * model,
+                    diffuse_colour,
+                },
+                fs_params
+            );
+    
+            unsafe {
+                sg::draw(CUBE_INDEX_START as Int, CUBE_INDEX_ONE_PAST_END as Int, 1);
+            }
+        }}
+    }
+
+    // Hour markers
     for i in 0..12 {
         let angle = i as f32 * TAU / 12.;
 
         let model =
             Mat4::rotation(Radians(angle), vec3!(z)) *
-            Mat4::translate(vec3!(0., 1., 3./64.)) *
+            Mat4::translate(vec3!(0., 4. * T_K, 0.25 * T_K)) *
             Mat4::scale(vec3!(0.5, 1., 0.1));
 
-        textured_lit::apply_uniforms(
-            textured_lit::VSParams {
-                model,
-                mvp: view_proj * model,
-                diffuse_colour,
-            },
-            fs_params
-        );
+        cube!(model)
+    }
 
-        unsafe {
-            sg::draw(CUBE_INDEX_START as Int, CUBE_INDEX_ONE_PAST_END as Int, 1);
-        }
+    // Hour hand
+    {
+        let model =
+            Mat4::rotation(Radians(0.), vec3!(z)) *
+            Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
+            Mat4::scale(vec3!(0.3, 2.5, 0.1));
+
+        cube!(model)
     }
 }
 
