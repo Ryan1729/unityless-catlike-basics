@@ -63,15 +63,19 @@ const FAR: f32 = 16777216.0;
 
 const CYLINDER_INDEX_START: shaders::Index = 0;
 const CYLINDER_INDEX_ONE_PAST_END: shaders::Index = CYLINDER_INDEX_START + math::geom::CYLINDER_INDEX_COUNT as shaders::Index;
-const CUBE_INDEX_START: shaders::Index = CYLINDER_INDEX_ONE_PAST_END;
-const CUBE_INDEX_ONE_PAST_END: shaders::Index = CUBE_INDEX_START + math::geom::CUBE_INDEX_COUNT as shaders::Index;
-const INDEX_LEN: usize = CUBE_INDEX_ONE_PAST_END as usize;
+const CUBE1_INDEX_START: shaders::Index = CYLINDER_INDEX_ONE_PAST_END;
+const CUBE1_INDEX_ONE_PAST_END: shaders::Index = CUBE1_INDEX_START + math::geom::CUBE_INDEX_COUNT as shaders::Index;
+const CUBE2_INDEX_START: shaders::Index = CUBE1_INDEX_ONE_PAST_END;
+const CUBE2_INDEX_ONE_PAST_END: shaders::Index = CUBE2_INDEX_START + math::geom::CUBE_INDEX_COUNT as shaders::Index;
+const INDEX_LEN: usize = CUBE2_INDEX_ONE_PAST_END as usize;
 
 const CYLINDER_VERTEX_START: shaders::Index = 0;
 const CYLINDER_VERTEX_ONE_PAST_END: shaders::Index = CYLINDER_VERTEX_START + math::geom::CYLINDER_POINT_COUNT as shaders::Index;
-const CUBE_VERTEX_START: shaders::Index = CYLINDER_VERTEX_ONE_PAST_END;
-const CUBE_VERTEX_ONE_PAST_END: shaders::Index = CUBE_VERTEX_START + math::geom::CUBE_POINT_COUNT as shaders::Index;
-const VERTEX_LEN: usize = CUBE_VERTEX_ONE_PAST_END as usize;
+const CUBE1_VERTEX_START: shaders::Index = CYLINDER_VERTEX_ONE_PAST_END;
+const CUBE1_VERTEX_ONE_PAST_END: shaders::Index = CUBE1_VERTEX_START + math::geom::CUBE_POINT_COUNT as shaders::Index;
+const CUBE2_VERTEX_START: shaders::Index = CUBE1_VERTEX_ONE_PAST_END;
+const CUBE2_VERTEX_ONE_PAST_END: shaders::Index = CUBE2_VERTEX_START + math::geom::CUBE_POINT_COUNT as shaders::Index;
+const VERTEX_LEN: usize = CUBE2_VERTEX_ONE_PAST_END as usize;
 
 struct IndexedMesh {
     pub vertices: [textured_lit::Vertex; VERTEX_LEN],
@@ -116,8 +120,8 @@ fn gen_mesh() -> IndexedMesh {
 
     let cube_mesh = math::geom::gen_cube_mesh(1./8.);
 
-    for i in CUBE_VERTEX_START..CUBE_VERTEX_ONE_PAST_END {
-        let read_i = (i - CUBE_VERTEX_START) as usize;
+    for i in CUBE1_VERTEX_START..CUBE1_VERTEX_ONE_PAST_END {
+        let read_i = (i - CUBE1_VERTEX_START) as usize;
         let point = cube_mesh.points[read_i];
         let normal = Vec3::from(cube_mesh.normals[read_i]);
 
@@ -134,10 +138,34 @@ fn gen_mesh() -> IndexedMesh {
         };
     }
 
-    for i in CUBE_INDEX_START..CUBE_INDEX_ONE_PAST_END {
+    for i in CUBE1_INDEX_START..CUBE1_INDEX_ONE_PAST_END {
         let i = i as usize;
-        indices[i] = cube_mesh.indices[i - CUBE_INDEX_START as usize]
-            + CUBE_VERTEX_START;
+        indices[i] = cube_mesh.indices[i - CUBE1_INDEX_START as usize]
+            + CUBE1_VERTEX_START;
+    }
+
+    for i in CUBE2_VERTEX_START..CUBE2_VERTEX_ONE_PAST_END {
+        let read_i = (i - CUBE2_VERTEX_START) as usize;
+        let point = cube_mesh.points[read_i];
+        let normal = Vec3::from(cube_mesh.normals[read_i]);
+
+        vertices[i as usize] = textured_lit::vertex!{
+            point.x,
+            point.y,
+            point.z,
+            normal.x,
+            normal.y,
+            normal.z,
+            0xFF0000B3,
+            0,
+            0,
+        };
+    }
+
+    for i in CUBE2_INDEX_START..CUBE2_INDEX_ONE_PAST_END {
+        let i = i as usize;
+        indices[i] = cube_mesh.indices[i - CUBE2_INDEX_START as usize]
+            + CUBE2_VERTEX_START;
     }
 
     IndexedMesh {
@@ -249,26 +277,8 @@ fn draw_model(state: &State, view_proj: Mat4) {
     // translation amounts.
     const T_K: f32 = 1./4.;
 
-    // Clock face
-    {
-        let model = Mat4::scale(vec3!(10., 10., 0.2));
-
-        textured_lit::apply_uniforms(
-            textured_lit::VSParams {
-                model,
-                mvp: view_proj * model,
-                diffuse_colour,
-            },
-            fs_params
-        );
-
-        unsafe {
-            sg::draw(CYLINDER_INDEX_START as Int, CYLINDER_INDEX_ONE_PAST_END as Int, 1);
-        }
-    }
-
-    macro_rules! cube {
-        ($model_matrix: expr) => {{
+    macro_rules! draw {
+        ($model_matrix: expr, $start_i: expr, $end_i: expr) => {{
             let model = $model_matrix;
 
             textured_lit::apply_uniforms(
@@ -281,9 +291,16 @@ fn draw_model(state: &State, view_proj: Mat4) {
             );
     
             unsafe {
-                sg::draw(CUBE_INDEX_START as Int, CUBE_INDEX_ONE_PAST_END as Int, 1);
+                sg::draw($start_i as Int, ($end_i - $start_i) as Int, 1);
             }
         }}
+    }
+
+    // Clock face
+    {
+        let model = Mat4::scale(vec3!(10., 10., 0.2));
+
+        draw!(model, CYLINDER_INDEX_START, CYLINDER_INDEX_ONE_PAST_END);
     }
 
     // Hour markers
@@ -295,7 +312,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
             Mat4::translate(vec3!(0., 4. * T_K, 0.25 * T_K)) *
             Mat4::scale(vec3!(0.5, 1., 0.1));
 
-        cube!(model)
+        draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
     }
 
     let minute_angle = -state.time * 1./32.;
@@ -307,7 +324,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
             Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
             Mat4::scale(vec3!(0.2, 4., 0.1));
 
-        cube!(model)
+        draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
     }
 
     // Minute hand
@@ -317,7 +334,18 @@ fn draw_model(state: &State, view_proj: Mat4) {
             Mat4::translate(vec3!(0., T_K, 0.35 * T_K)) *
             Mat4::scale(vec3!(0.3, 2.5, 0.1));
 
-        cube!(model)
+        draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
+    }
+
+    // Second hand
+    {
+        let model =
+            // Just do something distinct that is not too fast or too slow.
+            Mat4::rotation(Radians(minute_angle * -60.), vec3!(z)) *
+            Mat4::translate(vec3!(0., 1.25 * T_K, 0.45 * T_K)) *
+            Mat4::scale(vec3!(0.1, 5., 0.1));
+
+        draw!(model, CUBE2_INDEX_START, CUBE2_INDEX_ONE_PAST_END);
     }
 }
 
