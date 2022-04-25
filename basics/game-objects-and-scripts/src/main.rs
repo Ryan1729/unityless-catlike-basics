@@ -298,11 +298,23 @@ fn draw_model(state: &State, view_proj: Mat4) {
         cube!(model)
     }
 
+    let minute_angle = -state.time * 1./32.;
+
     // Hour hand
     {
         let model =
-            Mat4::rotation(Radians(-state.time), vec3!(z)) *
+            Mat4::rotation(Radians(minute_angle * 60.), vec3!(z)) *
             Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
+            Mat4::scale(vec3!(0.2, 4., 0.1));
+
+        cube!(model)
+    }
+
+    // Minute hand
+    {
+        let model =
+            Mat4::rotation(Radians(minute_angle), vec3!(z)) *
+            Mat4::translate(vec3!(0., T_K, 0.35 * T_K)) *
             Mat4::scale(vec3!(0.3, 2.5, 0.1));
 
         cube!(model)
