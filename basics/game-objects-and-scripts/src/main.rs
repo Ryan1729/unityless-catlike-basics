@@ -315,7 +315,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
         draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
     }
 
-    let minute_angle = -state.time * 1./32.;
+    let minute_angle = 0.;//-state.time * 1./32.;
 
     // Hour hand
     {
