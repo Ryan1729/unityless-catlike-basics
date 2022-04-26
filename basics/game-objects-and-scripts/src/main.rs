@@ -315,12 +315,30 @@ fn draw_model(state: &State, view_proj: Mat4) {
         draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
     }
 
-    let minute_angle = 0.;//-state.time * 1./32.;
+    // This project is not focused on displaying an accurate time. So let's
+    // just act naively and get something a very approximate time of day in
+    // UTC.
+
+    use std::time::SystemTime;
+
+    let (hour, minute, second) = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+        Ok(n) => {
+            let total_seconds = n.as_secs();
+
+            (
+                (total_seconds / (60 * 60)) % 12,
+                (total_seconds / 60) % 60,
+                total_seconds % 60,
+            )
+        },
+        // We don't really care about edges cases like this right now either.
+        Err(_) => (0, 0, 0),
+    };
 
     // Hour hand
     {
         let model =
-            Mat4::rotation(Radians(-TAU / 12.), vec3!(z)) *
+            Mat4::rotation(Radians(hour as f32 * -TAU / 12.), vec3!(z)) *
             Mat4::translate(vec3!(0., T_K, 0.35 * T_K)) *
             Mat4::scale(vec3!(0.3, 2.5, 0.1));
 
@@ -330,7 +348,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
     // Minute hand
     {
         let model =
-            Mat4::rotation(Radians(minute_angle), vec3!(z)) *
+            Mat4::rotation(Radians(minute as f32 * -TAU / 60.), vec3!(z)) *
             Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
             Mat4::scale(vec3!(0.2, 4., 0.1));
 
@@ -340,8 +358,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
     // Second hand
     {
         let model =
-            // Just do something distinct that is not too fast or too slow.
-            Mat4::rotation(Radians(minute_angle * -60.), vec3!(z)) *
+            Mat4::rotation(Radians(second as f32 * -TAU / 60.), vec3!(z)) *
             Mat4::translate(vec3!(0., 1.25 * T_K, 0.45 * T_K)) *
             Mat4::scale(vec3!(0.1, 5., 0.1));
 
