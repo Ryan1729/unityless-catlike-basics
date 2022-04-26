@@ -320,9 +320,9 @@ fn draw_model(state: &State, view_proj: Mat4) {
     // Hour hand
     {
         let model =
-            Mat4::rotation(Radians(minute_angle * 60.), vec3!(z)) *
-            Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
-            Mat4::scale(vec3!(0.2, 4., 0.1));
+            Mat4::rotation(Radians(-TAU / 12.), vec3!(z)) *
+            Mat4::translate(vec3!(0., T_K, 0.35 * T_K)) *
+            Mat4::scale(vec3!(0.3, 2.5, 0.1));
 
         draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
     }
@@ -331,8 +331,8 @@ fn draw_model(state: &State, view_proj: Mat4) {
     {
         let model =
             Mat4::rotation(Radians(minute_angle), vec3!(z)) *
-            Mat4::translate(vec3!(0., T_K, 0.35 * T_K)) *
-            Mat4::scale(vec3!(0.3, 2.5, 0.1));
+            Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
+            Mat4::scale(vec3!(0.2, 4., 0.1));
 
         draw!(model, CUBE1_INDEX_START, CUBE1_INDEX_ONE_PAST_END);
     }
