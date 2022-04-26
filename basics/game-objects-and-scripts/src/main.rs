@@ -289,7 +289,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
                 },
                 fs_params
             );
-    
+
             unsafe {
                 sg::draw($start_i as Int, ($end_i - $start_i) as Int, 1);
             }
@@ -322,23 +322,21 @@ fn draw_model(state: &State, view_proj: Mat4) {
     use std::time::SystemTime;
 
     let (hour, minute, second) = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
-        Ok(n) => {
-            let total_seconds = n.as_secs();
-
-            (
-                (total_seconds / (60 * 60)) % 12,
-                (total_seconds / 60) % 60,
-                total_seconds % 60,
-            )
-        },
+        // There's probably a better way to avoid f32 precision issues, but this
+        // works, at least right now.
+        Ok(n) => (
+            ((n / (60 * 60)).as_secs_f64() % 12.) as f32,
+            ((n / 60).as_secs_f64() % 60.) as f32,
+            (n.as_secs_f64() % 60.) as f32,
+        ),
         // We don't really care about edges cases like this right now either.
-        Err(_) => (0, 0, 0),
+        Err(_) => (0., 0., 0.),
     };
 
     // Hour hand
     {
         let model =
-            Mat4::rotation(Radians(hour as f32 * -TAU / 12.), vec3!(z)) *
+            Mat4::rotation(Radians(hour * -TAU / 12.), vec3!(z)) *
             Mat4::translate(vec3!(0., T_K, 0.35 * T_K)) *
             Mat4::scale(vec3!(0.3, 2.5, 0.1));
 
@@ -348,7 +346,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
     // Minute hand
     {
         let model =
-            Mat4::rotation(Radians(minute as f32 * -TAU / 60.), vec3!(z)) *
+            Mat4::rotation(Radians(minute * -TAU / 60.), vec3!(z)) *
             Mat4::translate(vec3!(0., 0.75 * T_K, 0.25 * T_K)) *
             Mat4::scale(vec3!(0.2, 4., 0.1));
 
@@ -358,7 +356,7 @@ fn draw_model(state: &State, view_proj: Mat4) {
     // Second hand
     {
         let model =
-            Mat4::rotation(Radians(second as f32 * -TAU / 60.), vec3!(z)) *
+            Mat4::rotation(Radians(second * -TAU / 60.), vec3!(z)) *
             Mat4::translate(vec3!(0., 1.25 * T_K, 0.45 * T_K)) *
             Mat4::scale(vec3!(0.1, 5., 0.1));
 
