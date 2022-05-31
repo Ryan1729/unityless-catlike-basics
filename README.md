@@ -1,5 +1,7 @@
 # Unityless Catlike Basics
 
+![screenshot](/screenshot.png?raw=true "image of a white clock with black hour markings, black hour and minute hands, and a red second hand. It shows a little after 3:00")
+
 I ran across [Catlike Coding's Unity tutorials](https://catlikecoding.com/unity/tutorials) and found them to be very well done. So I wanted to give following them a try. The one problem is I prefer to not spend my time building things on platforms that might go away, so I'm not particularly interested in learning Unity specifically. From my perspective, Unity seems to be in a more precarious position than building on Open Source software. (As of this writing, Unity has some C# code which is viewable for reference purposes only, so "source avaialble", but not Open Source.)
 
 So, instead of directly following the tutorials, I'm attempting to recreate the output without the Unity engine. I will likely be using some sort of other third party engine/libraries however. At this time I would prefer to write the bulk of the code in Rust, but I'm not promising anything in that regard.
